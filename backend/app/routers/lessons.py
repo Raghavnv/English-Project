@@ -1,0 +1,111 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from typing import Optional
+from app.database import get_db
+from app.models.models import Admin, Class, Lesson, Question
+from app.auth import get_current_admin
+
+router = APIRouter(prefix="/api/lessons", tags=["lessons"])
+
+
+class QuestionIn(BaseModel):
+    prompt: str
+    type: Optional[str] = "text"
+    order: Optional[int] = 0
+
+
+class LessonIn(BaseModel):
+    class_label: str
+    title: str
+    description: Optional[str] = ""
+    questions: Optional[list[QuestionIn]] = []
+
+
+def get_or_create_class(label: str, db: Session) -> Class:
+    cls = db.query(Class).filter(Class.label == label.strip()).first()
+    if not cls:
+        cls = Class(label=label.strip())
+        db.add(cls)
+        db.flush()
+    return cls
+
+
+def lesson_to_dict(lesson: Lesson) -> dict:
+    return {
+        "id":          lesson.id,
+        "class_id":    lesson.class_id,
+        "class_label": lesson.cls.label,
+        "title":       lesson.title,
+        "description": lesson.description,
+        "created_at":  lesson.created_at.isoformat() if lesson.created_at else None,
+        "questions": [
+            {"id": q.id, "prompt": q.prompt, "type": q.type, "order": q.order}
+            for q in lesson.questions
+        ]
+    }
+
+
+@router.get("/")
+def get_all_lessons(db: Session = Depends(get_db)):
+    lessons = db.query(Lesson).join(Lesson.cls).order_by(Class.label, Lesson.created_at).all()
+    return [lesson_to_dict(l) for l in lessons]
+
+
+@router.get("/classes")
+def get_classes(db: Session = Depends(get_db)):
+    classes = db.query(Class).order_by(Class.label).all()
+    return [
+        {"id": cls.id, "label": cls.label, "lessons": [lesson_to_dict(l) for l in cls.lessons]}
+        for cls in classes
+    ]
+
+
+@router.get("/{lesson_id}")
+def get_lesson(lesson_id: str, db: Session = Depends(get_db)):
+    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    return lesson_to_dict(lesson)
+
+
+@router.post("/", status_code=201)
+def create_lesson(
+    body: LessonIn,
+    db: Session = Depends(get_db),
+    current_admin: Admin = Depends(get_current_admin)
+):
+    cls = get_or_create_class(body.class_label, db)
+    lesson = Lesson(
+        class_id=cls.id,
+        admin_id=current_admin.id,
+        title=body.title.strip(),
+        description=body.description or ""
+    )
+    db.add(lesson)
+    db.flush()
+
+    for i, q in enumerate(body.questions):
+        db.add(Question(
+            lesson_id=lesson.id,
+            prompt=q.prompt.strip(),
+            type=q.type or "text",
+            order=q.order if q.order is not None else i
+        ))
+
+    db.commit()
+    db.refresh(lesson)
+    return lesson_to_dict(lesson)
+
+
+@router.delete("/{lesson_id}", status_code=204)
+def delete_lesson(
+    lesson_id: str,
+    db: Session = Depends(get_db),
+    current_admin: Admin = Depends(get_current_admin)
+):
+    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    db.delete(lesson)
+    db.commit()

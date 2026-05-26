@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EnglishBridge Bangalore</title>
+  <meta
+    name="description"
+    content="EnglishBridge Bangalore is an in-person English learning initiative for underserved children, supported by thoughtful AI practice."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,700&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="EnglishBridge Bangalore home">
+        <span class="brand-mark">
+          <img
+            class="brand-logo"
+            src="https://api.logo.com/api/v2/images?design=lg_hwt2cBy6LwvoVHvFsi&u=1777398156000&width=1200&height=1200&margins=200&fit=contain&format=webp&quality=60&tightBounds=true"
+            alt="EnglishBridge Bangalore logo"
+          >
+        </span>
+        <span class="brand-copy">
+          <strong>EnglishBridge</strong>
+          <span>Bangalore</span>
+        </span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-label="Open navigation">
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="site-nav evenly-spaced-nav" aria-label="Primary navigation">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="vision.html">Vision & Goals</a>
+        <a href="about.html">About Us</a>
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-toggle" type="button" aria-expanded="false">
+            Who We Are
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="founders.html">Founders</a>
+            <a href="contact.html">Contact Us</a>
+          </div>
+        </div>
+        <a href="welcome.html" class="nav-platform-link" aria-label="Enter the learning platform">
+          <span class="nav-platform-dot"></span>
+          Platform
+        </a>
+      </nav>
+
+      <style>
+        .site-nav { grid-template-columns: repeat(4, minmax(0,1fr)) auto; }
+        .nav-platform-link {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
+          padding: 10px 18px;
+          border-radius: 999px;
+          background: var(--text);
+          color: #fffaf2 !important;
+          font-weight: 700;
+          font-size: 0.9rem;
+          white-space: nowrap;
+          border: 1px solid rgba(255,255,255,0.08);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 4px 12px rgba(31,27,23,0.18);
+          transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+        .nav-platform-link:hover {
+          opacity: 0.88;
+          transform: translateY(-1px);
+          background: var(--text) !important;
+          border-color: transparent !important;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 6px 16px rgba(31,27,23,0.22) !important;
+        }
+        .nav-platform-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #a8c77a;
+          flex-shrink: 0;
+        }
+        @media (max-width: 980px) {
+          .site-nav { grid-template-columns: 1fr; }
+          .nav-platform-link { justify-content: flex-start; }
+        }
+      </style>
+    </header>
+
+    <main>
+      <section class="hero hero-home">
+        <div class="hero-copy">
+          <p class="eyebrow">EnglishBridge Bangalore</p>
+          <h1>English learning built on presence, trust, and real conversation</h1>
+          <p class="hero-text">
+            We are creating an in-person teaching initiative for underserved children in Bangalore, with human connection at the center and AI used carefully for assignments, revision, and extra practice.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="vision.html">See Our Vision</a>
+            <a class="button button-secondary" href="about.html">Read About Us</a>
+          </div>
+        </div>
+
+        <figure class="media-card media-hero">
+          <img
+            src="https://t4.ftcdn.net/jpg/04/89/48/41/240_F_489484108_gSmFITWfnLYfAljgausKu3DKxL51BAft.jpg"
+            alt="Indian school children sitting together in a classroom"
+          >
+          <figcaption>Learning begins where children feel seen and supported.</figcaption>
+        </figure>
+      </section>
+
+      <section class="section-grid">
+        <div class="section-intro">
+          <p class="eyebrow">What We Are Building</p>
+          <h2>A local education effort designed to feel warm, serious, and human.</h2>
+        </div>
+        <div class="section-body">
+          <p>
+            Our first commitment is simple: show up in person. We want classrooms where children are encouraged to speak, read, ask questions, and grow more comfortable with English through repeated interaction with people who care.
+          </p>
+          <p>
+            Technology has a role, but not the starring role. We see AI as a quiet layer that can help with assignments, prompts, pronunciation support, vocabulary review, and practice beyond classroom hours.
+          </p>
+        </div>
+      </section>
+
+      <section class="section-grid media-split">
+        <figure class="media-card">
+          <img
+            src="https://images.pexels.com/photos/18012462/pexels-photo-18012462.jpeg?cs=srgb&dl=pexels-swastikarora-18012462.jpg&fm=jpg"
+            alt="Indian children smiling in a classroom"
+          >
+          <figcaption>Confidence grows when learning feels participatory.</figcaption>
+        </figure>
+        <div class="feature-stack">
+          <article class="feature-card">
+            <p class="eyebrow">In Person First</p>
+            <h3>Conversation-led sessions</h3>
+            <p>We want spoken English to become less intimidating through group activities, listening, reading aloud, and everyday dialogue.</p>
+          </article>
+          <article class="feature-card">
+            <p class="eyebrow">AI as Support</p>
+            <h3>Practice beyond class</h3>
+            <p>Assignments can become more personal through vocabulary drills, reflection prompts, and adaptive follow-up built around each learner.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <p class="eyebrow">EnglishBridge Bangalore</p>
+        <h2>Human teaching first. AI where it truly helps.</h2>
+      </div>
+      <div class="footer-copy">
+        <p><a href="vision.html">Vision &amp; Goals</a></p>
+        <p><a href="founders.html">Founders</a></p>
+        <p><a href="contact.html">Contact Us</a></p>
+        <p style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,249,240,0.13);">
+          <a href="welcome.html" class="platform-entry-link">
+            <span class="platform-entry-icon">&#x2192;</span>
+            Enter Learning Platform
+          </a>
+        </p>
+      </div>
+    </footer>
+
+    <style>
+      .platform-entry-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0.62;
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        transition: opacity 0.22s ease, gap 0.22s ease;
+        border-bottom: none !important;
+      }
+      .platform-entry-link:hover { opacity: 1; gap: 12px; }
+      .platform-entry-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        background: rgba(255,249,240,0.14);
+        font-size: 0.78rem;
+        flex-shrink: 0;
+        transition: background 0.22s ease;
+      }
+      .platform-entry-link:hover .platform-entry-icon { background: rgba(255,249,240,0.28); }
+    </style>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

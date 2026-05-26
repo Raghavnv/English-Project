@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome | EnglishBridge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="platform.css">
+  <style>
+
+    .welcome-shell {
+      width: min(calc(100% - 32px), 1100px);
+      margin: 0 auto;
+      padding: 28px 0 60px;
+      display: grid;
+      gap: 20px;
+    }
+
+    /* ── HEADER ── */
+    .welcome-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      border-radius: 22px;
+      background: rgba(255, 248, 239, 0.82);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.68);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 16px;
+      z-index: 20;
+    }
+
+    /* ── HERO ── */
+    .welcome-hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .hero-left {
+      padding: 52px 48px;
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(255,251,246,0.97), rgba(249,240,227,0.92));
+      border: 1px solid rgba(255,255,255,0.72);
+      box-shadow: var(--shadow);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .hero-left::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(80,58,40,0.07);
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    .hero-left::after {
+      content: "";
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 20px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(188,93,45,0.5), rgba(111,124,74,0.08));
+      pointer-events: none;
+    }
+
+    .welcome-eyebrow {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+    }
+
+    .welcome-title {
+      font-family: "Newsreader", serif;
+      font-size: clamp(2.4rem, 4vw, 3.6rem);
+      line-height: 1.05;
+      color: var(--text);
+      max-width: 14ch;
+    }
+
+    .welcome-subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+      max-width: 50ch;
+    }
+
+    .hero-right {
+      display: grid;
+      gap: 20px;
+    }
+
+    .stat-card {
+      padding: 28px 30px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255,251,246,0.95), rgba(249,240,227,0.9));
+      border: 1px solid rgba(255,255,255,0.68);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .stat-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .stat-icon-orange { background: rgba(188,93,45,0.12); }
+    .stat-icon-green  { background: rgba(111,124,74,0.14); }
+    .stat-icon-warm   { background: rgba(188,93,45,0.08); }
+
+    .stat-text strong {
+      display: block;
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .stat-text span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    /* ── ABOUT STRIP ── */
+    .about-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .about-card {
+      padding: 26px 24px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255,251,246,0.95), rgba(249,240,227,0.9));
+      border: 1px solid rgba(255,255,255,0.68);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .about-card-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      margin-bottom: 10px;
+    }
+
+    .about-card h3 {
+      font-family: "Newsreader", serif;
+      font-size: 1.22rem;
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .about-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    /* ── PORTAL SECTION ── */
+    .portal-section {
+      display: grid;
+      gap: 14px;
+    }
+
+    .portal-section-head {
+      padding: 0 4px;
+    }
+
+    .portal-section-head p {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      margin-bottom: 6px;
+    }
+
+    .portal-section-head h2 {
+      font-family: "Newsreader", serif;
+      font-size: 1.7rem;
+      color: var(--text);
+    }
+
+    .portal-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .portal-card {
+      padding: 36px 32px;
+      border-radius: 26px;
+      background: linear-gradient(145deg, rgba(255,251,246,0.97), rgba(249,240,227,0.92));
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      text-align: left;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 28px 56px rgba(75,48,26,0.18);
+    }
+
+    .portal-card::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(80,58,40,0.07);
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    .portal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    .portal-badge-student {
+      background: rgba(111,124,74,0.14);
+      color: #3d5220;
+    }
+
+    .portal-badge-admin {
+      background: rgba(188,93,45,0.12);
+      color: var(--accent-deep);
+    }
+
+    .portal-card h3 {
+      font-family: "Newsreader", serif;
+      font-size: 1.8rem;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    .portal-card p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      max-width: 38ch;
+    }
+
+    .portal-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      min-height: 44px;
+      padding: 0 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: none;
+      cursor: pointer;
+      width: fit-content;
+      transition: transform 150ms ease, box-shadow 150ms ease;
+    }
+
+    .portal-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .portal-cta-student {
+      background: #3d5220;
+      color: #f5f9ee;
+    }
+
+    .portal-cta-admin {
+      background: var(--accent-deep);
+      color: #fffaf2;
+    }
+
+    .portal-deco {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      opacity: 0.07;
+    }
+
+    .portal-deco-student { background: #3d5220; }
+    .portal-deco-admin   { background: var(--accent-deep); }
+
+    /* ── FOOTER ── */
+    .welcome-footer {
+      padding: 24px 32px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(31,27,23,0.96), rgba(93,53,36,0.95));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .welcome-footer p {
+      color: rgba(255,249,240,0.7);
+      font-size: 0.88rem;
+    }
+
+    .welcome-footer strong {
+      color: #fffaf2;
+      font-size: 0.95rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 820px) {
+      .welcome-hero,
+      .portal-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .about-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-left {
+        padding: 36px 28px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .hero-left { padding: 28px 22px; }
+      .portal-card { padding: 28px 22px; }
+      .welcome-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="welcome-shell">
+
+  <!-- HEADER -->
+  <header class="welcome-header">
+    <div class="platform-brand">
+      <div class="platform-brand-mark" style="width:56px;height:56px;overflow:hidden;background:rgba(255,250,242,0.95);border:1px solid rgba(188,93,45,0.14);border-radius:16px;box-shadow:0 4px 12px rgba(124,53,26,0.12);padding:4px;flex-shrink:0;">
+        <img src="https://api.logo.com/api/v2/images?design=lg_hwt2cBy6LwvoVHvFsi&u=1777398156000&width=1200&height=1200&margins=200&fit=contain&format=webp&quality=60&tightBounds=true" alt="EnglishBridge logo" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+      <div class="platform-brand-copy">
+        <strong>EnglishBridge</strong>
+        <span>Bangalore</span>
+      </div>
+    </div>
+    <span style="font-size:0.85rem;color:var(--muted);font-weight:600;">Learning Platform</span>
+  </header>
+
+  <!-- HERO -->
+  <div class="welcome-hero">
+    <div class="hero-left">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:4px;">
+        <img src="https://api.logo.com/api/v2/images?design=lg_hwt2cBy6LwvoVHvFsi&u=1777398156000&width=1200&height=1200&margins=200&fit=contain&format=webp&quality=60&tightBounds=true" alt="EnglishBridge logo" style="width:72px;height:72px;object-fit:contain;border-radius:18px;background:rgba(255,250,242,0.9);border:1px solid rgba(188,93,45,0.14);padding:6px;box-shadow:0 6px 18px rgba(124,53,26,0.14);">
+        <p class="welcome-eyebrow" style="margin:0;">EnglishBridge Bangalore</p>
+      </div>
+      <h1 class="welcome-title">English learning built on trust and real practice.</h1>
+      <p class="welcome-subtitle">
+        A classroom-first platform for underserved children in Bangalore. Teachers lead, students practise, and progress is tracked — all in one place.
+      </p>
+    </div>
+
+    <div class="hero-right">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-orange">📚</div>
+        <div class="stat-text">
+          <strong>Lesson-based learning</strong>
+          <span>Admins create structured lessons with questions that students work through at their own pace.</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-green">📈</div>
+        <div class="stat-text">
+          <strong>Progress you can see</strong>
+          <span>Every answer saved, every lesson tracked. Students and teachers know exactly where they stand.</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-warm">🤝</div>
+        <div class="stat-text">
+          <strong>Human connection first</strong>
+          <span>Technology supports the teacher — it never replaces the relationship at the heart of learning.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT STRIP -->
+  <div class="about-strip">
+    <div class="about-card">
+      <p class="about-card-label">How it works</p>
+      <h3>Admins build the content</h3>
+      <p>Teachers and coordinators log in as admins to create classes, add lessons, and write the questions students will answer.</p>
+    </div>
+    <div class="about-card">
+      <p class="about-card-label">For students</p>
+      <h3>Students learn and track</h3>
+      <p>Students log in, pick their class, open a lesson, type their answers, and save progress. Everything is stored so they can resume anytime.</p>
+    </div>
+    <div class="about-card">
+      <p class="about-card-label">Our approach</p>
+      <h3>Simple, consistent, human</h3>
+      <p>No complicated setup. No algorithms making decisions. Just clear lessons, honest progress tracking, and a teacher who shows up.</p>
+    </div>
+  </div>
+
+  <!-- PORTAL SELECTION -->
+  <div class="portal-section">
+    <div class="portal-section-head">
+      <p>Get Started</p>
+      <h2>Who are you entering as?</h2>
+    </div>
+
+    <div class="portal-cards">
+
+      <!-- STUDENT -->
+      <div class="portal-card" onclick="window.location.href='login.html'">
+        <span class="portal-badge portal-badge-student">🎓 Student</span>
+        <h3>I'm here to learn</h3>
+        <p>Enter your name and school to access your class, open your lessons, and track your answers and progress.</p>
+        <button class="portal-cta portal-cta-student" onclick="window.location.href='login.html'">
+          Enter as Student →
+        </button>
+        <div class="portal-deco portal-deco-student"></div>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="portal-card" onclick="window.location.href='admin-login.html'">
+        <span class="portal-badge portal-badge-admin">🛠 Admin</span>
+        <h3>I'm here to teach</h3>
+        <p>Create and manage classes, write lessons with questions, and keep content updated for your students.</p>
+        <button class="portal-cta portal-cta-admin" onclick="window.location.href='admin-login.html'">
+          Enter as Admin →
+        </button>
+        <div class="portal-deco portal-deco-admin"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="welcome-footer">
+    <div>
+      <strong>EnglishBridge Bangalore</strong>
+      <p>Built for trust before scale.</p>
+    </div>
+    <p style="color:rgba(255,249,240,0.5);font-size:0.82rem;">In-person teaching · AI-supported practice</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

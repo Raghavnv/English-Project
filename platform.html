@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EnglishBridge Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  <meta name="description" content="EnglishBridge Platform helps students continue their English learning through class-based AI-supported practice and saved progress.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="platform.css">
+  <style>
+    /* ── STUDENT CHIP ── */
+    .student-chip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 6px 14px 6px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(80,58,40,0.12);
+      font-size: 0.86rem;
+    }
+    .student-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(188,93,45,0.18), rgba(111,124,74,0.22));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--accent-deep);
+      flex-shrink: 0;
+    }
+    .student-chip-info strong {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .student-chip-info span {
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+    .logout-btn {
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(188,93,45,0.2);
+      background: rgba(188,93,45,0.07);
+      color: var(--accent-deep);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .logout-btn:hover { background: rgba(188,93,45,0.14); }
+
+    /* ── WELCOME BANNER ── */
+    .welcome-banner {
+      padding: 22px 26px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(188,93,45,0.08), rgba(111,124,74,0.07));
+      border: 1px solid rgba(188,93,45,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .welcome-banner h2 {
+      font-family: "Newsreader", serif;
+      font-size: 1.3rem;
+      margin: 0 0 3px;
+    }
+    .welcome-banner p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin: 0;
+    }
+    .welcome-banner-stats {
+      display: flex;
+      gap: 20px;
+      flex-shrink: 0;
+    }
+    .welcome-banner-stats div {
+      text-align: center;
+    }
+    .welcome-banner-stats span {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .welcome-banner-stats strong {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent-deep);
+    }
+
+    /* ── AI PANEL WIRED ── */
+    .ai-thinking {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+    .ai-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: ai-pulse 1.2s ease-in-out infinite;
+    }
+    .ai-dot:nth-child(2) { animation-delay: 0.2s; }
+    .ai-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ai-pulse {
+      0%,100% { opacity: 0.25; transform: scale(0.8); }
+      50%      { opacity: 1;    transform: scale(1.1); }
+    }
+    .hint-revealed {
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(111,124,74,0.1);
+      border: 1px solid rgba(111,124,74,0.2);
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.65;
+      margin-top: 10px;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .platform-main { grid-template-columns: 1fr !important; }
+      .platform-sidebar { display: none; }
+      .platform-sidebar.mobile-open { display: flex; }
+      .mobile-sidebar-toggle {
+        display: inline-flex !important;
+      }
+      .welcome-banner-stats { display: none; }
+    }
+    .mobile-sidebar-toggle {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(80,58,40,0.14);
+      background: rgba(255,255,255,0.55);
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="platform-shell">
+    <header class="platform-header">
+      <div class="platform-brand">
+        <div class="platform-brand-mark" style="overflow:hidden;background:rgba(255,250,242,0.95);border:1px solid rgba(188,93,45,0.14);border-radius:14px;box-shadow:0 4px 12px rgba(124,53,26,0.12);padding:4px;">
+          <img src="https://api.logo.com/api/v2/images?design=lg_hwt2cBy6LwvoVHvFsi&u=1777398156000&width=1200&height=1200&margins=200&fit=contain&format=webp&quality=60&tightBounds=true" alt="EnglishBridge logo" style="width:100%;height:100%;object-fit:contain;display:block;">
+        </div>
+        <div class="platform-brand-copy">
+          <strong>EnglishBridge</strong>
+          <span>Learning Platform</span>
+        </div>
+      </div>
+
+      <div class="platform-header-actions">
+        <button class="mobile-sidebar-toggle" id="mobileSidebarToggle">☰ Classes</button>
+        <div class="student-chip" id="studentChip">
+          <div class="student-avatar" id="studentAvatar">?</div>
+          <div class="student-chip-info">
+            <strong id="studentChipName">—</strong>
+            <span id="studentChipSchool">—</span>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+      </div>
+    </header>
+
+    <main class="platform-main">
+      <aside class="platform-sidebar" id="platformSidebar">
+        <section class="sidebar-panel">
+          <p class="panel-label">Learner</p>
+          <h1 class="sidebar-title" id="sidebarWelcome">Welcome back!</h1>
+          <p class="sidebar-copy">
+            Choose the class you are attending below. The platform will show your lessons and saved progress.
+          </p>
+        </section>
+
+        <section class="sidebar-panel">
+          <div class="panel-head">
+            <p class="panel-label">Select Class</p>
+            <span class="pill" id="activeClassPill">—</span>
+          </div>
+          <div class="class-list" id="classList"></div>
+        </section>
+
+        <section class="sidebar-panel progress-panel">
+          <div class="panel-head">
+            <p class="panel-label">Overall Progress</p>
+            <span class="progress-percent" id="overallProgressValue">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="overallProgressFill"></div>
+          </div>
+          <div class="progress-grid" id="progressGrid"></div>
+        </section>
+      </aside>
+
+      <section class="platform-content">
+
+        <!-- WELCOME BANNER -->
+        <div class="welcome-banner" id="welcomeBanner" style="display:none;">
+          <div>
+            <h2 id="welcomeBannerTitle">Welcome back!</h2>
+            <p id="welcomeBannerSub">Pick up where you left off.</p>
+          </div>
+          <div class="welcome-banner-stats">
+            <div><span>Lessons</span><strong id="bannerLessonCount">0</strong></div>
+            <div><span>Done</span><strong id="bannerCompletedCount">0</strong></div>
+          </div>
+        </div>
+
+        <section class="hero-band">
+          <div>
+            <p class="panel-label">Current Class Plan</p>
+            <h2 id="classHeading">No class yet</h2>
+            <p id="classSummary">Your teacher hasn't added any classes yet. Check back soon.</p>
+          </div>
+          <div class="hero-band-stats">
+            <div><span>Lessons</span><strong id="lessonCount">0</strong></div>
+            <div><span>Completed</span><strong id="completedCount">0</strong></div>
+            <div><span>AI Practice</span><strong>Enabled</strong></div>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <div class="section-head">
+            <div>
+              <p class="panel-label">Lesson Flow</p>
+              <h3>Class modules</h3>
+            </div>
+            <button class="text-button" type="button" id="resetClassButton">Reset Class Progress</button>
+          </div>
+          <div class="module-grid" id="moduleGrid"></div>
+        </section>
+
+        <section class="workspace-grid">
+          <div class="workspace-panel lesson-panel">
+            <div class="section-head">
+              <div>
+                <p class="panel-label">Selected Lesson</p>
+                <h3 id="lessonTitle">Choose a lesson</h3>
+              </div>
+              <span class="status-badge" id="lessonStatus">Waiting</span>
+            </div>
+            <p class="lesson-description" id="lessonDescription">
+              Select a lesson above to view the learning goal and start practising.
+            </p>
+            <div class="question-stack" id="questionStack"></div>
+          </div>
+
+          <div class="workspace-panel ai-panel">
+            <div class="section-head">
+              <div>
+                <p class="panel-label">AI Guide</p>
+                <h3>Practice support</h3>
+              </div>
+              <span class="status-badge" id="aiStatus" style="font-size:0.75rem;">Ready</span>
+            </div>
+
+            <div class="ai-card">
+              <p class="ai-title">What you're working on</p>
+              <p class="ai-copy" id="aiLessonFocus">Select a lesson to see what skill you'll be practising.</p>
+            </div>
+
+            <div class="ai-card">
+              <p class="ai-title">Encouragement</p>
+              <p class="ai-copy" id="aiEncouragement">Good progress comes from small, repeated practice. Finish one lesson at a time.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="platform.js"></script>
+
+  <!-- RESET MODAL -->
+  <div class="modal-overlay" id="resetModal">
+    <div class="modal-box">
+      <p class="modal-title">Reset Class Progress?</p>
+      <p class="modal-body" id="resetModalBody">All progress for this class will be cleared. This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="resetModalCancel">Cancel</button>
+        <button class="modal-confirm" id="resetModalConfirm">Yes, Reset</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

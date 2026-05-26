@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | EnglishBridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Newsreader:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="platform.css">
+  <style>
+    .auth-shell {
+      width: min(calc(100% - 32px), 460px);
+      margin: 0 auto;
+      padding: 48px 0 60px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .auth-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .auth-card {
+      padding: 36px 32px;
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(255,251,246,0.97), rgba(249,240,227,0.93));
+      border: 1px solid rgba(255,255,255,0.72);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .auth-card::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(80,58,40,0.07);
+      border-radius: 20px;
+      pointer-events: none;
+    }
+
+    .auth-card h2 {
+      font-family: "Newsreader", serif;
+      font-size: 1.9rem;
+      margin-bottom: 6px;
+    }
+
+    .auth-subtitle {
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.6;
+      margin-bottom: 4px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      margin: 18px 0 4px;
+    }
+
+    .auth-btn {
+      width: 100%;
+      margin-top: 22px;
+      min-height: 50px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent-deep);
+      color: #fffaf2;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .auth-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .auth-toggle {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .auth-toggle button {
+      background: none;
+      border: none;
+      color: var(--accent-deep);
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0;
+    }
+
+    .auth-toggle button:hover {
+      text-decoration: underline;
+    }
+
+    .error-msg {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(188,93,45,0.1);
+      border: 1px solid rgba(188,93,45,0.2);
+      color: var(--accent-deep);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    .success-msg {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(111,124,74,0.1);
+      border: 1px solid rgba(111,124,74,0.2);
+      color: #3d5220;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .success-msg.show {
+      display: block;
+    }
+
+    .mode-tab {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .mode-tab-btn {
+      flex: 1;
+      min-height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(80,58,40,0.12);
+      background: rgba(255,255,255,0.5);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .mode-tab-btn.active {
+      background: var(--accent-deep);
+      color: #fffaf2;
+      border-color: transparent;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .back-link:hover { color: var(--text); }
+
+    input[type="password"] { letter-spacing: 0.06em; }
+  </style>
+</head>
+<body>
+
+<div class="auth-shell">
+
+  <div class="auth-brand">
+    <div class="platform-brand-mark" style="overflow:hidden;background:transparent;border:none;box-shadow:none;padding:2px;"><img src="https://api.logo.com/api/v2/images?design=lg_hwt2cBy6LwvoVHvFsi&u=1777398156000&width=1200&height=1200&margins=200&fit=contain&format=webp&quality=60&tightBounds=true" alt="EnglishBridge logo" style="width:100%;height:100%;object-fit:contain;"></div>
+    <div class="platform-brand-copy">
+      <strong>EnglishBridge</strong>
+      <span>Admin Portal</span>
+    </div>
+  </div>
+
+  <div class="auth-card">
+
+    <div class="mode-tab">
+      <button class="mode-tab-btn active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="mode-tab-btn" id="tabRegister" onclick="switchTab('register')">Create Account</button>
+    </div>
+
+    <!-- LOGIN MODE -->
+    <div id="loginForm">
+      <h2>Admin Sign In</h2>
+      <p class="auth-subtitle">Enter your admin credentials to access the dashboard.</p>
+
+      <label class="form-label" for="loginUser">Username</label>
+      <input id="loginUser" type="text" placeholder="Your admin username" autocomplete="username">
+
+      <label class="form-label" for="loginPass">Password</label>
+      <input id="loginPass" type="password" placeholder="Your password" autocomplete="current-password">
+
+      <div class="error-msg" id="loginError"></div>
+
+      <button class="auth-btn" onclick="doLogin()">Sign In →</button>
+    </div>
+
+    <!-- REGISTER MODE -->
+    <div id="registerForm" style="display:none;">
+      <h2>Create Admin Account</h2>
+      <p class="auth-subtitle">Set up a new admin account. You can create multiple accounts for different teachers.</p>
+
+      <label class="form-label" for="regUser">Username</label>
+      <input id="regUser" type="text" placeholder="Choose a username" autocomplete="username">
+
+      <label class="form-label" for="regPass">Password</label>
+      <input id="regPass" type="password" placeholder="Choose a password" autocomplete="new-password">
+
+      <label class="form-label" for="regPassConfirm">Confirm Password</label>
+      <input id="regPassConfirm" type="password" placeholder="Repeat your password" autocomplete="new-password">
+
+      <div class="error-msg" id="registerError"></div>
+      <div class="success-msg" id="registerSuccess"></div>
+
+      <button class="auth-btn" onclick="doRegister()">Create Account →</button>
+    </div>
+
+  </div>
+
+  <button class="back-link" onclick="window.location.href='welcome.html'">← Back to Welcome</button>
+
+</div>
+
+<script src="api.js"></script>
+<script>
+function switchTab(mode) {
+  const isLogin = mode === "login";
+  document.getElementById("loginForm").style.display    = isLogin ? "" : "none";
+  document.getElementById("registerForm").style.display = isLogin ? "none" : "";
+  document.getElementById("tabLogin").classList.toggle("active", isLogin);
+  document.getElementById("tabRegister").classList.toggle("active", !isLogin);
+  clearErrors();
+}
+
+function clearErrors() {
+  ["loginError","registerError","registerSuccess"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove("show"); el.textContent = ""; }
+  });
+}
+
+function showError(id, msg)   { const el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.add("show"); } }
+function showSuccess(id, msg) { const el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.add("show"); } }
+
+async function doLogin() {
+  const username = document.getElementById("loginUser").value.trim();
+  const password = document.getElementById("loginPass").value;
+  if (!username || !password) { showError("loginError", "Please enter your username and password."); return; }
+  const btn = document.querySelector("#loginForm .auth-btn");
+  if (btn) { btn.textContent = "Signing in…"; btn.disabled = true; }
+  try {
+    await Auth.login(username, password);
+    window.location.href = "admin.html";
+  } catch (err) {
+    showError("loginError", err.message || "Incorrect username or password.");
+    if (btn) { btn.textContent = "Sign In →"; btn.disabled = false; }
+  }
+}
+
+async function doRegister() {
+  const username = document.getElementById("regUser").value.trim();
+  const password = document.getElementById("regPass").value;
+  const confirm  = document.getElementById("regPassConfirm").value;
+  if (!username || !password) { showError("registerError", "Please fill in all fields."); return; }
+  if (username.length < 3)    { showError("registerError", "Username must be at least 3 characters."); return; }
+  if (password.length < 6)    { showError("registerError", "Password must be at least 6 characters."); return; }
+  if (password !== confirm)   { showError("registerError", "Passwords do not match."); return; }
+  const btn = document.querySelector("#registerForm .auth-btn");
+  if (btn) { btn.textContent = "Creating…"; btn.disabled = true; }
+  try {
+    await Auth.register(username, password);
+    document.getElementById("regUser").value = "";
+    document.getElementById("regPass").value = "";
+    document.getElementById("regPassConfirm").value = "";
+    showSuccess("registerSuccess", `✓ Account "${username}" created! You can now sign in.`);
+    if (btn) { btn.textContent = "Create Account →"; btn.disabled = false; }
+  } catch (err) {
+    showError("registerError", err.message || "Could not create account.");
+    if (btn) { btn.textContent = "Create Account →"; btn.disabled = false; }
+  }
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  const loginVisible = document.getElementById("loginForm").style.display !== "none";
+  if (loginVisible) doLogin(); else doRegister();
+});
+</script>
+</body>
+</html>

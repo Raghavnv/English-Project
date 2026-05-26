@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EnglishBridge Login</title>
+
+  <!-- SAME FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Newsreader:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="platform.css">
+</head>
+<body>
+
+<div class="platform-shell">
+
+  <!-- HEADER -->
+  <header class="platform-header">
+    <div class="platform-brand">
+      <div class="platform-brand-mark" style="overflow:hidden;background:transparent;border:none;box-shadow:none;padding:2px;"><img src="https://api.logo.com/api/v2/images?design=lg_hwt2cBy6LwvoVHvFsi&u=1777398156000&width=1200&height=1200&margins=200&fit=contain&format=webp&quality=60&tightBounds=true" alt="EnglishBridge logo" style="width:100%;height:100%;object-fit:contain;"></div>
+      <div class="platform-brand-copy">
+        <strong>EnglishBridge</strong>
+        <span>Student Access Portal</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- LOGIN PANEL -->
+  <main class="platform-main" style="grid-template-columns:1fr;">
+    <section class="workspace-panel login-container">
+
+      <h2>Welcome Back</h2>
+      <p class="sidebar-copy">Enter your details to continue your learning journey.</p>
+
+      <input id="name" placeholder="Your Name" autocomplete="name">
+      <input id="school" placeholder="Your School" autocomplete="organization">
+
+      <div id="errorMsg" style="display:none;margin-top:8px;padding:10px 14px;border-radius:12px;background:rgba(188,93,45,0.1);border:1px solid rgba(188,93,45,0.2);color:var(--accent-deep);font-size:0.88rem;font-weight:600;">
+        Please enter both your name and school.
+      </div>
+
+      <button class="primary-action" style="margin-top:14px;" onclick="login()">Enter Platform</button>
+      <button class="secondary-action" style="margin-top:8px;" onclick="goAdmin()">Admin Login</button>
+
+    </section>
+  </main>
+
+</div>
+
+<script src="api.js"></script>
+<script>
+async function login() {
+  const name   = document.getElementById("name").value.trim();
+  const school = document.getElementById("school").value.trim();
+  const errEl  = document.getElementById("errorMsg");
+
+  if (!name || !school) {
+    errEl.textContent = "Please enter both your name and school.";
+    errEl.style.display = "block";
+    return;
+  }
+  errEl.style.display = "none";
+
+  const btn = document.querySelector(".primary-action");
+  if (btn) { btn.textContent = "Signing in…"; btn.disabled = true; }
+
+  try {
+    await Students.login(name, school);
+    window.location.href = "platform.html";
+  } catch (err) {
+    errEl.textContent = "Could not connect to server. Make sure the backend is running.";
+    errEl.style.display = "block";
+    if (btn) { btn.textContent = "Enter Platform"; btn.disabled = false; }
+  }
+}
+function goAdmin() { window.location.href = "admin-login.html"; }
+document.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+</script>
+</body>
+</html>
