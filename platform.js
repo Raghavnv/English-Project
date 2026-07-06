@@ -123,15 +123,13 @@ function getModuleProgress(moduleId) {
   const p = allProgress[moduleId];
   if (!p) return { completed: false, answeredCount: 0, answers: {} };
   const answers = p.answers || {};
-  // Derive count from answers map if answered_count is missing or zero but answers exist
-  const derivedCount = Object.values(answers).filter(a => {
+  const derived = Object.values(answers).filter(a => {
     const text = typeof a === "string" ? a : a?.text;
     return text && text.trim().length > 0;
   }).length;
-  const answeredCount = p.answered_count > 0 ? p.answered_count : derivedCount;
   return {
     completed:     p.completed,
-    answeredCount,
+    answeredCount: p.answered_count > 0 ? p.answered_count : derived,
     answers
   };
 }
@@ -148,6 +146,7 @@ function renderWelcomeBanner() {
   const completed = selectedClass
     ? selectedClass.modules.filter(m => getModuleProgress(m.id).completed).length
     : 0;
+  if (!isAdminViewing && student) student.streak_days = student.streak_days || 0;
 
   const titleEl = document.getElementById("welcomeBannerTitle");
   const subEl   = document.getElementById("welcomeBannerSub");
@@ -217,6 +216,11 @@ function renderProgress() {
 
   if (lessonCountEl)     lessonCountEl.textContent     = total;
   if (completedCountEl)  completedCountEl.textContent  = completed;
+  const streakEl = document.getElementById("streakCount");
+  if (streakEl) {
+    const streak = student?.streak_days || 0;
+    streakEl.textContent = streak > 0 ? `🔥 ${streak}` : "0";
+  }
   if (progressValueEl)   progressValueEl.textContent   = percent + "%";
   if (progressFillEl)    progressFillEl.style.width    = percent + "%";
   if (activeClassPillEl) activeClassPillEl.textContent = selectedClass.label;
@@ -235,7 +239,14 @@ function renderModules() {
     return;
   }
 
-  selectedClass.modules.forEach(module => {
+  // Sort by order field
+  const sortedModules = [...selectedClass.modules].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  sortedModules.forEach((module, idx) => {
+    // A module is locked if it has locked:true AND the previous module is not completed
+    const prevModule   = idx > 0 ? sortedModules[idx - 1] : null;
+    const prevComplete = prevModule ? getModuleProgress(prevModule.id).completed : true;
+    const isActuallyLocked = module.locked && !prevComplete;
     const progress   = getModuleProgress(module.id);
     const total      = module.questions?.length ?? 0;
     const answered   = Math.min(progress.answeredCount || 0, total);
@@ -246,7 +257,7 @@ function renderModules() {
       : "No questions";
 
     const button = document.createElement("button");
-    button.className = "module-card" + (module.id === state.selectedModuleId ? " is-active" : "");
+    button.className = "module-card" + (module.id === state.selectedModuleId ? " is-active" : "") + (isActuallyLocked ? " is-locked" : "");
     button.innerHTML = `
       <div class="module-card-top">
         <span class="module-meta ${isComplete ? "module-meta-done" : ""}">${statusText}</span>
@@ -255,6 +266,7 @@ function renderModules() {
       <p>${module.description || ""}</p>
     `;
     button.onclick = () => {
+      if (isActuallyLocked) return;
       state.selectedModuleId = module.id;
       renderModules();
       renderLessonPanel(selectedClass, module);
@@ -267,8 +279,8 @@ function renderModules() {
 // ===== LESSON PANEL =====
 function renderLessonPanel(selectedClass, module) {
   const progress   = getModuleProgress(module.id);
-  const total      = module.questions?.length ?? 0;
-  const answered   = Math.min(progress.answeredCount || 0, total);
+  const total      = module.questions?.length || 0;
+  const answered   = progress.answeredCount || 0;
   const isComplete = progress.completed;
   const percent    = total > 0 ? Math.round((answered / total) * 100) : 0;
 
@@ -324,6 +336,8 @@ const encouragements = [
 
 function renderAIPanel(module) {
   const focusEl    = document.getElementById("aiLessonFocus");
+  const hintEl     = document.getElementById("aiHint");
+  const hintReveal = document.getElementById("hintReveal");
   const encEl      = document.getElementById("aiEncouragement");
   const statusEl   = document.getElementById("aiStatus");
 
@@ -332,6 +346,38 @@ function renderAIPanel(module) {
   if (focusEl) focusEl.textContent = module.description
     ? `This lesson covers: "${module.description}". Read each question carefully before answering.`
     : `You're working on "${module.title}". Take your time with each question.`;
+
+  if (hintReveal) hintReveal.innerHTML = "";
+  if (hintEl) hintEl.textContent = module.questions?.length > 0
+    ? "Click below to get an AI hint for the first question."
+    : "No questions in this lesson yet.";
+
+  const oldBtn = document.getElementById("hintButton");
+  if (oldBtn) {
+    const newBtn = oldBtn.cloneNode(true);
+    oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+    newBtn.disabled = !module.questions?.length;
+    newBtn.textContent = "Get a Hint";
+
+    newBtn.addEventListener("click", async () => {
+      newBtn.disabled = true;
+      newBtn.textContent = "Thinking…";
+      if (statusEl) statusEl.textContent = "Thinking…";
+      try {
+        const q = module.questions[0];
+        const res = await AI.getHint(q.id, module.title);
+        if (hintReveal) hintReveal.innerHTML = `
+          <div style="margin-top:10px;padding:12px 14px;border-radius:12px;background:rgba(111,124,74,0.1);border:1px solid rgba(111,124,74,0.2);font-size:0.9rem;line-height:1.65;">
+            💡 ${res.hint}
+          </div>`;
+        newBtn.textContent = "Hint shown ✓";
+        if (statusEl) statusEl.textContent = "Ready";
+      } catch {
+        newBtn.textContent = "Try Again";
+        newBtn.disabled = false;
+      }
+    });
+  }
 
   if (encEl) encEl.textContent = encouragements[Math.floor(Math.random() * encouragements.length)];
 }
@@ -356,24 +402,18 @@ resetModal?.addEventListener("click", (e) => { if (e.target === resetModal) clos
 resetModalConfirm?.addEventListener("click", async () => {
   const selectedClass = getSelectedClass();
   if (!selectedClass) { closeResetModal(); return; }
-
   const confirmBtn = document.getElementById("resetModalConfirm");
   if (confirmBtn) { confirmBtn.textContent = "Resetting…"; confirmBtn.disabled = true; }
-
   try {
     if (!isAdminViewing && student?.id) {
       const lessonIds = selectedClass.modules.map(m => m.id);
       await Students.resetProgress(student.id, lessonIds);
     }
-    // Clear local cache for this class
-    const selectedClass2 = getSelectedClass();
-    selectedClass2?.modules.forEach(m => { delete allProgress[m.id]; });
-  } catch (err) {
-    console.error("Reset failed:", err);
-  } finally {
+    selectedClass.modules.forEach(m => { delete allProgress[m.id]; });
+  } catch (err) { console.error("Reset failed:", err); }
+  finally {
     if (confirmBtn) { confirmBtn.textContent = "Yes, Reset"; confirmBtn.disabled = false; }
-    closeResetModal();
-    render();
+    closeResetModal(); render();
   }
 });
 
@@ -383,7 +423,6 @@ window.addEventListener("blur",  () => { didBlur = true; });
 window.addEventListener("focus", async () => {
   if (!didBlur) return;
   didBlur = false;
-  // Refresh progress from server so answered counts are always fresh
   if (!isAdminViewing && student?.id) {
     try { allProgress = await Students.getProgress(student.id); } catch {}
   }

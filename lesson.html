@@ -565,6 +565,32 @@
       color: #78350f;
     }
 
+    /* ── AI TEXT FORMATTING ── */
+    .buddy-bubble p, .feedback-area p { margin: 0 0 6px; line-height: 1.7; }
+    .buddy-bubble p:last-child, .feedback-area p:last-child { margin-bottom: 0; }
+
+    .buddy-bubble .ai-list, .feedback-area .ai-list,
+    .hint-bubble .ai-list {
+      margin: 6px 0 6px 4px;
+      padding-left: 16px;
+      list-style: none;
+    }
+    .buddy-bubble .ai-list li, .feedback-area .ai-list li,
+    .hint-bubble .ai-list li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 5px;
+      line-height: 1.65;
+    }
+    .buddy-bubble .ai-list li::before, .feedback-area .ai-list li::before,
+    .hint-bubble .ai-list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      font-weight: 700;
+      opacity: 0.6;
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       .lesson-main-grid { grid-template-columns: 1fr; }

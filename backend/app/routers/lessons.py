@@ -12,6 +12,7 @@ router = APIRouter(prefix="/api/lessons", tags=["lessons"])
 class QuestionIn(BaseModel):
     prompt: str
     type: Optional[str] = "text"
+    difficulty: Optional[str] = "medium"
     order: Optional[int] = 0
 
 
@@ -19,6 +20,8 @@ class LessonIn(BaseModel):
     class_label: str
     title: str
     description: Optional[str] = ""
+    order: Optional[int] = 0
+    locked: Optional[bool] = False
     questions: Optional[list[QuestionIn]] = []
 
 
@@ -39,8 +42,10 @@ def lesson_to_dict(lesson: Lesson) -> dict:
         "title":       lesson.title,
         "description": lesson.description,
         "created_at":  lesson.created_at.isoformat() if lesson.created_at else None,
+        "order":       lesson.order,
+        "locked":      lesson.locked,
         "questions": [
-            {"id": q.id, "prompt": q.prompt, "type": q.type, "order": q.order}
+            {"id": q.id, "prompt": q.prompt, "type": q.type, "difficulty": q.difficulty, "order": q.order}
             for q in lesson.questions
         ]
     }
@@ -80,7 +85,9 @@ def create_lesson(
         class_id=cls.id,
         admin_id=current_admin.id,
         title=body.title.strip(),
-        description=body.description or ""
+        description=body.description or "",
+        order=body.order or 0,
+        locked=body.locked or False
     )
     db.add(lesson)
     db.flush()
@@ -90,9 +97,33 @@ def create_lesson(
             lesson_id=lesson.id,
             prompt=q.prompt.strip(),
             type=q.type or "text",
+            difficulty=q.difficulty or "medium",
             order=q.order if q.order is not None else i
         ))
 
+    db.commit()
+    db.refresh(lesson)
+    return lesson_to_dict(lesson)
+
+
+class LessonUpdate(BaseModel):
+    locked: Optional[bool] = None
+    order:  Optional[int]  = None
+
+@router.patch("/{lesson_id}")
+def update_lesson(
+    lesson_id: str,
+    body: LessonUpdate,
+    db: Session = Depends(get_db),
+    current_admin: Admin = Depends(get_current_admin)
+):
+    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    if body.locked is not None:
+        lesson.locked = body.locked
+    if body.order is not None:
+        lesson.order = body.order
     db.commit()
     db.refresh(lesson)
     return lesson_to_dict(lesson)

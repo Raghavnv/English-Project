@@ -157,6 +157,27 @@
       font-weight: 700;
       cursor: pointer;
     }
+
+    .module-card.is-locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+      pointer-events: none;
+      position: relative;
+    }
+    .module-card.is-locked::after {
+      content: "🔒 Complete previous lessons first";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(255,251,246,0.7);
+      border-radius: inherit;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -238,6 +259,7 @@
           <div class="hero-band-stats">
             <div><span>Lessons</span><strong id="lessonCount">0</strong></div>
             <div><span>Completed</span><strong id="completedCount">0</strong></div>
+            <div><span>Streak</span><strong id="streakCount">🔥 0</strong></div>
             <div><span>AI Practice</span><strong>Enabled</strong></div>
           </div>
         </section>
@@ -280,6 +302,15 @@
             <div class="ai-card">
               <p class="ai-title">What you're working on</p>
               <p class="ai-copy" id="aiLessonFocus">Select a lesson to see what skill you'll be practising.</p>
+            </div>
+
+            <div class="ai-card">
+              <p class="ai-title">Hint</p>
+              <p class="ai-copy" id="aiHint">Select a lesson first, then ask for a hint.</p>
+              <div id="hintReveal"></div>
+              <button class="header-chip header-chip-strong full-width" type="button" id="hintButton" disabled>
+                Get a Hint
+              </button>
             </div>
 
             <div class="ai-card">

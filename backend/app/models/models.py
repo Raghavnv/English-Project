@@ -39,6 +39,9 @@ class Student(Base):
         __import__("sqlalchemy").UniqueConstraint("name", "school", name="uq_student_name_school"),
     )
 
+    streak_days  = Column(Integer, default=0)
+    last_active  = Column(DateTime(timezone=True), nullable=True)
+
     progress = relationship("Progress", back_populates="student", cascade="all, delete-orphan")
 
 
@@ -62,6 +65,8 @@ class Lesson(Base):
     admin_id    = Column(String, ForeignKey("admins.id", ondelete="CASCADE"), nullable=False)
     title       = Column(String(200), nullable=False)
     description = Column(Text, default="")
+    order       = Column(Integer, default=0)
+    locked      = Column(Boolean, default=False)
     created_at  = Column(DateTime(timezone=True), server_default=func.now())
 
     cls        = relationship("Class", back_populates="lessons")
@@ -78,8 +83,9 @@ class Question(Base):
     id        = Column(String, primary_key=True, default=new_uuid)
     lesson_id = Column(String, ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False)
     prompt    = Column(Text, nullable=False)
-    type      = Column(String(20), default="text")   # "text" or "speech"
-    order     = Column(Integer, default=0)
+    type       = Column(String(20), default="text")   # "text" or "speech"
+    difficulty = Column(String(10), default="medium")  # "easy", "medium", "hard"
+    order      = Column(Integer, default=0)
 
     lesson  = relationship("Lesson", back_populates="questions")
     answers = relationship("Answer", back_populates="question", cascade="all, delete-orphan")
@@ -114,6 +120,7 @@ class Answer(Base):
     question_id = Column(String, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False)
     text        = Column(Text, default="")
     ai_feedback = Column(Text, default="")    # cached AI feedback
+    ai_score    = Column(Integer, default=0)    # 1-5 score from AI
     updated_at  = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
     progress  = relationship("Progress", back_populates="answers")

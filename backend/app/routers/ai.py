@@ -64,16 +64,38 @@ def get_feedback(body: FeedbackRequest, db: Session = Depends(get_db)):
     if not body.answer_text.strip():
         return {"feedback": "Please write something first — even one sentence is a great start! 😊"}
 
+    difficulty = question.difficulty or "medium"
+    diff_guide = {
+        "easy":   "This is an easy question — be strict but still kind. If there are grammar errors, point them out clearly.",
+        "medium": "This is a medium difficulty question — be balanced. Mention one grammar issue if present.",
+        "hard":   "This is a hard question — be very encouraging. Only mention a grammar issue if it really affects meaning."
+    }.get(difficulty, "")
+
     prompt = f"""The student was asked: "{question.prompt}"
 Their answer was: "{body.answer_text}"
+Difficulty level: {difficulty}. {diff_guide}
 
-Give them short, kind feedback. Check:
-1. Does it answer the question?
-2. Any obvious grammar issue (mention at most one)
-3. End with encouragement. 2 sentences maximum."""
+Respond ONLY with a JSON object, no other text:
+{{"score": <integer 1-5>, "feedback": "<2-3 sentence feedback>"}}
+
+Score guide: 5=excellent, 4=good, 3=okay, 2=needs work, 1=try again.
+Feedback must be warm, simple English for a school child in India. Always acknowledge effort first."""
 
     try:
-        feedback_text = ask_groq(prompt, max_tokens=120)
+        raw = ask_groq(prompt, max_tokens=180)
+        import json, re
+        try:
+            parsed   = json.loads(raw)
+            score    = int(parsed.get("score", 3))
+            feedback_text = parsed.get("feedback", raw)
+        except Exception:
+            # fallback: extract score with regex if JSON parse fails
+            m = re.search(r'"score"\s*:\s*(\d)', raw)
+            score = int(m.group(1)) if m else 3
+            fm = re.search(r'"feedback"\s*:\s*"(.+?)"', raw, re.S)
+            feedback_text = fm.group(1) if fm else raw
+
+        score = max(1, min(5, score))
 
         if body.progress_id:
             answer_row = db.query(Answer).filter(
@@ -82,9 +104,10 @@ Give them short, kind feedback. Check:
             ).first()
             if answer_row:
                 answer_row.ai_feedback = feedback_text
+                answer_row.ai_score    = score
                 db.commit()
 
-        return {"feedback": feedback_text}
+        return {"feedback": feedback_text, "score": score}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
@@ -137,30 +160,9 @@ class GenerateQuestionsRequest(BaseModel):
     lesson_description: Optional[str] = ""
     class_label: Optional[str] = ""
     count: Optional[int] = 5
-    question_type: Optional[str] = "text"  # "text", "speech", or "mix"
 
 @router.post("/generate-questions")
 def generate_questions(body: GenerateQuestionsRequest):
-    qtype = (body.question_type or "text").lower()
-
-    if qtype == "speech":
-        type_instructions = """- All questions must be SPEECH questions: open-ended prompts that encourage the student to SPEAK aloud
-- Questions should ask students to describe, tell a story, share an opinion, or explain something verbally
-- Use prompts like "Tell me about...", "Describe...", "What do you think about...", "Can you explain..."
-- Output ONLY the questions, one per line, no labels, no preamble"""
-    elif qtype == "mix":
-        type_instructions = """- Generate a MIX of text and speech questions
-- For TEXT questions, prefix the line with "TEXT: "
-- For SPEECH questions, prefix the line with "SPEECH: "
-- Speech questions should be open-ended verbal prompts (describe, tell, explain, share opinion)
-- Text questions should ask students to write sentences, fill in the blank, or give short written answers
-- Alternate between types, roughly half and half
-- Output ONLY the prefixed questions, one per line, no preamble"""
-    else:
-        type_instructions = """- All questions must be TEXT questions: ask students to write sentences, give written answers, or complete writing tasks
-- Mix styles: describe, explain, write a sentence using a word, share written opinions
-- Output ONLY the questions, one per line, no labels, no preamble"""
-
     prompt = f"""You are creating English lesson questions for school children in Bangalore, India.
 
 Lesson Title: "{body.lesson_title}"
@@ -168,11 +170,12 @@ Class / Level: "{body.class_label or 'General'}"
 Description: "{body.lesson_description or 'No description provided'}"
 
 Generate exactly {body.count} questions for this lesson. Rules:
-- Questions should be age-appropriate and encourage English practice
+- Questions should be age-appropriate and encourage English writing or speaking practice
+- Mix different types: some asking students to describe, explain, write sentences, or share opinions
 - Simple, clear language that Indian school children can understand
 - Each question should be 1-2 sentences only
-{type_instructions}
-- No numbers, no bullets, no dashes unless prefixing with TEXT: or SPEECH:"""
+- Output ONLY the questions, one per line, nothing else
+- No numbers, no bullets, no dashes, no preamble, no explanation"""
 
     try:
         raw = ask_groq(prompt, max_tokens=400, system="You are a helpful assistant that outputs only the requested content, nothing else.")
@@ -255,7 +258,6 @@ class RelearnRequest(BaseModel):
 
 @router.post("/relearn")
 def get_relearn_content(body: RelearnRequest, db: Session = Depends(get_db)):
-    """Generate a comprehensive, student-friendly lesson recap powered by AI."""
     from app.models.models import Lesson, Question as QuestionModel
     lesson_questions = db.query(QuestionModel).filter(
         QuestionModel.lesson_id == body.lesson_id
@@ -270,24 +272,54 @@ def get_relearn_content(body: RelearnRequest, db: Session = Depends(get_db)):
 Description: "{body.lesson_description or 'No description provided'}"
 {questions_context}
 
-Create a friendly, engaging lesson recap for a school child in Bangalore. Structure it as:
-1. A brief "What you'll learn" intro (1-2 sentences)
-2. "Key Concepts" - 3-4 bullet points of the main ideas, each explained simply
-3. "Helpful Examples" - 2-3 concrete examples or sample sentences
-4. "Quick Tips" - 2-3 short tips to help answer the lesson questions well
-
-Use simple English. Be warm and encouraging. Format with clear sections using these exact headers:
+Create a friendly lesson recap for a school child in Bangalore. Use EXACTLY these section headers:
 WHAT YOU WILL LEARN
 KEY CONCEPTS
 HELPFUL EXAMPLES
-QUICK TIPS"""
+QUICK TIPS
+
+Each section: 2-4 bullet points. Simple English. Be warm and encouraging."""
 
     try:
-        content = ask_groq(
-            prompt,
-            max_tokens=600,
-            system="You are a warm, engaging English teacher for school children in India. Format your response clearly with the exact section headers provided. Use simple language and be encouraging."
-        )
+        content = ask_groq(prompt, max_tokens=600,
+            system="You are a warm English teacher for school children in India. Use the exact section headers provided. Simple language, be encouraging.")
         return {"content": content}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+
+
+# ── GENERATE QUESTIONS WITH TYPE ─────────────────────────────────────────────
+
+class GenerateQuestionsRequest(BaseModel):
+    lesson_title: str
+    lesson_description: Optional[str] = ""
+    class_label: Optional[str] = ""
+    count: Optional[int] = 5
+    question_type: Optional[str] = "text"
+
+@router.post("/generate-questions")
+def generate_questions(body: GenerateQuestionsRequest):
+    qtype = (body.question_type or "text").lower()
+    if qtype == "speech":
+        type_instr = "All questions must be open-ended SPEECH prompts (describe, tell, explain, share opinion). Prefix each line with 'SPEECH: '"
+    elif qtype == "mix":
+        type_instr = "Generate a mix. Prefix TEXT questions with 'TEXT: ' and SPEECH questions with 'SPEECH: '. Alternate roughly half and half."
+    else:
+        type_instr = "All questions must be TEXT questions asking students to write sentences or short answers. No prefix needed."
+
+    prompt = f"""Lesson: "{body.lesson_title}" | Level: "{body.class_label or 'General'}" | Description: "{body.lesson_description or ''}"
+Generate exactly {body.count} English practice questions for school children in Bangalore.
+{type_instr}
+Rules: age-appropriate, simple clear English, 1-2 sentences each, no numbers or bullets."""
+
+    try:
+        raw = ask_groq(prompt, max_tokens=400,
+            system="Output only the requested questions, nothing else.")
+        questions = [
+            line.strip().lstrip("-•*0123456789.) ")
+            for line in raw.split("\n")
+            if line.strip() and len(line.strip()) > 10
+        ][:body.count]
+        return {"questions": questions}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")

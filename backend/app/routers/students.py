@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime, timezone, timedelta
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
@@ -56,7 +57,7 @@ def get_student_progress(student_id: str, db: Session = Depends(get_db)):
     for p in student.progress:
         answers_map = {}
         for a in p.answers:
-            answers_map[a.question_id] = {"text": a.text, "ai_feedback": a.ai_feedback}
+            answers_map[a.question_id] = {"text": a.text, "ai_feedback": a.ai_feedback, "ai_score": a.ai_score or 0}
         result[p.lesson_id] = {
             "completed":      p.completed,
             "answered_count": p.answered_count,
@@ -103,13 +104,31 @@ def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get
 
     progress.answered_count = answered_count
     progress.completed = (answered_count >= total_questions and total_questions > 0)
+
+    # ── UPDATE STREAK ──
+    now = datetime.now(timezone.utc)
+    last = student.last_active
+    if last is None:
+        student.streak_days = 1
+    else:
+        last_naive = last.replace(tzinfo=None) if last.tzinfo else last
+        now_naive  = now.replace(tzinfo=None)
+        delta = (now_naive.date() - last_naive.date()).days
+        if delta == 0:
+            pass  # same day, no change
+        elif delta == 1:
+            student.streak_days = (student.streak_days or 0) + 1
+        else:
+            student.streak_days = 1  # streak broken
+    student.last_active = now
     db.commit()
 
     return {
         "lesson_id":      body.lesson_id,
         "answered_count": answered_count,
         "total":          total_questions,
-        "completed":      progress.completed
+        "completed":      progress.completed,
+        "streak_days":    student.streak_days or 0
     }
 
 
@@ -123,7 +142,8 @@ def list_students(db: Session = Depends(get_db), current_admin=Depends(get_curre
             "school":              s.school,
             "registered_at":       s.created_at.isoformat() if s.created_at else None,
             "lessons_total":       len(s.progress),
-            "lessons_completed":   sum(1 for p in s.progress if p.completed)
+            "lessons_completed":   sum(1 for p in s.progress if p.completed),
+            "streak_days":         s.streak_days or 0
         }
         for s in students
     ]
@@ -159,5 +179,24 @@ def reset_all_progress(student_id: str, class_lesson_ids: list[str] | None = Non
     if class_lesson_ids:
         q = q.filter(Progress.lesson_id.in_(class_lesson_ids))
     q.delete(synchronize_session=False)
+    db.commit()
+    return {"reset": True}
+
+
+@router.delete("/{student_id}/progress/{lesson_id}")
+def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends(get_db)):
+    progress = db.query(Progress).filter(
+        Progress.student_id == student_id,
+        Progress.lesson_id == lesson_id
+    ).first()
+    if progress:
+        db.delete(progress)
+        db.commit()
+    return {"reset": True, "lesson_id": lesson_id}
+
+
+@router.delete("/{student_id}/progress")
+def reset_all_progress(student_id: str, db: Session = Depends(get_db)):
+    db.query(Progress).filter(Progress.student_id == student_id).delete()
     db.commit()
     return {"reset": True}
