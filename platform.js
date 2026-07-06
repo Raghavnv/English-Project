@@ -122,10 +122,17 @@ function getSelectedClass() { return classes.find(c => c.id === state.selectedCl
 function getModuleProgress(moduleId) {
   const p = allProgress[moduleId];
   if (!p) return { completed: false, answeredCount: 0, answers: {} };
+  const answers = p.answers || {};
+  // Derive count from answers map if answered_count is missing or zero but answers exist
+  const derivedCount = Object.values(answers).filter(a => {
+    const text = typeof a === "string" ? a : a?.text;
+    return text && text.trim().length > 0;
+  }).length;
+  const answeredCount = p.answered_count > 0 ? p.answered_count : derivedCount;
   return {
     completed:     p.completed,
-    answeredCount: p.answered_count || 0,
-    answers:       p.answers || {}
+    answeredCount,
+    answers
   };
 }
 
@@ -230,8 +237,8 @@ function renderModules() {
 
   selectedClass.modules.forEach(module => {
     const progress   = getModuleProgress(module.id);
-    const total      = module.questions?.length || 0;
-    const answered   = progress.answeredCount || 0;
+    const total      = module.questions?.length ?? 0;
+    const answered   = Math.min(progress.answeredCount || 0, total);
     const isComplete = progress.completed;
 
     const statusText = isComplete ? "✓ Completed"
@@ -260,8 +267,8 @@ function renderModules() {
 // ===== LESSON PANEL =====
 function renderLessonPanel(selectedClass, module) {
   const progress   = getModuleProgress(module.id);
-  const total      = module.questions?.length || 0;
-  const answered   = progress.answeredCount || 0;
+  const total      = module.questions?.length ?? 0;
+  const answered   = Math.min(progress.answeredCount || 0, total);
   const isComplete = progress.completed;
   const percent    = total > 0 ? Math.round((answered / total) * 100) : 0;
 
@@ -346,17 +353,42 @@ function closeResetModal() { resetModal.classList.remove("is-open"); }
 document.getElementById("resetClassButton")?.addEventListener("click", openResetModal);
 resetModalCancel?.addEventListener("click", closeResetModal);
 resetModal?.addEventListener("click", (e) => { if (e.target === resetModal) closeResetModal(); });
-resetModalConfirm?.addEventListener("click", () => {
-  // Progress reset is per-student on the server — for now clear local cache and reload
-  allProgress = {};
-  closeResetModal();
-  render();
+resetModalConfirm?.addEventListener("click", async () => {
+  const selectedClass = getSelectedClass();
+  if (!selectedClass) { closeResetModal(); return; }
+
+  const confirmBtn = document.getElementById("resetModalConfirm");
+  if (confirmBtn) { confirmBtn.textContent = "Resetting…"; confirmBtn.disabled = true; }
+
+  try {
+    if (!isAdminViewing && student?.id) {
+      const lessonIds = selectedClass.modules.map(m => m.id);
+      await Students.resetProgress(student.id, lessonIds);
+    }
+    // Clear local cache for this class
+    const selectedClass2 = getSelectedClass();
+    selectedClass2?.modules.forEach(m => { delete allProgress[m.id]; });
+  } catch (err) {
+    console.error("Reset failed:", err);
+  } finally {
+    if (confirmBtn) { confirmBtn.textContent = "Yes, Reset"; confirmBtn.disabled = false; }
+    closeResetModal();
+    render();
+  }
 });
 
 // ===== RELOAD ON RETURN =====
 let didBlur = false;
 window.addEventListener("blur",  () => { didBlur = true; });
-window.addEventListener("focus", () => { if (didBlur) { didBlur = false; loadData(); } });
+window.addEventListener("focus", async () => {
+  if (!didBlur) return;
+  didBlur = false;
+  // Refresh progress from server so answered counts are always fresh
+  if (!isAdminViewing && student?.id) {
+    try { allProgress = await Students.getProgress(student.id); } catch {}
+  }
+  render();
+});
 
 // ===== MAIN RENDER =====
 function render() {

@@ -118,6 +118,14 @@ const Students = {
     });
   },
 
+  async resetProgress(studentId, lessonIds = []) {
+    // lessonIds: array of lesson IDs to reset (all lessons in a class)
+    return apiFetch(`/api/students/${studentId}/progress`, {
+      method: "DELETE",
+      body: JSON.stringify(lessonIds)
+    });
+  },
+
   // Admin only
   async list() {
     return apiFetch("/api/students/");

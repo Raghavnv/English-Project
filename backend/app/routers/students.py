@@ -137,3 +137,27 @@ def delete_student(student_id: str, db: Session = Depends(get_db), current_admin
     db.delete(student)
     db.commit()
     return {"message": "Student deleted"}
+
+
+@router.delete("/{student_id}/progress/{lesson_id}")
+def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends(get_db)):
+    """Reset a student's progress for a specific lesson."""
+    progress = db.query(Progress).filter(
+        Progress.student_id == student_id,
+        Progress.lesson_id == lesson_id
+    ).first()
+    if progress:
+        db.delete(progress)
+        db.commit()
+    return {"reset": True, "lesson_id": lesson_id}
+
+
+@router.delete("/{student_id}/progress")
+def reset_all_progress(student_id: str, class_lesson_ids: list[str] | None = None, db: Session = Depends(get_db)):
+    """Reset all progress for a student (optionally scoped to specific lesson IDs)."""
+    q = db.query(Progress).filter(Progress.student_id == student_id)
+    if class_lesson_ids:
+        q = q.filter(Progress.lesson_id.in_(class_lesson_ids))
+    q.delete(synchronize_session=False)
+    db.commit()
+    return {"reset": True}
