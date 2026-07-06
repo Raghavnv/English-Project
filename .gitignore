@@ -1,2 +1,15 @@
 .env
 .env.example
+
+# Python cache/bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Database files (local dev data, shouldn't be in git)
+*.db
+*.sqlite3
+
+# OS junk
+.DS_Store
+Thumbs.db
