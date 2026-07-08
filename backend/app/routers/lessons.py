@@ -77,13 +77,21 @@ def get_lesson(lesson_id: str, db: Session = Depends(get_db)):
 @router.post("/", status_code=201)
 def create_lesson(
     body: LessonIn,
-    db: Session = Depends(get_db),
-    current_admin: Admin = Depends(get_current_admin)
+    db: Session = Depends(get_db)
+    # DEMO: get_current_admin removed — RESTORE before going live
 ):
+    # DEMO: auto-use (or create) a placeholder admin since auth is disabled
+    demo_admin = db.query(Admin).first()
+    if not demo_admin:
+        from app.auth import hash_password
+        demo_admin = Admin(username="demo", password_hash=hash_password("demo-only-temp"))
+        db.add(demo_admin)
+        db.flush()
+
     cls = get_or_create_class(body.class_label, db)
     lesson = Lesson(
         class_id=cls.id,
-        admin_id=current_admin.id,
+        admin_id=demo_admin.id,
         title=body.title.strip(),
         description=body.description or "",
         order=body.order or 0,
@@ -114,8 +122,8 @@ class LessonUpdate(BaseModel):
 def update_lesson(
     lesson_id: str,
     body: LessonUpdate,
-    db: Session = Depends(get_db),
-    current_admin: Admin = Depends(get_current_admin)
+    db: Session = Depends(get_db)
+    # DEMO: get_current_admin removed — RESTORE before going live
 ):
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
@@ -132,8 +140,8 @@ def update_lesson(
 @router.delete("/{lesson_id}", status_code=204)
 def delete_lesson(
     lesson_id: str,
-    db: Session = Depends(get_db),
-    current_admin: Admin = Depends(get_current_admin)
+    db: Session = Depends(get_db)
+    # DEMO: get_current_admin removed — RESTORE before going live
 ):
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:

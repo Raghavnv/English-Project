@@ -133,7 +133,7 @@ def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get
 
 
 @router.get("/")
-def list_students(db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):
+def list_students(db: Session = Depends(get_db)):  # DEMO: get_current_admin removed — RESTORE before going live
     students = db.query(Student).order_by(Student.name).all()
     return [
         {
@@ -150,7 +150,7 @@ def list_students(db: Session = Depends(get_db), current_admin=Depends(get_curre
 
 
 @router.delete("/{student_id}")
-def delete_student(student_id: str, db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):
+def delete_student(student_id: str, db: Session = Depends(get_db)):  # DEMO: get_current_admin removed — RESTORE before going live
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")

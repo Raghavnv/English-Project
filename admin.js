@@ -1,7 +1,7 @@
-// ===== AUTH CHECK =====
-if (!Auth.isLoggedIn()) {
-  window.location.href = "admin-login.html";
-}
+// ===== AUTH CHECK (DISABLED FOR DEMO — RESTORE BEFORE GOING LIVE) =====
+// if (!Auth.isLoggedIn()) {
+//   window.location.href = "admin-login.html";
+// }
 const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
 const adminWelcomeEl = document.getElementById("adminWelcome");
 if (adminWelcomeEl) adminWelcomeEl.textContent = "Welcome, " + (adminSession.username || "Admin");

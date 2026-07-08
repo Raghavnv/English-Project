@@ -1,13 +1,13 @@
-// ===== LOGIN CHECK =====
+// ===== LOGIN CHECK (DISABLED FOR DEMO — RESTORE BEFORE GOING LIVE) =====
 const student      = getStudentData();
 const adminSession = JSON.parse(localStorage.getItem("adminSession") || "null");
 
-if (!student && !adminSession) {
-  window.location.href = "login.html";
-}
+// if (!student && !adminSession) {
+//   window.location.href = "login.html";
+// }
 
 const isAdminViewing = !student && !!adminSession;
-const activeUser     = student || { name: adminSession?.username || "Admin", school: "Admin View" };
+const activeUser     = student || { name: adminSession?.username || "Guest", school: "Demo View" };
 
 // ===== LOGOUT =====
 function doLogout() {
