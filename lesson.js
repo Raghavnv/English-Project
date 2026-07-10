@@ -235,13 +235,16 @@ function renderQuestions(lesson, savedProgress) {
 
       try {
         const res     = await AI.getFeedback(qid, answerText, progressId);
-        const isGood  = /good|great|well|correct|nice|excel|perfect|spot.on/i.test(res.feedback);
+        const score   = typeof res.score === "number" ? res.score : null;
+        const isGood  = score !== null ? score >= 3 : /good|great|well|correct|nice|excel|perfect|spot.on/i.test(res.feedback);
+        const badge   = score !== null ? (isGood ? "✅ Correct" : "❌ Needs Work") : (isGood ? "✅" : "💬");
         feedbackEl.innerHTML = `
           <div style="padding:11px 14px;border-radius:12px;font-size:0.88rem;line-height:1.65;
             background:${isGood ? "rgba(111,124,74,0.1)" : "rgba(188,93,45,0.07)"};
             border:1px solid ${isGood ? "rgba(111,124,74,0.22)" : "rgba(188,93,45,0.18)"};
             color:${isGood ? "#3a5018" : "var(--accent-deep)"};">
-            ${isGood ? "✅" : "💬"} ${formatAIText(res.feedback)}
+            <strong>${badge}</strong>${score !== null ? ` · Score ${score}/5` : ""}<br>
+            ${formatAIText(res.feedback)}
           </div>`;
       } catch (err) {
         feedbackEl.innerHTML = `<span style="color:var(--muted);font-size:0.85rem;">Could not get feedback: ${err.message}</span>`;

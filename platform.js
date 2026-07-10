@@ -325,6 +325,64 @@ function renderLessonPanel(selectedClass, module) {
   stack.appendChild(goBtn);
 }
 
+// ===== AI STUDENT ANALYSIS WIDGET =====
+function renderLocalAnalysisStats() {
+  const section = document.getElementById("aiAnalysisSection");
+  if (!section) return;
+  if (isAdminViewing || !student?.id) { section.style.display = "none"; return; }
+  section.style.display = "";
+
+  let scored = 0, correct = 0, scoreSum = 0;
+  Object.values(allProgress || {}).forEach(p => {
+    Object.values(p.answers || {}).forEach(a => {
+      const text = typeof a === "string" ? a : a?.text;
+      const score = typeof a === "object" ? (a.ai_score || 0) : 0;
+      if (text && text.trim() && score > 0) {
+        scored++;
+        scoreSum += score;
+        if (score >= 3) correct++;
+      }
+    });
+  });
+
+  const accuracy = scored > 0 ? Math.round((correct / scored) * 100) : 0;
+  const avgScore = scored > 0 ? (scoreSum / scored).toFixed(1) : "0";
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set("statScored", scored);
+  set("statCorrect", correct);
+  set("statAccuracy", accuracy + "%");
+  set("statAvgScore", avgScore + "/5");
+}
+
+async function getAiFeedbackAnalysis() {
+  const btn = document.getElementById("getAiFeedbackBtn");
+  const textEl = document.getElementById("aiAnalysisText");
+  if (!student?.id || !btn || !textEl) return;
+  btn.disabled = true;
+  btn.textContent = "Thinking…";
+  textEl.textContent = "Analysing your progress…";
+  try {
+    const data = await AI.getAnalysis(student.id);
+    textEl.textContent = data.ai_summary || "No summary available yet.";
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set("statScored", data.scored_count ?? 0);
+    set("statCorrect", data.correct_count ?? 0);
+    set("statAccuracy", (data.accuracy_percentage ?? 0) + "%");
+    set("statAvgScore", (data.average_score ?? 0) + "/5");
+  } catch (err) {
+    textEl.textContent = "Could not get AI feedback right now: " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "✨ Get AI Feedback";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("getAiFeedbackBtn");
+  if (btn) btn.addEventListener("click", getAiFeedbackAnalysis);
+});
+
 // ===== AI PANEL =====
 const encouragements = [
   "Every answer you write builds your confidence. Keep going! 🌟",
@@ -440,6 +498,7 @@ function render() {
   renderClassList();
   renderProgress();
   renderModules();
+  renderLocalAnalysisStats();
 
   const sc = getSelectedClass();
   const m  = sc?.modules.find(mod => mod.id === state.selectedModuleId);

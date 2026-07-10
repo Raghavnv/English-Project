@@ -325,38 +325,65 @@ Rules: age-appropriate, simple clear English, 1-2 sentences each, no numbers or 
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
 
-router = APIRouter()
+@router.get("/analysis/{student_id}")
+def get_student_analysis(student_id: str, db: Session = Depends(get_db)):
+    """
+    Computes real accuracy/progress stats for a student from the database
+    and asks the AI for a short, encouraging written analysis.
+    """
+    from app.models.models import Student as StudentModel
 
-@router.get("/api/progress")
-async def get_student_progress():
-    """
-    Returns student progress data for the Chart.js graph along with an AI-generated summary.
-    """
-    # 1. Fetch the student's real data from your database (Mocked for now)
-    weeks = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"]
-    lessons_completed = [2, 4, 7, 8, 12]
-    accuracy_percentage = 85
-    
-    # 2. Construct the prompt for your AI model
-    ai_prompt = f"""
-    You are an encouraging English teacher. Analyze this student's progress data:
-    - Weeks: {weeks}
-    - Lessons completed per week: {lessons_completed}
-    - Overall accuracy: {accuracy_percentage}%
-    
-    Write a 2-sentence summary praising their effort, pointing out a specific positive trend, and encouraging them to keep going. Keep the tone warm and supportive.
-    """
-    
-    # 3. Call your AI model here (e.g., OpenAI, Gemini, etc.)
-    # ai_summary = call_your_ai_model(ai_prompt) 
-    
-    # Simulated AI Response for testing:
-    mock_ai_summary = "Incredible work! You've consistently increased your lesson completion every week, jumping from 2 to 12 lessons. Keep maintaining that 85% accuracy, and your English fluency will skyrocket!"
+    student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
 
-    # 4. Return the data to the frontend
-    return {
-        "weeks": weeks,
-        "lessons_completed": lessons_completed,
+    progresses = student.progress
+    lessons_total     = len(progresses)
+    lessons_completed = sum(1 for p in progresses if p.completed)
+
+    scored_answers = []
+    for p in progresses:
+        for a in p.answers:
+            if a.text and a.text.strip() and a.ai_score:
+                scored_answers.append(a.ai_score)
+
+    answered_count = sum(1 for p in progresses for a in p.answers if a.text and a.text.strip())
+    correct_count  = sum(1 for s in scored_answers if s >= 3)
+    avg_score      = round(sum(scored_answers) / len(scored_answers), 2) if scored_answers else 0
+    accuracy_percentage = round((correct_count / len(scored_answers)) * 100) if scored_answers else 0
+
+    stats = {
+        "lessons_total":       lessons_total,
+        "lessons_completed":   lessons_completed,
+        "answered_count":      answered_count,
+        "scored_count":        len(scored_answers),
+        "correct_count":       correct_count,
+        "average_score":       avg_score,
         "accuracy_percentage": accuracy_percentage,
-        "ai_feedback": mock_ai_summary
+        "streak_days":         student.streak_days or 0,
     }
+
+    if len(scored_answers) == 0:
+        stats["ai_summary"] = (
+            f"{student.name} hasn't had any answers checked by the AI tutor yet. "
+            "Encourage them to press \"Check with AI\" after writing an answer so we can start tracking progress!"
+        )
+        return stats
+
+    prompt = f"""Student name: {student.name}
+Lessons completed: {lessons_completed} of {lessons_total}
+Questions answered and AI-checked: {len(scored_answers)}
+Average AI score (out of 5): {avg_score}
+Accuracy (score >= 3 counted correct): {accuracy_percentage}%
+Current streak: {student.streak_days or 0} days
+
+Write a short progress analysis (2-3 sentences) for this student's teacher/parent AND the student to read.
+Be specific using the numbers above, warm, and encouraging. Point out one strength and, if accuracy is below
+70%, one gentle area to keep practising. Simple English."""
+
+    try:
+        stats["ai_summary"] = ask_groq(prompt, max_tokens=180)
+    except Exception as e:
+        stats["ai_summary"] = f"Could not generate AI summary right now ({str(e)})."
+
+    return stats

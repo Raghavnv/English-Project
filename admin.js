@@ -565,10 +565,18 @@ async function renderProgress(classesData) {
               const ansObj   = answers[q.id] || {};
               const ansText  = ansObj.text || "";
               const feedback = ansObj.ai_feedback || "";
+              const aiScore  = ansObj.ai_score || 0;
+              const hasScore = ansText.trim() && aiScore > 0;
+              const isCorrect = aiScore >= 3;
+              const scoreBadge = hasScore
+                ? `<span class="lesson-status-chip ${isCorrect ? "chip-done" : "chip-progress"}" style="margin-left:8px;">
+                     ${isCorrect ? "✅ Correct" : "❌ Needs Work"} · ${aiScore}/5
+                   </span>`
+                : "";
               const arow     = document.createElement("div");
               arow.className = "answer-row";
               arow.innerHTML = `
-                <div class="answer-q">Q${qi + 1}: ${escHtml(q.prompt)}</div>
+                <div class="answer-q">Q${qi + 1}: ${escHtml(q.prompt)}${scoreBadge}</div>
                 ${ansText.trim()
                   ? `<div class="answer-text">${escHtml(ansText)}</div>
                      ${feedback ? `<div style="margin-top:6px;font-size:0.8rem;color:#3d5220;background:rgba(111,124,74,0.08);padding:6px 10px;border-radius:8px;">💬 ${escHtml(feedback)}</div>` : ""}`
