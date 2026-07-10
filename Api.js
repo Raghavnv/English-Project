@@ -170,6 +170,10 @@ const Lessons = {
   async delete(lessonId) {
     return apiFetch(`/api/lessons/${lessonId}`, { method: "DELETE" });
   },
+  
+  async deleteClass(classId) {
+    return apiFetch(`/api/lessons/classes/${classId}`, { method: "DELETE" });
+  },
 
   async addQuestion(lessonId, prompt, type = "text") {
     return apiFetch(`/api/lessons/${lessonId}/questions`, {

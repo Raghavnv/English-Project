@@ -329,12 +329,18 @@ function renderLessonPanel(selectedClass, module) {
 function renderLocalAnalysisStats() {
   const section = document.getElementById("aiAnalysisSection");
   if (!section) return;
-  if (isAdminViewing || !student?.id) { section.style.display = "none"; return; }
+  if (isAdminViewing || !student?.id) { 
+    section.style.display = "none"; 
+    return; 
+  }
   section.style.display = "";
 
   let scored = 0, correct = 0, scoreSum = 0;
+  
+  // Scans all recorded structural items inside all progress files, explicitly ignoring overarching course completion flags
   Object.values(allProgress || {}).forEach(p => {
-    Object.values(p.answers || {}).forEach(a => {
+    if (!p.answers) return;
+    Object.values(p.answers).forEach(a => {
       const text = typeof a === "string" ? a : a?.text;
       const score = typeof a === "object" ? (a.ai_score || 0) : 0;
       if (text && text.trim() && score > 0) {
@@ -354,6 +360,40 @@ function renderLocalAnalysisStats() {
   set("statAccuracy", accuracy + "%");
   set("statAvgScore", avgScore + "/5");
 }
+
+// WIRED MODAL TOGGLE EVENT HANDLERS
+document.addEventListener("DOMContentLoaded", () => {
+  const openBtn = document.getElementById("openAnalysisModalBtn");
+  const closeBtn = document.getElementById("closeAnalysisModalBtn");
+  const modal = document.getElementById("aiAnalysisModal");
+
+  if (openBtn && modal) {
+    openBtn.addEventListener("click", () => {
+      renderLocalAnalysisStats(); // Recomputes partial parameters upon interaction
+      modal.style.opacity = "1";
+      modal.style.pointerEvents = "all";
+      modal.querySelector("div").style.transform = "translateY(0) scale(1)";
+    });
+  }
+
+  if (closeBtn && modal) {
+    closeBtn.addEventListener("click", () => {
+      modal.style.opacity = "0";
+      modal.style.pointerEvents = "none";
+      modal.querySelector("div").style.transform = "translateY(16px) scale(0.97)";
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.opacity = "0";
+        modal.style.pointerEvents = "none";
+        modal.querySelector("div").style.transform = "translateY(16px) scale(0.97)";
+      }
+    });
+  }
+});
 
 async function getAiFeedbackAnalysis() {
   const btn = document.getElementById("getAiFeedbackBtn");

@@ -149,6 +149,7 @@ function startEditLesson(lesson) {
   document.getElementById("addBtn").textContent = "Update Lesson";
   document.querySelector(".admin-card h2").textContent = "Edit Lesson";
 
+
   // Show cancel button
   let cancelBtn = document.getElementById("cancelEditBtn");
   if (!cancelBtn) {
@@ -229,33 +230,66 @@ async function renderSavedLessons() {
 
   try {
     const classes = await Lessons.getClasses();
-    const allLessons = classes.flatMap(c => c.lessons);
 
-    if (allLessons.length === 0) {
-      container.innerHTML = `<p style="color:var(--muted);font-size:0.9rem;">No lessons saved yet.</p>`;
+    if (classes.length === 0) {
+      container.innerHTML = `<p style="color:var(--muted);font-size:0.9rem;">No lessons or classes saved yet.</p>`;
       return;
     }
 
     container.innerHTML = "";
-    allLessons.forEach(lesson => {
-      const card = document.createElement("div");
-      card.className = "saved-lesson-card";
-      card.innerHTML = `
-        <div class="saved-lesson-info">
-          <strong>${escHtml(lesson.title)}</strong>
-          <span>${escHtml(lesson.class_label)} · ${lesson.questions.length} question(s)</span>
+    classes.forEach(cls => {
+      const classSection = document.createElement("div");
+      classSection.style.cssText = "margin-bottom: 24px; padding: 20px; border-radius: 18px; background: rgba(80,58,40,0.03); border: 1px solid rgba(80,58,40,0.06);";
+      
+      classSection.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(80,58,40,0.08); padding-bottom: 8px;">
+          <h4 style="margin: 0; font-size: 1.15rem; color: var(--accent-deep); font-family: 'Newsreader', serif;">📂 ${escHtml(cls.label)}</h4>
+          <button class="delete-class-btn" data-id="${cls.id}" style="min-height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(188,93,45,0.3); background: rgba(188,93,45,0.1); color: var(--accent-deep); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.2s;">Delete Class</button>
         </div>
-        <div style="display:flex;gap:8px;">
-          <button class="edit-lesson-btn" data-id="${lesson.id}" style="min-height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(80,58,40,0.18);background:rgba(255,255,255,0.6);font-size:0.82rem;font-weight:700;cursor:pointer;">✏️ Edit</button>
-          <button class="delete-lesson-btn" data-id="${lesson.id}">Delete</button>
-        </div>
+        <div class="class-lessons-container"></div>
       `;
-      card.querySelector(".delete-lesson-btn").addEventListener("click", () => deleteLesson(lesson.id));
-      card.querySelector(".edit-lesson-btn").addEventListener("click", () => startEditLesson(lesson));
-      container.appendChild(card);
+
+      classSection.querySelector(".delete-class-btn").addEventListener("click", () => deleteClass(cls.id));
+
+      const lessonsContainer = classSection.querySelector(".class-lessons-container");
+
+      if (!cls.lessons || cls.lessons.length === 0) {
+        lessonsContainer.innerHTML = `<p style="color:var(--muted);font-size:0.86rem;font-style:italic;margin:0; padding: 4px 0;">No lessons in this class yet.</p>`;
+      } else {
+        cls.lessons.forEach(lesson => {
+          const card = document.createElement("div");
+          card.className = "saved-lesson-card";
+          card.style.margin = "8px 0";
+          card.innerHTML = `
+            <div class="saved-lesson-info">
+              <strong>${escHtml(lesson.title)}</strong>
+              <span>${lesson.questions ? lesson.questions.length : 0} question(s)</span>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="edit-lesson-btn" data-id="${lesson.id}" style="min-height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(80,58,40,0.18);background:rgba(255,255,255,0.6);font-size:0.82rem;font-weight:700;cursor:pointer;">✏️ Edit</button>
+              <button class="delete-lesson-btn" data-id="${lesson.id}">Delete</button>
+            </div>
+          `;
+          card.querySelector(".delete-lesson-btn").addEventListener("click", () => deleteLesson(lesson.id));
+          card.querySelector(".edit-lesson-btn").addEventListener("click", () => startEditLesson(lesson));
+          lessonsContainer.appendChild(card);
+        });
+      }
+      container.appendChild(classSection);
     });
   } catch (err) {
     container.innerHTML = `<p style="color:var(--muted);font-size:0.9rem;">Could not load lessons: ${err.message}</p>`;
+  }
+}
+
+async function deleteClass(classId) {
+  if (!confirm("Are you sure you want to delete this entire class along with all its lessons? This action cannot be undone.")) return;
+  try {
+    await Lessons.deleteClass(classId);
+    showPopup("✓ Class removed successfully");
+    await renderSavedLessons();
+  } catch (err) {
+    showPopup("Error deleting class: " + err.message);
   }
 }
 
