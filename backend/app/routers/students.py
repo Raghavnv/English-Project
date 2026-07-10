@@ -201,39 +201,3 @@ def reset_all_progress(student_id: str, db: Session = Depends(get_db)):
     db.commit()
     return {"reset": True}
 
-
-router = APIRouter()
-
-@router.get("/api/progress")
-async def get_student_progress():
-    """
-    Returns student progress data for the Chart.js graph along with an AI-generated summary.
-    """
-    # 1. Fetch the student's real data from your database (Mocked for now)
-    weeks = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"]
-    lessons_completed = [2, 4, 7, 8, 12]
-    accuracy_percentage = 85
-    
-    # 2. Construct the prompt for your AI model
-    ai_prompt = f"""
-    You are an encouraging English teacher. Analyze this student's progress data:
-    - Weeks: {weeks}
-    - Lessons completed per week: {lessons_completed}
-    - Overall accuracy: {accuracy_percentage}%
-    
-    Write a 2-sentence summary praising their effort, pointing out a specific positive trend, and encouraging them to keep going. Keep the tone warm and supportive.
-    """
-    
-    # 3. Call your AI model here (e.g., OpenAI, Gemini, etc.)
-    # ai_summary = call_your_ai_model(ai_prompt) 
-    
-    # Simulated AI Response for testing:
-    mock_ai_summary = "Incredible work! You've consistently increased your lesson completion every week, jumping from 2 to 12 lessons. Keep maintaining that 85% accuracy, and your English fluency will skyrocket!"
-
-    # 4. Return the data to the frontend
-    return {
-        "weeks": weeks,
-        "lessons_completed": lessons_completed,
-        "accuracy_percentage": accuracy_percentage,
-        "ai_feedback": mock_ai_summary
-    }
