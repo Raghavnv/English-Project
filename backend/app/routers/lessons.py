@@ -148,3 +148,23 @@ def delete_lesson(
         raise HTTPException(status_code=404, detail="Lesson not found")
     db.delete(lesson)
     db.commit()
+
+@router.delete("/classes/{class_id}", status_code=204)
+def delete_class(
+    class_id: str,
+    db: Session = Depends(get_db)
+    # DEMO: get_current_admin removed — RESTORE before going live
+):
+    cls = db.query(Class).filter(Class.id == class_id).first()
+    if not cls:
+        raise HTTPException(status_code=404, detail="Class not found")
+    
+    # Safely delete all lessons associated with this class first
+    # to prevent any Foreign Key constraint errors in the database
+    lessons_in_class = db.query(Lesson).filter(Lesson.class_id == class_id).all()
+    for lesson in lessons_in_class:
+        db.delete(lesson)
+        
+    # Now delete the empty class
+    db.delete(cls)
+    db.commit()
