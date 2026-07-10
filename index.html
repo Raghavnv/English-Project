@@ -372,7 +372,6 @@
 
 <div class="welcome-shell">
 
-  <!-- HEADER -->
   <header class="welcome-header">
     <div class="platform-brand">
       <div class="platform-brand-mark" style="width:56px;height:56px;overflow:hidden;background:rgba(255,250,242,0.95);border:1px solid rgba(188,93,45,0.14);border-radius:16px;box-shadow:0 4px 12px rgba(124,53,26,0.12);padding:4px;flex-shrink:0;">
@@ -386,7 +385,6 @@
     <span style="font-size:0.85rem;color:var(--muted);font-weight:600;">Learning Platform</span>
   </header>
 
-  <!-- HERO -->
   <div class="welcome-hero">
     <div class="hero-left">
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:4px;">
@@ -424,7 +422,6 @@
     </div>
   </div>
 
-  <!-- ABOUT STRIP -->
   <div class="about-strip">
     <div class="about-card">
       <p class="about-card-label">How it works</p>
@@ -443,7 +440,6 @@
     </div>
   </div>
 
-  <!-- PORTAL SELECTION -->
   <div class="portal-section">
     <div class="portal-section-head">
       <p>Get Started</p>
@@ -452,23 +448,21 @@
 
     <div class="portal-cards">
 
-      <!-- STUDENT -->
-      <div class="portal-card" onclick="window.location.href='platform.html'">
+      <div class="portal-card" onclick="window.location.href='login.html'">
         <span class="portal-badge portal-badge-student">🎓 Student</span>
         <h3>I'm here to learn</h3>
         <p>Enter your name and school to access your class, open your lessons, and track your answers and progress.</p>
-        <button class="portal-cta portal-cta-student" onclick="window.location.href='platform.html'">
+        <button class="portal-cta portal-cta-student" onclick="window.location.href='login.html'">
           Enter as Student →
         </button>
         <div class="portal-deco portal-deco-student"></div>
       </div>
 
-      <!-- ADMIN -->
-      <div class="portal-card" onclick="window.location.href='admin.html'">
+      <div class="portal-card" onclick="window.location.href='admin-login.html'">
         <span class="portal-badge portal-badge-admin">🛠 Admin</span>
         <h3>I'm here to teach</h3>
         <p>Create and manage classes, write lessons with questions, and keep content updated for your students.</p>
-        <button class="portal-cta portal-cta-admin" onclick="window.location.href='admin.html'">
+        <button class="portal-cta portal-cta-admin" onclick="window.location.href='admin-login.html'">
           Enter as Admin →
         </button>
         <div class="portal-deco portal-deco-admin"></div>
@@ -477,7 +471,6 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer class="welcome-footer">
     <div>
       <strong>EnglishBridge Bangalore</strong>
@@ -487,6 +480,18 @@
   </footer>
 
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Check if the user is already signed in by looking for a token
+    const token = localStorage.getItem("token"); 
+    
+    if (token) {
+      // If a token is found, redirect straight to the main app page
+      window.location.href = "platform.html";
+    }
+  });
+</script>
 
 </body>
 </html>
