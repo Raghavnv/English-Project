@@ -324,6 +324,7 @@ Rules: age-appropriate, simple clear English, 1-2 sentences each, no numbers or 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
+
 router = APIRouter()
 
 @router.get("/api/progress")
