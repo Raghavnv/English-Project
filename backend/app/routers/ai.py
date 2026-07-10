@@ -329,9 +329,10 @@ Rules: age-appropriate, simple clear English, 1-2 sentences each, no numbers or 
 def get_student_analysis(student_id: str, db: Session = Depends(get_db)):
     """
     Computes real accuracy/progress stats for a student from the database
-    and asks the AI for a short, encouraging written analysis.
+    and asks the AI for a short, encouraging written analysis based on actual answers.
     """
     from app.models.models import Student as StudentModel
+    from app.models.models import Question as QuestionModel # Make sure to import the Question model
 
     student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
     if not student:
@@ -342,10 +343,20 @@ def get_student_analysis(student_id: str, db: Session = Depends(get_db)):
     lessons_completed = sum(1 for p in progresses if p.completed)
 
     scored_answers = []
+    recent_q_and_a = [] # We will store the actual questions and answers here
+
     for p in progresses:
         for a in p.answers:
-            if a.text and a.text.strip() and a.ai_score:
-                scored_answers.append(a.ai_score)
+            if a.text and a.text.strip():
+                if a.ai_score:
+                    scored_answers.append(a.ai_score)
+                
+                # Fetch the actual question text so the AI knows what the student was asked
+                q = db.query(QuestionModel).filter(QuestionModel.id == a.question_id).first()
+                q_text = q.prompt if q else "Question"
+                
+                # Bundle them together
+                recent_q_and_a.append(f"Q: {q_text}\nStudent's Answer: {a.text}\n")
 
     answered_count = sum(1 for p in progresses for a in p.answers if a.text and a.text.strip())
     correct_count  = sum(1 for s in scored_answers if s >= 3)
@@ -370,6 +381,10 @@ def get_student_analysis(student_id: str, db: Session = Depends(get_db)):
         )
         return stats
 
+    # Get the last 5 questions and answers to give the AI context without overwhelming the token limit
+    recent_context = "\n".join(recent_q_and_a[-5:])
+
+    # The updated prompt that forces the AI to read the text
     prompt = f"""Student name: {student.name}
 Lessons completed: {lessons_completed} of {lessons_total}
 Questions answered and AI-checked: {len(scored_answers)}
@@ -377,12 +392,15 @@ Average AI score (out of 5): {avg_score}
 Accuracy (score >= 3 counted correct): {accuracy_percentage}%
 Current streak: {student.streak_days or 0} days
 
+Here is what the student has been writing recently:
+{recent_context}
+
 Write a short progress analysis (2-3 sentences) for this student's teacher/parent AND the student to read.
-Be specific using the numbers above, warm, and encouraging. Point out one strength and, if accuracy is below
-70%, one gentle area to keep practising. Simple English."""
+Be specific by referencing the actual content of their answers above. Be warm and encouraging. Point out one strength and, if accuracy is below 70%, one gentle area to keep practising. Simple English."""
 
     try:
-        stats["ai_summary"] = ask_groq(prompt, max_tokens=180)
+        # I slightly increased max_tokens to give the AI room to reference the text
+        stats["ai_summary"] = ask_groq(prompt, max_tokens=250)
     except Exception as e:
         stats["ai_summary"] = f"Could not generate AI summary right now ({str(e)})."
 
