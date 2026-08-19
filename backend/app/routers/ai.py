@@ -175,26 +175,68 @@ Lesson Title: "{body.lesson_title}"
 Class / Level: "{body.class_label or 'General'}"
 Description: "{body.lesson_description or 'No description provided'}"
 
-Generate exactly {body.count} questions for this lesson. Rules:
-- Questions should be age-appropriate and encourage English writing or speaking practice
-- Mix different types: some asking students to describe, explain, write sentences, or share opinions
-- Simple, clear language that Indian school children can understand
-- Each question should be 1-2 sentences only
-- Output ONLY the questions, one per line, nothing else
-- No numbers, no bullets, no dashes, no preamble, no explanation"""
+Generate exactly {body.count} age-appropriate English practice questions.
+
+STRICT OUTPUT RULES:
+- Return ONLY the final student questions.
+- One question per line.
+- Do NOT include thinking, reasoning, analysis, headings, labels, lesson summaries, markdown, or explanations.
+- Do NOT write lines such as "Thinking Process", "Topic", "Description", or "Target Audience".
+- Make each question simple and clear for the stated class level.
+- Do not number the questions.
+"""
 
     try:
-        raw = ask_groq(prompt, max_tokens=400, system="You are a helpful assistant that outputs only the requested content, nothing else.")
-        questions = [
-            line.strip().lstrip("-•*0123456789.) ")
-            for line in raw.split("\n")
-            if line.strip() and len(line.strip()) > 10
-        ]
-        questions = questions[:body.count]
+        raw = ask_groq(
+            prompt,
+            max_tokens=400,
+            system="You generate only final student-facing English questions. Never show your reasoning or planning."
+        )
+
+        import re
+
+        blocked_starts = (
+            "thinking",
+            "analysis",
+            "deconstruct",
+            "topic:",
+            "target audience:",
+            "description:",
+            "lesson title:",
+            "class / level:",
+            "instructions:",
+            "output:",
+        )
+
+        questions = []
+
+        for line in raw.splitlines():
+            clean = line.strip().lstrip("-•*0123456789.) ").strip()
+            clean = re.sub(r"^(text|speech)\s*:\s*", "", clean, flags=re.IGNORECASE)
+
+            if not clean or len(clean) < 12:
+                continue
+
+            if clean.lower().startswith(blocked_starts):
+                continue
+
+            questions.append(clean)
+
+            if len(questions) >= body.count:
+                break
+
+        if not questions:
+            raise HTTPException(
+                status_code=502,
+                detail="The AI did not return usable questions. Please try again."
+            )
+
         return {"questions": questions}
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
-
 
 # ── STUDENT AI CHAT ───────────────────────────────────────────────────────────
 
