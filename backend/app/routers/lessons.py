@@ -77,11 +77,12 @@ def get_lesson(lesson_id: str, db: Session = Depends(get_db)):
 @router.post("/", status_code=201)
 def create_lesson(
     body: LessonIn,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: Admin = Depends(get_current_admin),
     # DEMO: get_current_admin removed — RESTORE before going live
 ):
     # DEMO: auto-use (or create) a placeholder admin since auth is disabled
-    demo_admin = db.query(Admin).first()
+    demo_admin = current_admin
     if not demo_admin:
         from app.auth import hash_password
         demo_admin = Admin(username="demo", password_hash=hash_password("demo-only-temp"))
@@ -122,7 +123,8 @@ class LessonUpdate(BaseModel):
 def update_lesson(
     lesson_id: str,
     body: LessonUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: Admin = Depends(get_current_admin),
     # DEMO: get_current_admin removed — RESTORE before going live
 ):
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
@@ -140,7 +142,8 @@ def update_lesson(
 @router.delete("/{lesson_id}", status_code=204)
 def delete_lesson(
     lesson_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: Admin = Depends(get_current_admin),
     # DEMO: get_current_admin removed — RESTORE before going live
 ):
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
@@ -152,7 +155,8 @@ def delete_lesson(
 @router.delete("/classes/{class_id}", status_code=204)
 def delete_class(
     class_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_admin: Admin = Depends(get_current_admin),
     # DEMO: get_current_admin removed — RESTORE before going live
 ):
     cls = db.query(Class).filter(Class.id == class_id).first()

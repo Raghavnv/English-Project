@@ -6,7 +6,8 @@ from groq import Groq
 import os
 from dotenv import load_dotenv
 from app.database import get_db
-from app.models.models import Question, Answer, Progress
+from app.models.models import Question, Answer, Progress, Student
+from app.auth import get_current_admin, require_authenticated_requester, require_student_or_admin
 
 load_dotenv()
 
@@ -58,7 +59,7 @@ def ask_groq(prompt: str, max_tokens: int = 150, system: str = SYSTEM_PROMPT) ->
 
 
 @router.post("/feedback")
-def get_feedback(body: FeedbackRequest, db: Session = Depends(get_db)):
+def get_feedback(body: FeedbackRequest, db: Session = Depends(get_db), requester=Depends(require_authenticated_requester)):
     question = get_question_or_404(body.question_id, db)
 
     if not body.answer_text.strip():
@@ -98,6 +99,11 @@ Feedback must be warm, simple English for a school child in India. Always acknow
         score = max(1, min(5, score))
 
         if body.progress_id:
+            # Learners can only attach feedback to their own saved responses.
+            if isinstance(requester, Student):
+                progress = db.query(Progress).filter(Progress.id == body.progress_id).first()
+                if not progress or progress.student_id != requester.id:
+                    raise HTTPException(status_code=403, detail="You can only update your own work.")
             answer_row = db.query(Answer).filter(
                 Answer.progress_id == body.progress_id,
                 Answer.question_id == body.question_id
@@ -114,7 +120,7 @@ Feedback must be warm, simple English for a school child in India. Always acknow
 
 
 @router.post("/hint")
-def get_hint(body: HintRequest, db: Session = Depends(get_db)):
+def get_hint(body: HintRequest, db: Session = Depends(get_db), requester=Depends(require_authenticated_requester)):
     question = get_question_or_404(body.question_id, db)
     prompt = f"""Lesson topic: "{body.lesson_title}"
 Question: "{question.prompt}"
@@ -126,7 +132,7 @@ Give a short helpful hint without giving away the answer. 1-2 sentences. Simple 
 
 
 @router.post("/guide")
-def get_guide(body: GuideRequest, db: Session = Depends(get_db)):
+def get_guide(body: GuideRequest, db: Session = Depends(get_db), requester=Depends(require_authenticated_requester)):
     question = get_question_or_404(body.question_id, db)
     prompt = f"""Lesson topic: "{body.lesson_title}"
 Question: "{question.prompt}"
@@ -138,7 +144,7 @@ Explain what this question is asking in very simple English for a young student 
 
 
 @router.post("/encouragement")
-def get_encouragement():
+def get_encouragement(requester=Depends(require_authenticated_requester)):
     import random
     messages = [
         "Every answer you write builds your confidence. Keep going! 🌟",
@@ -162,7 +168,7 @@ class GenerateQuestionsRequest(BaseModel):
     count: Optional[int] = 5
 
 @router.post("/generate-questions")
-def generate_questions(body: GenerateQuestionsRequest):
+def generate_questions(body: GenerateQuestionsRequest, current_admin=Depends(get_current_admin)):
     prompt = f"""You are creating English lesson questions for school children in Bangalore, India.
 
 Lesson Title: "{body.lesson_title}"
@@ -202,7 +208,7 @@ class ChatRequest(BaseModel):
     student_name: Optional[str] = ""
 
 @router.post("/chat")
-def chat_with_tutor(body: ChatRequest):
+def chat_with_tutor(body: ChatRequest, requester=Depends(require_authenticated_requester)):
     if not body.messages:
         raise HTTPException(status_code=400, detail="No messages provided")
 
@@ -257,7 +263,7 @@ class RelearnRequest(BaseModel):
     lesson_description: Optional[str] = ""
 
 @router.post("/relearn")
-def get_relearn_content(body: RelearnRequest, db: Session = Depends(get_db)):
+def get_relearn_content(body: RelearnRequest, db: Session = Depends(get_db), requester=Depends(require_authenticated_requester)):
     from app.models.models import Lesson, Question as QuestionModel
     lesson_questions = db.query(QuestionModel).filter(
         QuestionModel.lesson_id == body.lesson_id
@@ -298,7 +304,7 @@ class GenerateQuestionsRequest(BaseModel):
     question_type: Optional[str] = "text"
 
 @router.post("/generate-questions")
-def generate_questions(body: GenerateQuestionsRequest):
+def generate_questions(body: GenerateQuestionsRequest, current_admin=Depends(get_current_admin)):
     qtype = (body.question_type or "text").lower()
     if qtype == "speech":
         type_instr = "All questions must be open-ended SPEECH prompts (describe, tell, explain, share opinion). Prefix each line with 'SPEECH: '"
@@ -326,7 +332,7 @@ Rules: age-appropriate, simple clear English, 1-2 sentences each, no numbers or 
 
 
 @router.get("/analysis/{student_id}")
-def get_student_analysis(student_id: str, db: Session = Depends(get_db)):
+def get_student_analysis(student_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
     """
     Computes real accuracy/progress stats for a student from the database
     and asks the AI for a short, encouraging written analysis based on actual answers.

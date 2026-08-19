@@ -8,6 +8,9 @@ function clearAdminToken(){ localStorage.removeItem("adminToken"); }
 
 function getStudentId()   { return localStorage.getItem("studentId"); }
 function setStudentId(id) { localStorage.setItem("studentId", id); }
+function getStudentToken() { return localStorage.getItem("studentToken"); }
+function setStudentToken(token) { localStorage.setItem("studentToken", token); }
+function clearStudentToken() { localStorage.removeItem("studentToken"); }
 
 function getStudentData() {
   try { return JSON.parse(localStorage.getItem("student")) || null; }
@@ -29,6 +32,10 @@ async function apiFetch(path, options = {}) {
 
   if (token) {
     fetchOptions.headers["Authorization"] = `Bearer ${token}`;
+  }
+  const studentToken = getStudentToken();
+  if (studentToken) {
+    fetchOptions.headers["X-Student-Token"] = studentToken;
   }
 
   try {
@@ -99,6 +106,7 @@ const Students = {
       body: JSON.stringify({ name, school })
     });
     setStudentId(data.id);
+    setStudentToken(data.student_token);
     localStorage.setItem("student", JSON.stringify({ id: data.id, name: data.name, school: data.school }));
     return data;
   },

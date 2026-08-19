@@ -1,6 +1,7 @@
 // ===== LOGIN CHECK =====
 const student = getStudentData();
 if (!student) { window.location.href = "login.html"; }
+if (student && !getStudentToken()) { window.location.href = "login.html"; }
 
 const currentLesson = JSON.parse(localStorage.getItem("currentLesson"));
 if (!currentLesson) { window.location.href = "platform.html"; }

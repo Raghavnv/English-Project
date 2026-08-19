@@ -10,6 +10,12 @@ from app.routers import auth, lessons, students, ai
 
 load_dotenv()
 
+# Set CORS_ORIGINS to a comma-separated list of the real frontend domains before
+# launch. Local development remains available without opening the API to every site.
+cors_origins = [origin.strip() for origin in os.getenv(
+    "CORS_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000"
+).split(",") if origin.strip()]
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # This runs when the server starts
@@ -26,7 +32,7 @@ app = FastAPI(
 # ── CORS — FIXED & READY ──────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],      # Allows your frontend to connect
+    allow_origins=cors_origins,
     allow_credentials=False,  # Must be False when using wildcard origins (browser CORS rule)
     allow_methods=["*"],      # Allows GET, POST, DELETE, etc.
     allow_headers=["*"],      # Allows Authorization and Content-Type headers

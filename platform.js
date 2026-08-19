@@ -5,6 +5,13 @@ const adminSession = JSON.parse(localStorage.getItem("adminSession") || "null");
 // if (!student && !adminSession) {
 //   window.location.href = "login.html";
 // }
+if (!student && !adminSession) {
+  window.location.href = "login.html";
+}
+if (student && !getStudentToken()) {
+  localStorage.removeItem("student");
+  window.location.href = "login.html";
+}
 
 const isAdminViewing = !student && !!adminSession;
 const activeUser     = student || { name: adminSession?.username || "Guest", school: "Demo View" };
@@ -15,6 +22,8 @@ function doLogout() {
     window.location.href = "admin.html";
   } else {
     localStorage.removeItem("student");
+    localStorage.removeItem("studentId");
+    clearStudentToken();
     window.location.href = "login.html";
   }
 }

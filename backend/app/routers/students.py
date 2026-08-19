@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from datetime import datetime, timezone, timedelta
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
 from app.database import get_db
 from app.models.models import Student, Progress, Answer, Lesson
-from app.auth import get_current_admin
+from app.auth import create_student_access_token, get_current_admin, require_student_or_admin
 
 router = APIRouter(prefix="/api/students", tags=["students"])
 
@@ -13,6 +13,14 @@ router = APIRouter(prefix="/api/students", tags=["students"])
 class StudentLogin(BaseModel):
     name: str
     school: str
+
+    @field_validator("name", "school")
+    @classmethod
+    def required_trimmed_text(cls, value):
+        value = value.strip()
+        if not value or len(value) > 120:
+            raise ValueError("Please enter a valid value.")
+        return value
 
 
 class AnswerIn(BaseModel):
@@ -44,11 +52,16 @@ def student_login(body: StudentLogin, db: Session = Depends(get_db)):
     student = get_or_create_student(body.name, body.school, db)
     db.commit()
     db.refresh(student)
-    return {"id": student.id, "name": student.name, "school": student.school}
+    return {
+        "id": student.id,
+        "name": student.name,
+        "school": student.school,
+        "student_token": create_student_access_token(student.id),
+    }
 
 
 @router.get("/{student_id}/progress")
-def get_student_progress(student_id: str, db: Session = Depends(get_db)):
+def get_student_progress(student_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -67,7 +80,7 @@ def get_student_progress(student_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/{student_id}/progress")
-def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get_db)):
+def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -133,7 +146,7 @@ def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get
 
 
 @router.get("/")
-def list_students(db: Session = Depends(get_db)):  # DEMO: get_current_admin removed — RESTORE before going live
+def list_students(db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):  # DEMO: get_current_admin removed — RESTORE before going live
     students = db.query(Student).order_by(Student.name).all()
     return [
         {
@@ -150,7 +163,7 @@ def list_students(db: Session = Depends(get_db)):  # DEMO: get_current_admin rem
 
 
 @router.delete("/{student_id}")
-def delete_student(student_id: str, db: Session = Depends(get_db)):  # DEMO: get_current_admin removed — RESTORE before going live
+def delete_student(student_id: str, db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):  # DEMO: get_current_admin removed — RESTORE before going live
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -160,7 +173,7 @@ def delete_student(student_id: str, db: Session = Depends(get_db)):  # DEMO: get
 
 
 @router.delete("/{student_id}/progress/{lesson_id}")
-def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends(get_db)):
+def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
     """Reset a student's progress for a specific lesson."""
     progress = db.query(Progress).filter(
         Progress.student_id == student_id,
@@ -173,7 +186,7 @@ def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends
 
 
 @router.delete("/{student_id}/progress")
-def reset_all_progress(student_id: str, class_lesson_ids: list[str] | None = None, db: Session = Depends(get_db)):
+def reset_all_progress(student_id: str, class_lesson_ids: list[str] | None = None, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
     """Reset all progress for a student (optionally scoped to specific lesson IDs)."""
     q = db.query(Progress).filter(Progress.student_id == student_id)
     if class_lesson_ids:
@@ -184,7 +197,7 @@ def reset_all_progress(student_id: str, class_lesson_ids: list[str] | None = Non
 
 
 @router.delete("/{student_id}/progress/{lesson_id}")
-def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends(get_db)):
+def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
     progress = db.query(Progress).filter(
         Progress.student_id == student_id,
         Progress.lesson_id == lesson_id
@@ -196,8 +209,7 @@ def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends
 
 
 @router.delete("/{student_id}/progress")
-def reset_all_progress(student_id: str, db: Session = Depends(get_db)):
+def reset_all_progress(student_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
     db.query(Progress).filter(Progress.student_id == student_id).delete()
     db.commit()
     return {"reset": True}
-

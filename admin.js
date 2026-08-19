@@ -2,6 +2,9 @@
 // if (!Auth.isLoggedIn()) {
 //   window.location.href = "admin-login.html";
 // }
+if (!Auth.isLoggedIn()) {
+  window.location.href = "admin-login.html";
+}
 const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
 const adminWelcomeEl = document.getElementById("adminWelcome");
 if (adminWelcomeEl) adminWelcomeEl.textContent = "Welcome, " + (adminSession.username || "Admin");
