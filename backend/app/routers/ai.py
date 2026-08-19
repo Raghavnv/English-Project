@@ -12,7 +12,7 @@ from app.auth import get_current_admin, require_authenticated_requester, require
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-MODEL = "llama-3.1-8b-instant"
+MODEL = "qwen/qwen3.6-27b"
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
