@@ -184,6 +184,7 @@ STRICT OUTPUT RULES:
 - Do NOT write lines such as "Thinking Process", "Topic", "Description", or "Target Audience".
 - Make each question simple and clear for the stated class level.
 - Do not number the questions.
+- Every final question must end with a question mark (?).
 """
 
     try:
@@ -198,7 +199,12 @@ STRICT OUTPUT RULES:
         blocked_starts = (
             "thinking",
             "analysis",
+            "analyze",
             "deconstruct",
+            "task:",
+            "strict output",
+            "return only",
+            "one question per line",
             "topic:",
             "target audience:",
             "description:",
@@ -206,7 +212,10 @@ STRICT OUTPUT RULES:
             "class / level:",
             "instructions:",
             "output:",
+            "questions:",
         )
+
+
 
         questions = []
 
@@ -218,6 +227,8 @@ STRICT OUTPUT RULES:
                 continue
 
             if clean.lower().startswith(blocked_starts):
+                continue
+            if not clean.endswith("?"):
                 continue
 
             questions.append(clean)
