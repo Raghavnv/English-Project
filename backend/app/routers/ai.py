@@ -12,7 +12,7 @@ from app.auth import get_current_admin, require_authenticated_requester, require
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-MODEL = "qwen/qwen3.6-27b"
+MODEL = "openai/gpt-oss-20b"
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
