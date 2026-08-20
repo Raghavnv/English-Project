@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, field_validator
 from typing import Optional
 from app.database import get_db
-from app.models.models import Student, Progress, Answer, Lesson
+from app.models.models import Student, Progress, Answer, Lesson, Question
 from app.auth import create_student_access_token, get_current_admin, require_student_or_admin
 
 router = APIRouter(prefix="/api/students", tags=["students"])
@@ -115,8 +115,32 @@ def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get
         else:
             db.add(Answer(progress_id=progress.id, question_id=ans_in.question_id, text=text))
 
-    progress.answered_count = answered_count
+        progress.answered_count = answered_count
     progress.completed = (answered_count >= total_questions and total_questions > 0)
+
+    # ── AUTO-GRADE ON COMPLETION ──
+    if progress.completed:
+        from app.routers.ai import grade_answer
+        AUTO_GRADE_LIMIT = 15
+        graded = 0
+        db.flush()
+        answer_rows = db.query(Answer).filter(Answer.progress_id == progress.id).all()
+        for a in answer_rows:
+            if graded >= AUTO_GRADE_LIMIT:
+                break
+            if a.text and a.text.strip() and not a.ai_score:
+                question = db.query(Question).filter(Question.id == a.question_id).first()
+                if not question:
+                    continue
+                try:
+                    score, feedback_text = grade_answer(question, a.text)
+                    a.ai_score    = score
+                    a.ai_feedback = feedback_text
+                    graded       += 1
+                except Exception:
+                    continue
+
+    # ── UPDATE STREAK ──
 
     # ── UPDATE STREAK ──
     now = datetime.now(timezone.utc)
