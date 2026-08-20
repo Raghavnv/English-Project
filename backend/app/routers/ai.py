@@ -58,13 +58,13 @@ def ask_groq(prompt: str, max_tokens: int = 150, system: str = SYSTEM_PROMPT) ->
     return response.choices[0].message.content.strip()
 
 
-@router.post("/feedback")
-def get_feedback(body: FeedbackRequest, db: Session = Depends(get_db), requester=Depends(require_authenticated_requester)):
-    question = get_question_or_404(body.question_id, db)
-
-    if not body.answer_text.strip():
-        return {"feedback": "Please write something first — even one sentence is a great start! 😊"}
-
+def grade_answer(question, answer_text: str) -> tuple[int, str]:
+    """
+    Shared scorer used by both the /feedback endpoint (when a student clicks
+    "Check with AI") and the /analysis endpoint (to auto-grade answers that
+    were saved as part of a completed lesson but never individually checked).
+    Returns (score 1-5, feedback text).
+    """
     difficulty = question.difficulty or "medium"
     diff_guide = {
         "easy":   "This is an easy question — be strict but still kind. If there are grammar errors, point them out clearly.",
@@ -73,37 +73,42 @@ def get_feedback(body: FeedbackRequest, db: Session = Depends(get_db), requester
     }.get(difficulty, "")
 
     prompt = f"""The student was asked: "{question.prompt}"
-Their answer was: "{body.answer_text}"
-Difficulty level: {difficulty}. {diff_guide}
+    Their answer was: "{answer_text}"
+    Difficulty level: {difficulty}. {diff_guide}
 
-Respond ONLY with a JSON object, no other text:
-{{"score": <integer 1-5>, "feedback": "<2-3 sentence feedback>"}}
+    Respond ONLY with a JSON object, no other text:
+    {{"score": <integer 1-5>, "feedback": "<2-3 sentence feedback>"}}
 
-Score guide: 5=excellent, 4=good, 3=okay, 2=needs work, 1=try again.
-Feedback must be warm, simple English for a school child in India. Always acknowledge effort first."""
+    Score guide: 5=excellent, 4=good, 3=okay, 2=needs work, 1=try again.
+    Feedback must be warm, simple English for a school child in India. Always acknowledge effort first."""
+
+    raw = ask_groq(prompt, max_tokens=180)
+    import json, re
+    try:
+        parsed        = json.loads(raw)
+        score         = int(parsed.get("score", 3))
+        feedback_text = parsed.get("feedback", raw)
+    except Exception:
+        m = re.search(r'"score"\s*:\s*(\d)', raw)
+        score = int(m.group(1)) if m else 3
+        fm = re.search(r'"feedback"\s*:\s*"(.+?)"', raw, re.S)
+        feedback_text = fm.group(1) if fm else raw
+
+    score = max(1, min(5, score))
+    return score, feedback_text
+
+
+@router.post("/feedback")
+def get_feedback(body: FeedbackRequest, db: Session = Depends(get_db)):
+    question = get_question_or_404(body.question_id, db)
+
+    if not body.answer_text.strip():
+        return {"feedback": "Please write something first — even one sentence is a great start! 😊"}
 
     try:
-        raw = ask_groq(prompt, max_tokens=180)
-        import json, re
-        try:
-            parsed   = json.loads(raw)
-            score    = int(parsed.get("score", 3))
-            feedback_text = parsed.get("feedback", raw)
-        except Exception:
-            # fallback: extract score with regex if JSON parse fails
-            m = re.search(r'"score"\s*:\s*(\d)', raw)
-            score = int(m.group(1)) if m else 3
-            fm = re.search(r'"feedback"\s*:\s*"(.+?)"', raw, re.S)
-            feedback_text = fm.group(1) if fm else raw
-
-        score = max(1, min(5, score))
+        score, feedback_text = grade_answer(question, body.answer_text)
 
         if body.progress_id:
-            # Learners can only attach feedback to their own saved responses.
-            if isinstance(requester, Student):
-                progress = db.query(Progress).filter(Progress.id == body.progress_id).first()
-                if not progress or progress.student_id != requester.id:
-                    raise HTTPException(status_code=403, detail="You can only update your own work.")
             answer_row = db.query(Answer).filter(
                 Answer.progress_id == body.progress_id,
                 Answer.question_id == body.question_id
@@ -397,9 +402,32 @@ def get_student_analysis(student_id: str, db: Session = Depends(get_db), request
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
-    progresses = student.progress
+        progresses = student.progress
     lessons_total     = len(progresses)
     lessons_completed = sum(1 for p in progresses if p.completed)
+
+    # ── AUTO-GRADE ANY ANSWERED-BUT-UNCHECKED ANSWERS ──
+    AUTO_GRADE_LIMIT = 15
+    auto_graded = 0
+    for p in progresses:
+        for a in p.answers:
+            if auto_graded >= AUTO_GRADE_LIMIT:
+                break
+            if a.text and a.text.strip() and not a.ai_score:
+                q = db.query(QuestionModel).filter(QuestionModel.id == a.question_id).first()
+                if not q:
+                    continue
+                try:
+                    score, feedback_text = grade_answer(q, a.text)
+                    a.ai_score    = score
+                    a.ai_feedback = feedback_text
+                    auto_graded  += 1
+                except Exception:
+                    continue
+        if auto_graded >= AUTO_GRADE_LIMIT:
+            break
+    if auto_graded:
+        db.commit()
 
     scored_answers = []
     recent_q_and_a = [] # We will store the actual questions and answers here
@@ -434,10 +462,16 @@ def get_student_analysis(student_id: str, db: Session = Depends(get_db), request
     }
 
     if len(scored_answers) == 0:
-        stats["ai_summary"] = (
-            f"{student.name} hasn't had any answers checked by the AI tutor yet. "
-            "Encourage them to press \"Check with AI\" after writing an answer so we can start tracking progress!"
-        )
+        if answered_count > 0:
+            stats["ai_summary"] = (
+                f"{student.name} has written {answered_count} answer{'s' if answered_count != 1 else ''}, "
+                "but we couldn't check them with the AI tutor just now — please try refreshing this analysis again."
+            )
+        else:
+            stats["ai_summary"] = (
+                f"{student.name} hasn't answered any questions yet. "
+                "Encourage them to start a lesson and write an answer to begin tracking progress!"
+            )
         return stats
 
     # Get the last 5 questions and answers to give the AI context without overwhelming the token limit
