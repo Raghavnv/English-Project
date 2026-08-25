@@ -36,10 +36,68 @@ async function init() {
     renderQuestions(lesson, savedProgress);
     initBuddy();
     initRelearn(lesson);
+    loadFlashcards(lesson.id);
 
   } catch (err) {
     document.getElementById("questionStack").innerHTML =
       `<p class="empty-state">Could not load lesson: ${err.message}</p>`;
+  }
+}
+
+// ===== FLASHCARDS =====
+let currentFlashcards = [];
+let currentCardIndex = 0;
+
+async function loadFlashcards(lessonId) {
+  try {
+    currentFlashcards = await apiFetch(`/api/lessons/${lessonId}/flashcards/due?student_id=${student.id}`);
+    const section = document.getElementById("flashcardSection");
+    if (currentFlashcards && currentFlashcards.length > 0) {
+      section.style.display = "block";
+      showFlashcard(0);
+    } else {
+      section.style.display = "none";
+    }
+  } catch (e) {
+    console.error("Failed to load flashcards", e);
+  }
+}
+
+function showFlashcard(index) {
+  if (index >= currentFlashcards.length) {
+    document.getElementById("flashcardContainer").style.display = "none";
+    document.getElementById("flashcardControls").style.display = "none";
+    document.getElementById("flashcardCompleteMsg").style.display = "block";
+    return;
+  }
+  const card = currentFlashcards[index];
+  document.getElementById("flashcardFront").innerText = card.front;
+  document.getElementById("flashcardBack").innerText = card.back;
+  
+  const inner = document.getElementById("flashcardInner");
+  inner.classList.remove("is-flipped");
+  document.getElementById("flashcardControls").style.display = "none";
+  currentCardIndex = index;
+}
+
+document.getElementById("flashcardContainer")?.addEventListener("click", () => {
+  const inner = document.getElementById("flashcardInner");
+  if (inner.classList.contains("is-flipped")) return; // Already flipped
+  inner.classList.add("is-flipped");
+  document.getElementById("flashcardControls").style.display = "flex";
+});
+
+async function submitFlashcardReview(quality) {
+  const card = currentFlashcards[currentCardIndex];
+  // Move to next card immediately to keep UI snappy
+  showFlashcard(currentCardIndex + 1);
+  try {
+    await apiFetch(`/api/lessons/flashcards/${card.id}/review`, {
+      method: "POST",
+      body: JSON.stringify({ student_id: student.id, quality: quality })
+    });
+  } catch (e) {
+    console.error("Failed to submit review", e);
   }
 }
 
