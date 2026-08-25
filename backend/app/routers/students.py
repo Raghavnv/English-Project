@@ -50,6 +50,23 @@ def student_login(body: StudentLogin, db: Session = Depends(get_db)):
     if not body.name.strip() or not body.school.strip():
         raise HTTPException(status_code=400, detail="Name and school are required")
     student = get_or_create_student(body.name, body.school, db)
+    
+    # ── STREAK TRACKING ON LOGIN ──
+    now = datetime.now(timezone.utc)
+    last = student.last_active
+    if last is None:
+        student.streak_days = 1
+    else:
+        last_naive = last.replace(tzinfo=None) if last.tzinfo else last
+        now_naive  = now.replace(tzinfo=None)
+        delta = (now_naive.date() - last_naive.date()).days
+        if delta == 1:
+            student.streak_days = (student.streak_days or 0) + 1
+        elif delta > 1:
+            student.streak_days = 1
+        # if delta == 0, keep current streak
+    student.last_active = now
+
     db.commit()
     db.refresh(student)
     return {
@@ -57,6 +74,44 @@ def student_login(body: StudentLogin, db: Session = Depends(get_db)):
         "name": student.name,
         "school": student.school,
         "student_token": create_student_access_token(student.id),
+        "streak_days": student.streak_days
+    }
+
+
+@router.get("/{student_id}/profile")
+def get_student_profile(student_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    badges = []
+    completed_lessons = sum(1 for p in student.progress if p.completed)
+    
+    if completed_lessons >= 1:
+        badges.append({"id": "first_lesson", "name": "First Lesson", "icon": "🎓", "description": "Completed your first lesson!"})
+    if completed_lessons >= 5:
+        badges.append({"id": "five_lessons", "name": "High Five", "icon": "✋", "description": "Completed 5 lessons!"})
+    
+    streak = student.streak_days or 0
+    if streak >= 3:
+        badges.append({"id": "streak_3", "name": "On Fire", "icon": "🔥", "description": "Maintained a 3-day streak!"})
+    if streak >= 7:
+        badges.append({"id": "streak_7", "name": "Unstoppable", "icon": "☄️", "description": "Maintained a 7-day streak!"})
+    
+    has_perfect = False
+    for p in student.progress:
+        for a in p.answers:
+            if a.ai_score and a.ai_score >= 5:
+                has_perfect = True
+                break
+    if has_perfect:
+        badges.append({"id": "perfect_score", "name": "Perfect 5", "icon": "🌟", "description": "Got a 5/5 on an AI check!"})
+        
+    return {
+        "name": student.name,
+        "school": student.school,
+        "streak_days": streak,
+        "badges": badges
     }
 
 
@@ -140,9 +195,7 @@ def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get
                 except Exception:
                     continue
 
-    # ── UPDATE STREAK ──
-
-    # ── UPDATE STREAK ──
+    # ── UPDATE STREAK ON PROGRESS SAVE ──
     now = datetime.now(timezone.utc)
     last = student.last_active
     if last is None:
@@ -151,12 +204,10 @@ def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get
         last_naive = last.replace(tzinfo=None) if last.tzinfo else last
         now_naive  = now.replace(tzinfo=None)
         delta = (now_naive.date() - last_naive.date()).days
-        if delta == 0:
-            pass  # same day, no change
-        elif delta == 1:
+        if delta == 1:
             student.streak_days = (student.streak_days or 0) + 1
-        else:
-            student.streak_days = 1  # streak broken
+        elif delta > 1:
+            student.streak_days = 1
     student.last_active = now
     db.commit()
 
@@ -170,7 +221,7 @@ def save_progress(student_id: str, body: ProgressSave, db: Session = Depends(get
 
 
 @router.get("/")
-def list_students(db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):  # DEMO: get_current_admin removed — RESTORE before going live
+def list_students(db: Session = Depends(get_db), current_admin=Depends(get_current_admin)): 
     students = db.query(Student).order_by(Student.name).all()
     return [
         {
@@ -187,7 +238,7 @@ def list_students(db: Session = Depends(get_db), current_admin=Depends(get_curre
 
 
 @router.delete("/{student_id}")
-def delete_student(student_id: str, db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):  # DEMO: get_current_admin removed — RESTORE before going live
+def delete_student(student_id: str, db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -198,7 +249,6 @@ def delete_student(student_id: str, db: Session = Depends(get_db), current_admin
 
 @router.delete("/{student_id}/progress/{lesson_id}")
 def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
-    """Reset a student's progress for a specific lesson."""
     progress = db.query(Progress).filter(
         Progress.student_id == student_id,
         Progress.lesson_id == lesson_id
@@ -211,29 +261,9 @@ def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends
 
 @router.delete("/{student_id}/progress")
 def reset_all_progress(student_id: str, class_lesson_ids: list[str] | None = None, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
-    """Reset all progress for a student (optionally scoped to specific lesson IDs)."""
     q = db.query(Progress).filter(Progress.student_id == student_id)
     if class_lesson_ids:
         q = q.filter(Progress.lesson_id.in_(class_lesson_ids))
     q.delete(synchronize_session=False)
-    db.commit()
-    return {"reset": True}
-
-
-@router.delete("/{student_id}/progress/{lesson_id}")
-def reset_lesson_progress(student_id: str, lesson_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
-    progress = db.query(Progress).filter(
-        Progress.student_id == student_id,
-        Progress.lesson_id == lesson_id
-    ).first()
-    if progress:
-        db.delete(progress)
-        db.commit()
-    return {"reset": True, "lesson_id": lesson_id}
-
-
-@router.delete("/{student_id}/progress")
-def reset_all_progress(student_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
-    db.query(Progress).filter(Progress.student_id == student_id).delete()
     db.commit()
     return {"reset": True}

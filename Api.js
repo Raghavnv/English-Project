@@ -49,14 +49,12 @@ async function apiFetch(path, options = {}) {
     if (res.status === 204) return null;
     return res.json();
   } catch (err) {
-    // This helps you identify if the backend server is actually off
     if (err instanceof TypeError) {
       throw new Error("Cannot connect to server. Check if the backend is running at " + API_BASE);
     }
     throw err;
   }
 }
-
 
 // ════════════════════════════════════════════════════════════════════
 //  AUTH — ADMIN
@@ -94,7 +92,6 @@ const Auth = {
   }
 };
 
-
 // ════════════════════════════════════════════════════════════════════
 //  STUDENTS
 // ════════════════════════════════════════════════════════════════════
@@ -111,12 +108,15 @@ const Students = {
     return data;
   },
 
+  async getProfile(studentId) {
+    return apiFetch(`/api/students/${studentId}/profile`);
+  },
+
   async getProgress(studentId) {
     return apiFetch(`/api/students/${studentId}/progress`);
   },
 
   async saveProgress(studentId, lessonId, answers) {
-    // answers: { [questionId]: "answer text" }
     const answersArray = Object.entries(answers).map(([question_id, text]) => ({
       question_id, text: text || ""
     }));
@@ -127,14 +127,12 @@ const Students = {
   },
 
   async resetProgress(studentId, lessonIds = []) {
-    // lessonIds: array of lesson IDs to reset (all lessons in a class)
     return apiFetch(`/api/students/${studentId}/progress`, {
       method: "DELETE",
       body: JSON.stringify(lessonIds)
     });
   },
 
-  // Admin only
   async list() {
     return apiFetch("/api/students/");
   },
@@ -143,7 +141,6 @@ const Students = {
     return apiFetch(`/api/students/${studentId}`, { method: "DELETE" });
   }
 };
-
 
 // ════════════════════════════════════════════════════════════════════
 //  LESSONS
@@ -163,7 +160,6 @@ const Lessons = {
   },
 
   async create(classLabel, title, description, questions) {
-    // questions: [{ prompt, type, order }]
     return apiFetch("/api/lessons/", {
       method: "POST",
       body: JSON.stringify({
@@ -196,7 +192,6 @@ const Lessons = {
     });
   }
 };
-
 
 // ════════════════════════════════════════════════════════════════════
 //  AI
@@ -271,7 +266,6 @@ const AI = {
     });
   }
 };
-
 
 // ════════════════════════════════════════════════════════════════════
 //  SPEECH — Web Speech API wrapper

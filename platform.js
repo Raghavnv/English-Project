@@ -2,9 +2,6 @@
 const student      = getStudentData();
 const adminSession = JSON.parse(localStorage.getItem("adminSession") || "null");
 
-// if (!student && !adminSession) {
-//   window.location.href = "login.html";
-// }
 if (!student && !adminSession) {
   window.location.href = "login.html";
 }
@@ -65,7 +62,6 @@ function renderStudentChip() {
   }
 }
 
-// Call chip render as soon as DOM is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", renderStudentChip);
 } else {
@@ -84,6 +80,7 @@ if (mobileSidebarToggle && platformSidebar) {
 // ===== STATE =====
 let classes = [];
 let allProgress = {};
+let studentProfile = null;
 
 const state = {
   selectedClassId:  "",
@@ -95,7 +92,6 @@ async function loadData() {
   try {
     classes = await Lessons.getClasses();
 
-    // Map backend format to app format
     classes = classes.map(cls => ({
       id:      cls.id,
       label:   cls.label,
@@ -108,7 +104,13 @@ async function loadData() {
     }));
 
     if (!isAdminViewing && student?.id) {
-      try { allProgress = await Students.getProgress(student.id); } catch {}
+      try { 
+        allProgress = await Students.getProgress(student.id); 
+        studentProfile = await Students.getProfile(student.id);
+        student.streak_days = studentProfile.streak_days;
+      } catch (err) {
+        console.error("Error fetching progress/profile", err);
+      }
     }
 
     if (classes.length > 0) {
@@ -155,7 +157,6 @@ function renderWelcomeBanner() {
   const completed = selectedClass
     ? selectedClass.modules.filter(m => getModuleProgress(m.id).completed).length
     : 0;
-  if (!isAdminViewing && student) student.streak_days = student.streak_days || 0;
 
   const titleEl = document.getElementById("welcomeBannerTitle");
   const subEl   = document.getElementById("welcomeBannerSub");
@@ -225,16 +226,46 @@ function renderProgress() {
 
   if (lessonCountEl)     lessonCountEl.textContent     = total;
   if (completedCountEl)  completedCountEl.textContent  = completed;
+  
   const streakEl = document.getElementById("streakCount");
   if (streakEl) {
-    const streak = student?.streak_days || 0;
+    const streak = studentProfile?.streak_days || student?.streak_days || 0;
     streakEl.textContent = streak > 0 ? `🔥 ${streak}` : "0";
   }
+  
   if (progressValueEl)   progressValueEl.textContent   = percent + "%";
   if (progressFillEl)    progressFillEl.style.width    = percent + "%";
   if (activeClassPillEl) activeClassPillEl.textContent = selectedClass.label;
   if (classHeadingEl)    classHeadingEl.textContent    = selectedClass.label + " — Learning Path";
   if (classSummaryEl)    classSummaryEl.textContent    = `${total} lesson${total !== 1 ? "s" : ""} · ${completed} completed`;
+}
+
+// ===== BADGES & ACHIEVEMENTS =====
+function renderBadges() {
+  const badgesGrid = document.getElementById("badgesGrid");
+  const badgeCountPill = document.getElementById("badgeCountPill");
+  if (!badgesGrid) return;
+  
+  if (isAdminViewing || !studentProfile || !studentProfile.badges || studentProfile.badges.length === 0) {
+    if (badgeCountPill) badgeCountPill.textContent = "0";
+    badgesGrid.innerHTML = `<p class="empty-state" style="grid-column: 1 / -1; padding: 12px; margin-top: 10px;">No badges yet. Start learning to earn some!</p>`;
+    return;
+  }
+
+  const badges = studentProfile.badges;
+  if (badgeCountPill) badgeCountPill.textContent = badges.length;
+  badgesGrid.innerHTML = "";
+  
+  badges.forEach(b => {
+    const card = document.createElement("div");
+    card.className = "badge-card";
+    card.title = b.description;
+    card.innerHTML = `
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+    `;
+    badgesGrid.appendChild(card);
+  });
 }
 
 // ===== MODULE GRID =====
@@ -248,11 +279,9 @@ function renderModules() {
     return;
   }
 
-  // Sort by order field
   const sortedModules = [...selectedClass.modules].sort((a, b) => (a.order || 0) - (b.order || 0));
 
   sortedModules.forEach((module, idx) => {
-    // A module is locked if it has locked:true AND the previous module is not completed
     const prevModule   = idx > 0 ? sortedModules[idx - 1] : null;
     const prevComplete = prevModule ? getModuleProgress(prevModule.id).completed : true;
     const isActuallyLocked = module.locked && !prevComplete;
@@ -346,7 +375,6 @@ function renderLocalAnalysisStats() {
 
   let scored = 0, correct = 0, scoreSum = 0;
   
-  // Scans all recorded structural items inside all progress files, explicitly ignoring overarching course completion flags
   Object.values(allProgress || {}).forEach(p => {
     if (!p.answers) return;
     Object.values(p.answers).forEach(a => {
@@ -370,7 +398,6 @@ function renderLocalAnalysisStats() {
   set("statAvgScore", avgScore + "/5");
 }
 
-// WIRED MODAL TOGGLE EVENT HANDLERS
 document.addEventListener("DOMContentLoaded", () => {
   const openBtn = document.getElementById("openAnalysisModalBtn");
   const closeBtn = document.getElementById("closeAnalysisModalBtn");
@@ -378,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (openBtn && modal) {
     openBtn.addEventListener("click", () => {
-      renderLocalAnalysisStats(); // Recomputes partial parameters upon interaction
+      renderLocalAnalysisStats();
       modal.style.opacity = "1";
       modal.style.pointerEvents = "all";
       modal.querySelector("div").style.transform = "translateY(0) scale(1)";
@@ -531,7 +558,11 @@ window.addEventListener("focus", async () => {
   if (!didBlur) return;
   didBlur = false;
   if (!isAdminViewing && student?.id) {
-    try { allProgress = await Students.getProgress(student.id); } catch {}
+    try { 
+      allProgress = await Students.getProgress(student.id); 
+      studentProfile = await Students.getProfile(student.id);
+      student.streak_days = studentProfile.streak_days;
+    } catch {}
   }
   render();
 });
@@ -546,6 +577,7 @@ function render() {
   renderWelcomeBanner();
   renderClassList();
   renderProgress();
+  renderBadges();
   renderModules();
   renderLocalAnalysisStats();
 
@@ -558,7 +590,6 @@ function render() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Populate student name immediately before any API calls
   renderStudentChip();
   loadData();
 });
