@@ -330,25 +330,33 @@ Generate exactly {body.count} short English learning flashcards.
 Output ONLY a JSON array of objects. Example:
 [
   {{"front": "Word or Phrase", "back": "Simple meaning in English"}}
-]"""
+]
+Do NOT write any text before or after the array."""
     try:
         raw = ask_groq(
             prompt, 
-            max_tokens=500, 
-            system="You only output valid JSON arrays. Do not include markdown blocks."
+            max_tokens=800, 
+            system="You are a strict data generator. You only output valid JSON arrays. Do not use markdown blocks like ```json."
         )
         
         clean_json = raw.strip()
-        match = re.search(r'\[.*\]', clean_json, re.DOTALL)
         
+        # Hunt for the brackets just in case the AI added conversational text
+        match = re.search(r'\[.*\]', clean_json, re.DOTALL)
         if match:
-            cards = json.loads(match.group(0))
-        else:
-            cards = json.loads(clean_json)
+            clean_json = match.group(0)
             
-        return {"flashcards": cards[:body.count]}
+        try:
+            cards = json.loads(clean_json)
+            return {"flashcards": cards[:body.count]}
+        except json.JSONDecodeError:
+            # If the AI completely messes up the format, give a friendly message instead of a crash
+            raise ValueError("The AI did not format the cards correctly. Please try again.")
+            
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+        # We clean up the error message so the UI alert looks nicer
+        error_msg = str(e).replace("AI service error: ", "")
+        raise HTTPException(status_code=500, detail=error_msg)
 
 
 # ── AI ANALYTICS ──
