@@ -495,9 +495,16 @@ async function toggleRelearn() {
       currentLesson_module?.title || lessonTitle,
       currentLesson_module?.description || ""
     );
-    relearnLoaded = true;
-    renderRelearnContent(res.content, contentEl);
+    
+    // Only flag as loaded if we got a valid response
+    if (res && res.content) {
+      relearnLoaded = true;
+      renderRelearnContent(res.content, contentEl);
+    } else {
+      throw new Error("Empty response");
+    }
   } catch (err) {
+    relearnLoaded = false; // Allow retrying on next click
     contentEl.innerHTML = `<p style="color:rgba(147,197,253,0.6);font-size:0.88rem;">Could not load lesson recap. Please try again.</p>`;
   } finally {
     btn.classList.remove("loading");
@@ -505,7 +512,11 @@ async function toggleRelearn() {
 }
 
 function renderRelearnContent(text, el) {
-  // Parse the AI response into styled sections
+  if (!text) {
+    el.innerHTML = `<p style="color:rgba(147,197,253,0.7);">No content generated. Please try again.</p>`;
+    return;
+  }
+
   const sectionIcons = {
     "WHAT YOU WILL LEARN": "📚",
     "KEY CONCEPTS": "🔑",
@@ -526,7 +537,8 @@ function renderRelearnContent(text, el) {
 
     if (currentSection === "HELPFUL EXAMPLES") {
       buffer.forEach(line => {
-        const clean = line.replace(/^[-•*]\s*/, "").replace(/^["""](.+)["""]$/, "$1");
+        // More robust quote stripping
+        const clean = line.replace(/^[-•*]\s*/, "").replace(/^[""'](.+)[""']$/, "$1");
         html += `<div class="rl-example">"${escapeHtml(clean.replace(/^"|"$/g, ""))}"</div>`;
       });
     } else {
@@ -541,21 +553,34 @@ function renderRelearnContent(text, el) {
     buffer = [];
   }
 
+  let matchedAny = false;
+
   lines.forEach(line => {
-    const upperLine = line.toUpperCase().replace(/[📚🔑✏️💡]/gu, "").trim();
+    // Strip markdown formatting characters to make matching highly resilient
+    const cleanLine = line.replace(/[*#_]/g, ""); 
+    const upperLine = cleanLine.toUpperCase().replace(/[📚🔑✏️💡]/gu, "").trim();
     const matchedSection = Object.keys(sectionIcons).find(k => upperLine.includes(k));
+    
     if (matchedSection) {
       flushSection();
       currentSection = matchedSection;
+      matchedAny = true;
     } else if (currentSection) {
-      // Only add non-empty, non-header lines as content
       const clean = line.replace(/^[-•*\d.]\s*/, "").trim();
-      if (clean.length > 3) buffer.push(clean);
+      if (clean.length > 2) buffer.push(clean);
+    } else {
+      // If the AI gives intro text before any headers, capture it as a paragraph
+      html += `<p style="color:rgba(147,197,253,0.9); margin-bottom:12px;">${escapeHtml(line)}</p>`;
     }
   });
   flushSection();
 
-  el.innerHTML = html || `<p style="color:rgba(147,197,253,0.7);">${escapeHtml(text)}</p>`;
+  if (!matchedAny && !html) {
+    // Ultimate Fallback: If the AI ignores instructions entirely, format the raw markdown
+    html = `<div style="color:#cbd5e1; font-size:0.93rem; line-height:1.8;">${formatAIText(text)}</div>`;
+  }
+
+  el.innerHTML = html || `<p style="color:rgba(147,197,253,0.7); line-height:1.6;">${escapeHtml(text)}</p>`;
 }
 
 // ===== BUDDY CHAT =====
@@ -659,7 +684,7 @@ function handleBuddyKey(e) {
 
 function goBack() { window.location.href = "platform.html"; }
 
-// ── NEW: CONVERSATION QUICK ACTIONS ──
+// ── CONVERSATION QUICK ACTIONS ──
 function startConversationPractice() {
   const input = document.getElementById("buddyInput");
   input.value = "Let's practice a conversation! You pick a topic.";
