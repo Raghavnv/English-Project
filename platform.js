@@ -130,6 +130,15 @@ async function loadData() {
 // ===== HELPERS =====
 function getSelectedClass() { return classes.find(c => c.id === state.selectedClassId); }
 
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function getModuleProgress(moduleId) {
   const p = allProgress[moduleId];
   if (!p) return { completed: false, answeredCount: 0, answers: {} };
@@ -459,61 +468,272 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btn) btn.addEventListener("click", getAiFeedbackAnalysis);
 });
 
-// ===== AI PANEL =====
-const encouragements = [
-  "Every answer you write builds your confidence. Keep going! 🌟",
-  "Small steps every day lead to big progress. You've got this! 💪",
-  "Don't worry about being perfect — just keep practising! 📝",
-  "One lesson at a time. That's all it takes! 🎯",
-  "Your effort today is building your future. Keep it up! 🌈",
-];
-
+// ===== AI PANEL (TRANSFORMED INTO AI STUDY COMPANION) =====
 function renderAIPanel(module) {
   const focusEl    = document.getElementById("aiLessonFocus");
   const hintEl     = document.getElementById("aiHint");
   const hintReveal = document.getElementById("hintReveal");
   const encEl      = document.getElementById("aiEncouragement");
   const statusEl   = document.getElementById("aiStatus");
+  const oldBtn     = document.getElementById("hintButton");
 
   if (!module) return;
 
-  if (focusEl) focusEl.textContent = module.description
-    ? `This lesson covers: "${module.description}". Read each question carefully before answering.`
-    : `You're working on "${module.title}". Take your time with each question.`;
+  if (focusEl) focusEl.innerHTML = "🧠 AI Study Companion";
+  if (hintEl) hintEl.textContent = "Select a lesson below to review core concepts or practice with smart flashcards.";
+  
+  if (statusEl) statusEl.style.display = "none"; 
+  if (oldBtn) oldBtn.style.display = "none";
+  
+  if (encEl) encEl.textContent = "Powered by AI to help you learn faster and remember longer!";
 
-  if (hintReveal) hintReveal.innerHTML = "";
-  if (hintEl) hintEl.textContent = module.questions?.length > 0
-    ? "Click below to get an AI hint for the first question."
-    : "No questions in this lesson yet.";
-
-  const oldBtn = document.getElementById("hintButton");
-  if (oldBtn) {
-    const newBtn = oldBtn.cloneNode(true);
-    oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-    newBtn.disabled = !module.questions?.length;
-    newBtn.textContent = "Get a Hint";
-
-    newBtn.addEventListener("click", async () => {
-      newBtn.disabled = true;
-      newBtn.textContent = "Thinking…";
-      if (statusEl) statusEl.textContent = "Thinking…";
-      try {
-        const q = module.questions[0];
-        const res = await AI.getHint(q.id, module.title);
-        if (hintReveal) hintReveal.innerHTML = `
-          <div style="margin-top:10px;padding:12px 14px;border-radius:12px;background:rgba(111,124,74,0.1);border:1px solid rgba(111,124,74,0.2);font-size:0.9rem;line-height:1.65;">
-            💡 ${res.hint}
-          </div>`;
-        newBtn.textContent = "Hint shown ✓";
-        if (statusEl) statusEl.textContent = "Ready";
-      } catch {
-        newBtn.textContent = "Try Again";
-        newBtn.disabled = false;
-      }
+  if (hintReveal) {
+    const allLessons = classes.flatMap(c => c.modules);
+    let optionsHtml = '<option value="">Select a lesson...</option>';
+    
+    allLessons.forEach(l => {
+      const isSelected = l.id === module.id ? "selected" : "";
+      optionsHtml += `<option value="${l.id}" data-title="${escapeHtml(l.title)}" data-desc="${escapeHtml(l.description || '')}" ${isSelected}>${escapeHtml(l.title)}</option>`;
     });
+
+    hintReveal.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px; width: 100%;">
+        <select id="aiStudySelect" style="width: 100%; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(80,58,40,0.2); font-family: inherit; font-size: 0.95rem; background: rgba(255,255,255,0.8); color: var(--accent-deep); cursor: pointer;">
+          ${optionsHtml}
+        </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <button onclick="triggerStudyHub('relearn')" style="min-height: 40px; border-radius: 10px; border: none; background: rgba(56,189,248,0.1); color: #0284c7; font-weight: 700; cursor: pointer; border: 1px solid rgba(56,189,248,0.3); transition: all 0.2s ease;">📖 Re-Learn</button>
+          <button onclick="triggerStudyHub('flashcards')" style="min-height: 40px; border-radius: 10px; border: none; background: rgba(139,92,246,0.1); color: #6d28d9; font-weight: 700; cursor: pointer; border: 1px solid rgba(139,92,246,0.3); transition: all 0.2s ease;">✨ Flashcards</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// ===== INJECT AI MODALS DYNAMICALLY =====
+function injectStudyModals() {
+  if (document.getElementById("modalRelearn")) return; 
+
+  const modalsHTML = `
+    <style>
+      .ai-modal-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(20,15,10,0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 20px; }
+      .ai-modal-overlay.show { opacity: 1; pointer-events: all; }
+      .ai-modal-content { width: 100%; max-width: 800px; max-height: 90vh; border-radius: 28px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; transform: translateY(20px) scale(0.98); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+      .ai-modal-overlay.show .ai-modal-content { transform: translateY(0) scale(1); }
+      .ai-modal-header { padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+      .ai-modal-close { background: rgba(255,255,255,0.15); border: none; width: 36px; height: 36px; border-radius: 50%; color: #fff; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+      .ai-modal-close:hover { background: rgba(255,255,255,0.3); }
+      .ai-modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+      .relearn-modal { background: linear-gradient(135deg, #0f2027 0%, #1a3a4a 50%, #0f2027 100%); border: 1px solid rgba(56,189,248,0.3); }
+      .relearn-modal .ai-modal-header { border-bottom: 1px solid rgba(56,189,248,0.15); }
+      .relearn-modal .ai-modal-title { color: #e0f2fe; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; }
+      .flashcard-modal { background: linear-gradient(145deg, #f5f3ff, #ede9fe); border: 1px solid rgba(139, 92, 246, 0.4); }
+      .flashcard-modal .ai-modal-header { border-bottom: 1px solid rgba(139, 92, 246, 0.15); }
+      .flashcard-modal .ai-modal-title { color: #4c1d95; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; }
+      .flashcard-modal .ai-modal-close { background: rgba(76, 29, 149, 0.1); color: #4c1d95; }
+      .relearn-content { color: #cbd5e1; font-size: 1rem; line-height: 1.8; }
+      .relearn-content .rl-section { margin-bottom: 24px; }
+      .relearn-content .rl-header { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #7dd3fc; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(56,189,248,0.12); }
+      .relearn-content ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+      .relearn-content ul li { display: flex; gap: 10px; align-items: flex-start; }
+      .relearn-content ul li::before { content: "→"; color: #38bdf8; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
+      .relearn-content .rl-example { background: rgba(255,255,255,0.04); border: 1px solid rgba(56,189,248,0.1); border-radius: 12px; padding: 12px 16px; font-style: italic; color: #a5f3fc; margin-bottom: 10px; }
+      .ai-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; perspective: 1000px; }
+      .ai-card-wrapper { width: 100%; height: 180px; cursor: pointer; perspective: 1000px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; }
+      .ai-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; border-radius: 18px; box-shadow: 0 8px 20px rgba(46, 16, 101, 0.12); }
+      .ai-card-wrapper:hover .ai-card-inner { box-shadow: 0 12px 28px rgba(46, 16, 101, 0.2); transform: translateY(-3px); }
+      .ai-card-inner.is-flipped { transform: rotateY(180deg); }
+      .ai-card-front, .ai-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 18px; display: flex; align-items: center; justify-content: center; padding: 20px; font-size: 1.25rem; font-weight: 700; text-align: center; }
+      .ai-card-front { background: #ffffff; border: 2px solid rgba(139, 92, 246, 0.3); color: #4c1d95; }
+      .ai-card-back { background: linear-gradient(135deg, #7c3aed, #5b21b6); border: 2px solid rgba(109, 40, 217, 0.6); color: #ffffff; transform: rotateY(180deg); font-size: 1.05rem; line-height: 1.45; }
+      .ai-loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 16px; text-align: center; }
+      .spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; animation: spin 0.8s linear infinite; }
+      .spinner.purple { border-color: rgba(139,92,246,0.2); border-top-color: #7c3aed; }
+      .spinner.blue { border-color: rgba(56,189,248,0.2); border-top-color: #38bdf8; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes popIn { 0% { opacity: 0; transform: scale(0.8) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+    </style>
+    
+    <!-- MODAL: RE-LEARN -->
+    <div class="ai-modal-overlay" id="modalRelearn" onclick="closeStudyModals(event)">
+      <div class="ai-modal-content relearn-modal">
+        <div class="ai-modal-header">
+          <h3 class="ai-modal-title">📖 <span id="relearnModalTitle">Lesson Recap</span></h3>
+          <button class="ai-modal-close" onclick="closeStudyModals()">✕</button>
+        </div>
+        <div class="ai-modal-body">
+          <div id="relearnContentArea"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: FLASHCARDS -->
+    <div class="ai-modal-overlay" id="modalFlashcards" onclick="closeStudyModals(event)">
+      <div class="ai-modal-content flashcard-modal">
+        <div class="ai-modal-header">
+          <h3 class="ai-modal-title">✨ <span id="flashcardModalTitle">Smart Flashcards</span></h3>
+          <button class="ai-modal-close" onclick="closeStudyModals()">✕</button>
+        </div>
+        <div class="ai-modal-body">
+          <div id="flashcardContentArea" class="ai-card-grid"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML("beforeend", modalsHTML);
+}
+
+document.addEventListener("DOMContentLoaded", injectStudyModals);
+
+function closeStudyModals(e) {
+  if (e && e.target.classList && !e.target.classList.contains("ai-modal-overlay")) return;
+  
+  const modalRelearn = document.getElementById("modalRelearn");
+  const modalFlashcards = document.getElementById("modalFlashcards");
+  
+  if (modalRelearn) modalRelearn.classList.remove("show");
+  if (modalFlashcards) modalFlashcards.classList.remove("show");
+  
+  setTimeout(() => {
+    const rArea = document.getElementById("relearnContentArea");
+    const fArea = document.getElementById("flashcardContentArea");
+    if (rArea) rArea.innerHTML = "";
+    if (fArea) fArea.innerHTML = "";
+  }, 300);
+}
+
+// ── TRIGGER AI STUDY ACTIONS ──
+async function triggerStudyHub(type) {
+  const selectEl = document.getElementById("aiStudySelect");
+  if (!selectEl || !selectEl.value) {
+    alert("Please select a lesson from the dropdown first!");
+    return;
   }
 
-  if (encEl) encEl.textContent = encouragements[Math.floor(Math.random() * encouragements.length)];
+  const selectedOption = selectEl.options[selectEl.selectedIndex];
+  const lessonId = selectEl.value;
+  const title = selectedOption.dataset.title;
+  const desc = selectedOption.dataset.desc;
+
+  if (type === 'relearn') {
+    await openRelearn(lessonId, title, desc);
+  } else if (type === 'flashcards') {
+    await openFlashcards(title, desc);
+  }
+}
+
+async function openRelearn(lessonId, title, desc) {
+  const modal = document.getElementById("modalRelearn");
+  const titleEl = document.getElementById("relearnModalTitle");
+  const contentArea = document.getElementById("relearnContentArea");
+
+  if (titleEl) titleEl.textContent = title;
+  if (contentArea) {
+    contentArea.innerHTML = `
+      <div class="ai-loading-state">
+        <div class="spinner blue"></div>
+        <p style="color: #7dd3fc; margin: 0; font-weight: 600;">Buddy is writing a quick summary...</p>
+      </div>
+    `;
+  }
+  if (modal) modal.classList.add("show");
+
+  try {
+    const res = await AI.getRelearn(lessonId, title, desc);
+    if (res && res.content) {
+      const sectionIcons = { "WHAT YOU WILL LEARN": "📚", "KEY CONCEPTS": "🔑", "HELPFUL EXAMPLES": "✏️", "QUICK TIPS": "💡" };
+      const lines = res.content.split("\n").map(l => l.trim()).filter(Boolean);
+      let html = "";
+      let currentSection = null;
+      let buffer = [];
+
+      function flushSection() {
+        if (!currentSection || !buffer.length) return;
+        const icon = sectionIcons[currentSection] || "📌";
+        html += `<div class="rl-section"><div class="rl-header">${icon} ${currentSection}</div>`;
+        if (currentSection === "HELPFUL EXAMPLES") {
+          buffer.forEach(line => {
+            const clean = line.replace(/^[-•*]\s*/, "").replace(/^[""'](.+)[""']$/, "$1");
+            html += `<div class="rl-example">"${escapeHtml(clean.replace(/^"|"$/g, ""))}"</div>`;
+          });
+        } else {
+          html += `<ul>`;
+          buffer.forEach(line => { html += `<li>${escapeHtml(line.replace(/^[-•*]\s*/, ""))}</li>`; });
+          html += `</ul>`;
+        }
+        html += `</div>`;
+        buffer = [];
+      }
+
+      let matchedAny = false;
+      lines.forEach(line => {
+        const cleanLine = line.replace(/[*#_]/g, ""); 
+        const upperLine = cleanLine.toUpperCase().replace(/[📚🔑✏️💡]/gu, "").trim();
+        const matchedSection = Object.keys(sectionIcons).find(k => upperLine.includes(k));
+        
+        if (matchedSection) {
+          flushSection();
+          currentSection = matchedSection;
+          matchedAny = true;
+        } else if (currentSection) {
+          const clean = line.replace(/^[-•*\d.]\s*/, "").trim();
+          if (clean.length > 2) buffer.push(clean);
+        } else {
+          html += `<p style="color:rgba(147,197,253,0.9); margin-bottom:12px;">${escapeHtml(line)}</p>`;
+        }
+      });
+      flushSection();
+
+      if (!matchedAny && !html) html = `<div style="color:#cbd5e1; font-size:0.95rem; line-height:1.8;">${escapeHtml(res.content).replace(/\n/g, '<br>')}</div>`;
+      if (contentArea) contentArea.innerHTML = `<div class="relearn-content">${html}</div>`;
+    } else throw new Error("Received empty response from AI");
+  } catch (err) {
+    if (contentArea) contentArea.innerHTML = `<div style="color: #fca5a5; text-align: center; padding: 20px;">Could not generate recap: ${escapeHtml(err.message)}</div>`;
+  }
+}
+
+async function openFlashcards(title, desc) {
+  const modal = document.getElementById("modalFlashcards");
+  const titleEl = document.getElementById("flashcardModalTitle");
+  const contentArea = document.getElementById("flashcardContentArea");
+
+  if (titleEl) titleEl.textContent = title + " Deck";
+  if (contentArea) {
+    contentArea.innerHTML = `
+      <div class="ai-loading-state" style="grid-column: 1 / -1;">
+        <div class="spinner purple"></div>
+        <p style="color: #6d28d9; margin: 0; font-weight: 600;">Generating smart flashcards...</p>
+      </div>
+    `;
+  }
+  if (modal) modal.classList.add("show");
+
+  try {
+    const res = await AI.generateFlashcards(title, desc, 6);
+    const cards = res.flashcards || [];
+
+    if (cards.length === 0) throw new Error("AI did not return any cards.");
+    if (contentArea) {
+      contentArea.innerHTML = "";
+      cards.forEach((card, i) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "ai-card-wrapper";
+        wrapper.style.animationDelay = `${i * 0.1}s`; 
+        wrapper.innerHTML = `
+          <div class="ai-card-inner">
+            <div class="ai-card-front">${escapeHtml(card.front)}</div>
+            <div class="ai-card-back">${escapeHtml(card.back)}</div>
+          </div>
+        `;
+        wrapper.addEventListener("click", () => {
+          wrapper.querySelector(".ai-card-inner").classList.toggle("is-flipped");
+        });
+        contentArea.appendChild(wrapper);
+      });
+    }
+  } catch (err) {
+    if (contentArea) contentArea.innerHTML = `<div style="color: #dc2626; text-align: center; padding: 20px; grid-column: 1 / -1;">Error creating deck: ${escapeHtml(err.message)}</div>`;
+  }
 }
 
 // ===== RESET CLASS PROGRESS =====
