@@ -1,23 +1,49 @@
-// ── Api.js (Top Section) ──
 const API_BASE = "https://english-project-l9gy.onrender.com";
 
 // ── TOKEN HELPERS ─────────────────────────────────────────────────────────────
-function getAdminToken()  { return localStorage.getItem("adminToken"); }
-function setAdminToken(t) { localStorage.setItem("adminToken", t); }
-function clearAdminToken(){ localStorage.removeItem("adminToken"); }
 
-function getStudentId()   { return localStorage.getItem("studentId"); }
-function setStudentId(id) { localStorage.setItem("studentId", id); }
-function getStudentToken() { return localStorage.getItem("studentToken"); }
-function setStudentToken(token) { localStorage.setItem("studentToken", token); }
-function clearStudentToken() { localStorage.removeItem("studentToken"); }
+function getAdminToken() { 
+  return localStorage.getItem("adminToken"); 
+}
+
+function setAdminToken(t) { 
+  localStorage.setItem("adminToken", t); 
+}
+
+function clearAdminToken() { 
+  localStorage.removeItem("adminToken"); 
+}
+
+function getStudentId() { 
+  return localStorage.getItem("studentId"); 
+}
+
+function setStudentId(id) { 
+  localStorage.setItem("studentId", id); 
+}
+
+function getStudentToken() { 
+  return localStorage.getItem("studentToken"); 
+}
+
+function setStudentToken(token) { 
+  localStorage.setItem("studentToken", token); 
+}
+
+function clearStudentToken() { 
+  localStorage.removeItem("studentToken"); 
+}
 
 function getStudentData() {
-  try { return JSON.parse(localStorage.getItem("student")) || null; }
-  catch { return null; }
+  try { 
+    return JSON.parse(localStorage.getItem("student")) || null; 
+  } catch { 
+    return null; 
+  }
 }
 
 // ── UPDATED BASE FETCH ────────────────────────────────────────────────────────
+
 async function apiFetch(path, options = {}) {
   const token = getAdminToken();
   
@@ -33,6 +59,7 @@ async function apiFetch(path, options = {}) {
   if (token) {
     fetchOptions.headers["Authorization"] = `Bearer ${token}`;
   }
+  
   const studentToken = getStudentToken();
   if (studentToken) {
     fetchOptions.headers["X-Student-Token"] = studentToken;
@@ -67,6 +94,7 @@ const Auth = {
       body: JSON.stringify({ username, password })
     });
   },
+
   async login(username, password) {
     const data = await apiFetch("/api/auth/login", {
       method: "POST",
@@ -76,13 +104,16 @@ const Auth = {
     localStorage.setItem("adminSession", JSON.stringify({ username: data.username }));
     return data;
   },
+
   logout() {
     clearAdminToken();
     localStorage.removeItem("adminSession");
   },
+
   async me() {
     return apiFetch("/api/auth/me");
   },
+
   isLoggedIn() {
     return !!getAdminToken();
   }
@@ -103,12 +134,15 @@ const Students = {
     localStorage.setItem("student", JSON.stringify({ id: data.id, name: data.name, school: data.school }));
     return data;
   },
+
   async getProfile(studentId) {
     return apiFetch(`/api/students/${studentId}/profile`);
   },
+
   async getProgress(studentId) {
     return apiFetch(`/api/students/${studentId}/progress`);
   },
+
   async saveProgress(studentId, lessonId, answers) {
     const answersArray = Object.entries(answers).map(([question_id, text]) => ({
       question_id, text: text || ""
@@ -118,15 +152,18 @@ const Students = {
       body: JSON.stringify({ lesson_id: lessonId, answers: answersArray })
     });
   },
+
   async resetProgress(studentId, lessonIds = []) {
     return apiFetch(`/api/students/${studentId}/progress`, {
       method: "DELETE",
       body: JSON.stringify(lessonIds)
     });
   },
+
   async list() {
     return apiFetch("/api/students/");
   },
+
   async delete(studentId) {
     return apiFetch(`/api/students/${studentId}`, { method: "DELETE" });
   }
@@ -140,12 +177,15 @@ const Lessons = {
   async getAll() {
     return apiFetch("/api/lessons/");
   },
+
   async getClasses() {
     return apiFetch("/api/lessons/classes");
   },
+
   async getOne(lessonId) {
     return apiFetch(`/api/lessons/${lessonId}`);
   },
+
   async create(classLabel, title, description, questions, flashcards = []) {
     return apiFetch("/api/lessons/", {
       method: "POST",
@@ -158,18 +198,22 @@ const Lessons = {
       })
     });
   },
+
   async delete(lessonId) {
     return apiFetch(`/api/lessons/${lessonId}`, { method: "DELETE" });
   },
+
   async deleteClass(classId) {
     return apiFetch(`/api/lessons/classes/${classId}`, { method: "DELETE" });
   },
+
   async addQuestion(lessonId, prompt, type = "text") {
     return apiFetch(`/api/lessons/${lessonId}/questions`, {
       method: "POST",
       body: JSON.stringify({ prompt, type })
     });
   },
+
   async deleteQuestion(lessonId, questionId) {
     return apiFetch(`/api/lessons/${lessonId}/questions/${questionId}`, {
       method: "DELETE"
@@ -192,27 +236,33 @@ const AI = {
       })
     });
   },
+
   async getHint(questionId, lessonTitle = "") {
     return apiFetch("/api/ai/hint", {
       method: "POST",
       body: JSON.stringify({ question_id: questionId, lesson_title: lessonTitle })
     });
   },
+
   async getGuide(questionId, lessonTitle = "") {
     return apiFetch("/api/ai/guide", {
       method: "POST",
       body: JSON.stringify({ question_id: questionId, lesson_title: lessonTitle })
     });
   },
+
   async getEncouragement() {
     return apiFetch("/api/ai/encouragement", { method: "POST" });
   },
+
   async getAnalysis(studentId) {
     return apiFetch(`/api/ai/analysis/${studentId}`);
   },
+
   async getClassAnalysis() {
     return apiFetch("/api/ai/class-analysis");
   },
+
   async generateQuestions(lessonTitle, lessonDescription, classLabel, count = 5, questionType = "text") {
     return apiFetch("/api/ai/generate-questions", {
       method: "POST",
@@ -225,6 +275,7 @@ const AI = {
       })
     });
   },
+
   async chat(messages, lessonTitle = "", studentName = "") {
     return apiFetch("/api/ai/chat", {
       method: "POST",
@@ -235,6 +286,7 @@ const AI = {
       })
     });
   },
+
   async getRelearn(lessonId, lessonTitle = "", lessonDescription = "") {
     return apiFetch("/api/ai/relearn", {
       method: "POST",
@@ -242,6 +294,17 @@ const AI = {
         lesson_id: lessonId,
         lesson_title: lessonTitle,
         lesson_description: lessonDescription
+      })
+    });
+  },
+
+  async generateFlashcards(lessonTitle, lessonDescription, count = 6) {
+    return apiFetch("/api/ai/generate-flashcards", {
+      method: "POST",
+      body: JSON.stringify({
+        lesson_title: lessonTitle,
+        lesson_description: lessonDescription,
+        count: count
       })
     });
   }
@@ -254,9 +317,11 @@ const AI = {
 const Speech = {
   recognition: null,
   isListening: false,
+
   isSupported() {
     return "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
   },
+
   start(onResult, onEnd) {
     if (!this.isSupported()) {
       alert("Your browser doesn't support voice input. Try Chrome.");
@@ -272,10 +337,12 @@ const Speech = {
       const transcript = event.results[0][0].transcript;
       if (onResult) onResult(transcript);
     };
+
     this.recognition.onend = () => {
       this.isListening = false;
       if (onEnd) onEnd();
     };
+
     this.recognition.onerror = (event) => {
       this.isListening = false;
       if (onEnd) onEnd();
@@ -283,9 +350,11 @@ const Speech = {
         console.warn("Speech error:", event.error);
       }
     };
+
     this.recognition.start();
     this.isListening = true;
   },
+
   stop() {
     if (this.recognition) {
       this.recognition.stop();

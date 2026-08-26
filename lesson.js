@@ -1,26 +1,34 @@
 // ===== LOGIN CHECK =====
 const student = getStudentData();
-if (!student) { window.location.href = "login.html"; }
-if (student && !getStudentToken()) { window.location.href = "login.html"; }
+if (!student) { 
+  window.location.href = "login.html"; 
+}
+if (student && !getStudentToken()) { 
+  window.location.href = "login.html"; 
+}
 
 const currentLesson = JSON.parse(localStorage.getItem("currentLesson"));
-if (!currentLesson) { window.location.href = "platform.html"; }
+if (!currentLesson) { 
+  window.location.href = "platform.html"; 
+}
 
-let module      = null;
-let progressId  = null;
-let answers     = {};
+let module = null;
+let progressId = null;
+let answers = {};
 let lessonTitle = "";
 
 async function init() {
   try {
     const lesson = await Lessons.getOne(currentLesson.moduleId);
-    module      = lesson;
+    module = lesson;
     lessonTitle = lesson.title;
 
     const headerSpan = document.querySelector(".platform-brand-copy span");
-    if (headerSpan) headerSpan.textContent = student.name + " · " + (lesson.class_label || "Lesson");
+    if (headerSpan) {
+      headerSpan.textContent = student.name + " · " + (lesson.class_label || "Lesson");
+    }
 
-    document.getElementById("lessonTitle").innerText       = lesson.title;
+    document.getElementById("lessonTitle").innerText = lesson.title;
     document.getElementById("lessonDescription").innerText = lesson.description || "";
 
     let savedProgress = {};
@@ -29,9 +37,13 @@ async function init() {
       savedProgress = allProgress[lesson.id] || {};
       answers = { ...savedProgress.answers };
       Object.keys(answers).forEach(qid => {
-        if (typeof answers[qid] === "object") answers[qid] = answers[qid].text || "";
+        if (typeof answers[qid] === "object") {
+          answers[qid] = answers[qid].text || "";
+        }
       });
-    } catch {}
+    } catch (e) {
+      console.warn("Could not load saved progress", e);
+    }
 
     renderQuestions(lesson, savedProgress);
     initBuddy();
@@ -39,7 +51,7 @@ async function init() {
     loadFlashcards(lesson.id);
 
   } catch (err) {
-    document.getElementById("questionStack").innerHTML =
+    document.getElementById("questionStack").innerHTML = 
       `<p class="empty-state">Could not load lesson: ${err.message}</p>`;
   }
 }
@@ -52,6 +64,7 @@ async function loadFlashcards(lessonId) {
   try {
     currentFlashcards = await apiFetch(`/api/lessons/${lessonId}/flashcards/due?student_id=${student.id}`);
     const section = document.getElementById("flashcardSection");
+    
     if (currentFlashcards && currentFlashcards.length > 0) {
       section.style.display = "block";
       showFlashcard(0);
@@ -70,6 +83,7 @@ function showFlashcard(index) {
     document.getElementById("flashcardCompleteMsg").style.display = "block";
     return;
   }
+  
   const card = currentFlashcards[index];
   document.getElementById("flashcardFront").innerText = card.front;
   document.getElementById("flashcardBack").innerText = card.back;
@@ -83,6 +97,7 @@ function showFlashcard(index) {
 document.getElementById("flashcardContainer")?.addEventListener("click", () => {
   const inner = document.getElementById("flashcardInner");
   if (inner.classList.contains("is-flipped")) return; // Already flipped
+  
   inner.classList.add("is-flipped");
   document.getElementById("flashcardControls").style.display = "flex";
 });
@@ -91,6 +106,7 @@ async function submitFlashcardReview(quality) {
   const card = currentFlashcards[currentCardIndex];
   // Move to next card immediately to keep UI snappy
   showFlashcard(currentCardIndex + 1);
+  
   try {
     await apiFetch(`/api/lessons/flashcards/${card.id}/review`, {
       method: "POST",
@@ -111,7 +127,7 @@ function renderQuestions(lesson, savedProgress) {
     return;
   }
 
-  const total      = lesson.questions.length;
+  const total = lesson.questions.length;
   const isComplete = savedProgress.completed || false;
 
   // Progress banner
@@ -136,8 +152,8 @@ function renderQuestions(lesson, savedProgress) {
   stack.appendChild(autosaveEl);
 
   lesson.questions.forEach((q, i) => {
-    const isSpeech  = q.type === "speech";
-    const card      = document.createElement("div");
+    const isSpeech = q.type === "speech";
+    const card = document.createElement("div");
     const savedAnswer = answers[q.id] || "";
 
     // ── TYPE BADGE ──
@@ -225,9 +241,10 @@ function renderQuestions(lesson, savedProgress) {
         if (val.length >= MIN_ANSWER_LENGTH) answered++;
       }
     });
+    
     const pct = Math.round((answered / total) * 100);
     document.getElementById("progressText").textContent = `${answered} of ${total} answered`;
-    document.getElementById("progressPct").textContent  = pct + "%";
+    document.getElementById("progressPct").textContent = pct + "%";
     document.getElementById("progressFill").style.width = pct + "%";
     return answered;
   }
@@ -240,28 +257,54 @@ function renderQuestions(lesson, savedProgress) {
       try {
         await Students.saveProgress(student.id, lesson.id, answers);
         const ind = document.getElementById("autosaveIndicator");
-        if (ind) { ind.style.opacity = "1"; setTimeout(() => ind.style.opacity = "0", 1800); }
-      } catch {}
+        if (ind) { 
+          ind.style.opacity = "1"; 
+          setTimeout(() => ind.style.opacity = "0", 1800); 
+        }
+      } catch (err) {
+        console.warn("Autosave failed", err);
+      }
     }, 1400);
   }
 
   stack.querySelectorAll(".q-answer").forEach(ta => {
-    ta.addEventListener("input", () => { updateProgress(); triggerAutosave(); });
+    ta.addEventListener("input", () => { 
+      updateProgress(); 
+      triggerAutosave(); 
+    });
   });
 
   // Mic buttons for text questions
   stack.querySelectorAll(".q-mic-btn").forEach(micBtn => {
     const qid = micBtn.dataset.qid;
     const ta  = stack.querySelector(`.q-answer[data-qid="${qid}"]`);
+    
     micBtn.addEventListener("click", () => {
       if (Speech.isListening) {
-        Speech.stop(); micBtn.textContent = "🎤"; micBtn.style.background = "rgba(255,255,255,0.8)"; return;
+        Speech.stop(); 
+        micBtn.textContent = "🎤"; 
+        micBtn.style.background = "rgba(255,255,255,0.8)"; 
+        return;
       }
-      if (!Speech.isSupported()) { alert("Voice input requires Chrome."); return; }
-      micBtn.textContent = "⏹"; micBtn.style.background = "rgba(220,50,50,0.12)";
+      
+      if (!Speech.isSupported()) { 
+        alert("Voice input requires Chrome."); 
+        return; 
+      }
+      
+      micBtn.textContent = "⏹"; 
+      micBtn.style.background = "rgba(220,50,50,0.12)";
+      
       Speech.start(
-        (transcript) => { ta.value += (ta.value ? " " : "") + transcript; updateProgress(); triggerAutosave(); },
-        () => { micBtn.textContent = "🎤"; micBtn.style.background = "rgba(255,255,255,0.8)"; }
+        (transcript) => { 
+          ta.value += (ta.value ? " " : "") + transcript; 
+          updateProgress(); 
+          triggerAutosave(); 
+        },
+        () => { 
+          micBtn.textContent = "🎤"; 
+          micBtn.style.background = "rgba(255,255,255,0.8)"; 
+        }
       );
     });
   });
@@ -269,8 +312,8 @@ function renderQuestions(lesson, savedProgress) {
   // AI Check buttons
   stack.querySelectorAll(".check-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const qid      = btn.dataset.qid;
-      const q        = lesson.questions.find(x => x.id === qid);
+      const qid = btn.dataset.qid;
+      const q = lesson.questions.find(x => x.id === qid);
       const isSpeech = q && q.type === "speech";
       let answerText = "";
 
@@ -293,10 +336,11 @@ function renderQuestions(lesson, savedProgress) {
       feedbackEl.innerHTML = `<span style="color:var(--muted);font-size:0.85rem;">Thinking…</span>`;
 
       try {
-        const res     = await AI.getFeedback(qid, answerText, progressId);
-        const score   = typeof res.score === "number" ? res.score : null;
-        const isGood  = score !== null ? score >= 3 : /good|great|well|correct|nice|excel|perfect|spot.on/i.test(res.feedback);
-        const badge   = score !== null ? (isGood ? "✅ Correct" : "❌ Needs Work") : (isGood ? "✅" : "💬");
+        const res = await AI.getFeedback(qid, answerText, progressId);
+        const score = typeof res.score === "number" ? res.score : null;
+        const isGood = score !== null ? score >= 3 : /good|great|well|correct|nice|excel|perfect|spot.on/i.test(res.feedback);
+        const badge = score !== null ? (isGood ? "✅ Correct" : "❌ Needs Work") : (isGood ? "✅" : "💬");
+        
         feedbackEl.innerHTML = `
           <div style="padding:11px 14px;border-radius:12px;font-size:0.88rem;line-height:1.65;
             background:${isGood ? "rgba(111,124,74,0.1)" : "rgba(188,93,45,0.07)"};
@@ -317,14 +361,19 @@ function renderQuestions(lesson, savedProgress) {
   // Hint buttons
   stack.querySelectorAll(".q-hint-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const qid     = btn.dataset.qid;
-      const hintEl  = document.getElementById(`hint_${qid}`);
+      const qid = btn.dataset.qid;
+      const hintEl = document.getElementById(`hint_${qid}`);
+      
       if (hintEl.style.display !== "none") {
-        hintEl.style.display = "none"; btn.textContent = "💡 Hint"; return;
+        hintEl.style.display = "none"; 
+        btn.textContent = "💡 Hint"; 
+        return;
       }
+      
       btn.textContent = "…";
       hintEl.style.display = "";
       hintEl.textContent = "Getting hint…";
+      
       try {
         const res = await AI.getHint(qid, lessonTitle);
         hintEl.innerHTML = `<strong>💡 Hint</strong>${formatAIText(res.hint)}`;
@@ -345,9 +394,11 @@ function renderQuestions(lesson, savedProgress) {
         if (t && t.dataset.transcript) answers[q.id] = t.dataset.transcript;
       }
     });
+    
     updateProgress();
     doneBtn.textContent = "Saving…";
     doneBtn.disabled = true;
+    
     try {
       const result = await Students.saveProgress(student.id, lesson.id, answers);
       if (result.completed) {
@@ -355,7 +406,10 @@ function renderQuestions(lesson, savedProgress) {
         doneBtn.textContent = "✓ All Done!";
       } else {
         doneBtn.textContent = "✓ Progress Saved";
-        setTimeout(() => { doneBtn.textContent = "Save Answers"; doneBtn.disabled = false; }, 1500);
+        setTimeout(() => { 
+          doneBtn.textContent = "Save Answers"; 
+          doneBtn.disabled = false; 
+        }, 1500);
       }
     } catch (err) {
       doneBtn.textContent = "Error — Try Again";
@@ -372,20 +426,27 @@ function renderQuestions(lesson, savedProgress) {
 }
 
 // ===== SPEECH QUESTION RECORDING =====
-let activeSpeechQid  = null;
+let activeSpeechQid = null;
 let speechRecognition = null;
 
 function toggleSpeechRecord(qid) {
-  if (activeSpeechQid === qid) stopSpeechRecord(qid);
-  else { if (activeSpeechQid) stopSpeechRecord(activeSpeechQid); startSpeechRecord(qid); }
+  if (activeSpeechQid === qid) {
+    stopSpeechRecord(qid);
+  } else { 
+    if (activeSpeechQid) stopSpeechRecord(activeSpeechQid); 
+    startSpeechRecord(qid); 
+  }
 }
 
 function startSpeechRecord(qid) {
-  if (!Speech.isSupported()) { setSpeechStatus(qid, "❌ Voice input requires Chrome."); return; }
+  if (!Speech.isSupported()) { 
+    setSpeechStatus(qid, "❌ Voice input requires Chrome."); 
+    return; 
+  }
 
-  const btn          = document.getElementById(`recBtn_${qid}`);
+  const btn = document.getElementById(`recBtn_${qid}`);
   const transcriptEl = document.getElementById(`transcript_${qid}`);
-  activeSpeechQid    = qid;
+  activeSpeechQid = qid;
 
   btn.classList.add("recording");
   btn.innerHTML = "⏹ Stop Recording";
@@ -407,8 +468,11 @@ function startSpeechRecord(qid) {
         finalTranscript += (finalTranscript ? " " : "") + t;
         transcriptEl.dataset.transcript = finalTranscript;
         answers[qid] = finalTranscript;
-      } else { interim += t; }
+      } else { 
+        interim += t; 
+      }
     }
+    
     transcriptEl.innerHTML = finalTranscript
       ? `${finalTranscript}<span style="color:var(--muted);font-style:italic;"> ${interim}</span>`
       : `<span style="color:var(--muted);font-style:italic;">${interim || "Listening…"}</span>`;
@@ -419,7 +483,9 @@ function startSpeechRecord(qid) {
   };
 
   speechRecognition.onend = () => {
-    if (activeSpeechQid === qid) try { speechRecognition.start(); } catch {}
+    if (activeSpeechQid === qid) {
+      try { speechRecognition.start(); } catch {}
+    }
   };
 
   speechRecognition.start();
@@ -427,11 +493,22 @@ function startSpeechRecord(qid) {
 
 function stopSpeechRecord(qid) {
   activeSpeechQid = null;
-  if (speechRecognition) { speechRecognition.onend = null; speechRecognition.stop(); speechRecognition = null; }
-  const btn          = document.getElementById(`recBtn_${qid}`);
+  if (speechRecognition) { 
+    speechRecognition.onend = null; 
+    speechRecognition.stop(); 
+    speechRecognition = null; 
+  }
+  
+  const btn = document.getElementById(`recBtn_${qid}`);
   const transcriptEl = document.getElementById(`transcript_${qid}`);
-  if (btn) { btn.classList.remove("recording"); btn.innerHTML = "🎤 Start Speaking"; }
+  
+  if (btn) { 
+    btn.classList.remove("recording"); 
+    btn.innerHTML = "🎤 Start Speaking"; 
+  }
+  
   const finalText = transcriptEl ? (transcriptEl.dataset.transcript || "") : "";
+  
   if (finalText.trim()) {
     setSpeechStatus(qid, "✅ Recorded! You can check it with AI below.");
     if (transcriptEl) transcriptEl.innerHTML = finalText;
@@ -444,7 +521,10 @@ function stopSpeechRecord(qid) {
 function clearSpeech(qid) {
   if (activeSpeechQid === qid) stopSpeechRecord(qid);
   const t = document.getElementById(`transcript_${qid}`);
-  if (t) { t.dataset.transcript = ""; t.innerHTML = '<span style="color:var(--muted);font-style:italic;">Your spoken answer will appear here…</span>'; }
+  if (t) { 
+    t.dataset.transcript = ""; 
+    t.innerHTML = '<span style="color:var(--muted);font-style:italic;">Your spoken answer will appear here…</span>'; 
+  }
   answers[qid] = "";
   setSpeechStatus(qid, "");
 }
@@ -456,7 +536,7 @@ function setSpeechStatus(qid, msg) {
 
 // ===== RE-LEARN WITH AI =====
 let relearnLoaded = false;
-let relearnOpen   = false;
+let relearnOpen = false;
 let currentLesson_module = null;
 
 function initRelearn(lesson) {
@@ -466,8 +546,8 @@ function initRelearn(lesson) {
 }
 
 async function toggleRelearn() {
-  const body      = document.getElementById("relearnBody");
-  const btn       = document.getElementById("relearnToggleBtn");
+  const body = document.getElementById("relearnBody");
+  const btn = document.getElementById("relearnToggleBtn");
   const contentEl = document.getElementById("relearnContent");
 
   if (relearnOpen) {
@@ -496,7 +576,6 @@ async function toggleRelearn() {
       currentLesson_module?.description || ""
     );
     
-    // Only flag as loaded if we got a valid response
     if (res && res.content) {
       relearnLoaded = true;
       renderRelearnContent(res.content, contentEl);
@@ -504,7 +583,7 @@ async function toggleRelearn() {
       throw new Error("Empty response");
     }
   } catch (err) {
-    relearnLoaded = false; // Allow retrying on next click
+    relearnLoaded = false; 
     contentEl.innerHTML = `<p style="color:rgba(147,197,253,0.6);font-size:0.88rem;">Could not load lesson recap. Please try again.</p>`;
   } finally {
     btn.classList.remove("loading");
@@ -537,7 +616,6 @@ function renderRelearnContent(text, el) {
 
     if (currentSection === "HELPFUL EXAMPLES") {
       buffer.forEach(line => {
-        // More robust quote stripping
         const clean = line.replace(/^[-•*]\s*/, "").replace(/^[""'](.+)[""']$/, "$1");
         html += `<div class="rl-example">"${escapeHtml(clean.replace(/^"|"$/g, ""))}"</div>`;
       });
@@ -556,7 +634,6 @@ function renderRelearnContent(text, el) {
   let matchedAny = false;
 
   lines.forEach(line => {
-    // Strip markdown formatting characters to make matching highly resilient
     const cleanLine = line.replace(/[*#_]/g, ""); 
     const upperLine = cleanLine.toUpperCase().replace(/[📚🔑✏️💡]/gu, "").trim();
     const matchedSection = Object.keys(sectionIcons).find(k => upperLine.includes(k));
@@ -569,14 +646,13 @@ function renderRelearnContent(text, el) {
       const clean = line.replace(/^[-•*\d.]\s*/, "").trim();
       if (clean.length > 2) buffer.push(clean);
     } else {
-      // If the AI gives intro text before any headers, capture it as a paragraph
       html += `<p style="color:rgba(147,197,253,0.9); margin-bottom:12px;">${escapeHtml(line)}</p>`;
     }
   });
+  
   flushSection();
 
   if (!matchedAny && !html) {
-    // Ultimate Fallback: If the AI ignores instructions entirely, format the raw markdown
     html = `<div style="color:#cbd5e1; font-size:0.93rem; line-height:1.8;">${formatAIText(text)}</div>`;
   }
 
@@ -612,12 +688,20 @@ function showBuddyTyping() {
   const el   = document.createElement("div");
   el.className = "buddy-msg bot";
   el.id = "buddyTyping";
-  el.innerHTML = `<div class="buddy-typing"><div class="buddy-dot"></div><div class="buddy-dot"></div><div class="buddy-dot"></div></div>`;
+  el.innerHTML = `
+    <div class="buddy-typing">
+      <div class="buddy-dot"></div>
+      <div class="buddy-dot"></div>
+      <div class="buddy-dot"></div>
+    </div>`;
   body.appendChild(el);
   body.scrollTop = body.scrollHeight;
 }
 
-function hideBuddyTyping() { const el = document.getElementById("buddyTyping"); if (el) el.remove(); }
+function hideBuddyTyping() { 
+  const el = document.getElementById("buddyTyping"); 
+  if (el) el.remove(); 
+}
 
 function escapeHtml(str) {
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -633,10 +717,12 @@ function formatAIText(raw) {
   const lines = t.split(/\r?\n/);
   const out   = [];
   let inList  = false;
+  
   lines.forEach(line => {
     const bullet = line.match(/^[-•*]\s+(.+)/);
     const numbered = line.match(/^\d+[.)]\s+(.+)/);
     const trimmed  = line.trim();
+    
     if (bullet || numbered) {
       if (!inList) { out.push('<ul class="ai-list">'); inList = true; }
       out.push(`<li>${bullet ? bullet[1] : numbered[1]}</li>`);
@@ -649,6 +735,7 @@ function formatAIText(raw) {
       }
     }
   });
+  
   if (inList) out.push("</ul>");
   return out.filter((l, i, arr) => !(l === "" && arr[i - 1] === "")).join("");
 }
@@ -657,6 +744,7 @@ async function sendBuddy() {
   const input = document.getElementById("buddyInput");
   const btn   = document.getElementById("buddySendBtn");
   const text  = input.value.trim();
+  
   if (!text) return;
 
   input.value = "";
@@ -665,6 +753,7 @@ async function sendBuddy() {
 
   btn.disabled = true;
   showBuddyTyping();
+  
   try {
     const res = await AI.chat(buddyHistory, lessonTitle, student?.name || "");
     hideBuddyTyping();
@@ -679,10 +768,11 @@ async function sendBuddy() {
 }
 
 function handleBuddyKey(e) {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendBuddy(); }
+  if (e.key === "Enter" && !e.shiftKey) { 
+    e.preventDefault(); 
+    sendBuddy(); 
+  }
 }
-
-function goBack() { window.location.href = "platform.html"; }
 
 // ── CONVERSATION QUICK ACTIONS ──
 function startConversationPractice() {
@@ -698,5 +788,53 @@ function askForGrammarCheck() {
   sendBuddy();
   document.getElementById("buddyQuickActions").style.display = "none";
 }
+
+// ── NEW: DYNAMIC AI FLASHCARDS ──
+document.getElementById("generateAIFlashcardsBtn")?.addEventListener("click", async () => {
+  const btn = document.getElementById("generateAIFlashcardsBtn");
+  const status = document.getElementById("aiFlashcardStatus");
+  const grid = document.getElementById("aiFlashcardGrid");
+
+  btn.disabled = true;
+  btn.textContent = "Generating...";
+  status.style.display = "block";
+  status.textContent = "AI is thinking of fun concepts to learn...";
+  grid.innerHTML = "";
+
+  try {
+    const res = await AI.generateFlashcards(lessonTitle, module?.description || "", 6);
+    const cards = res.flashcards || [];
+    status.style.display = "none";
+
+    if(cards.length === 0) {
+      status.style.display = "block";
+      status.textContent = "Couldn't generate cards right now. Try again!";
+      return;
+    }
+
+    cards.forEach((card, i) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "ai-card-wrapper";
+      wrapper.style.animationDelay = `${i * 0.12}s`; 
+      wrapper.innerHTML = `
+        <div class="ai-card-inner">
+          <div class="ai-card-front">${escHtml(card.front)}</div>
+          <div class="ai-card-back">${escHtml(card.back)}</div>
+        </div>
+      `;
+      wrapper.addEventListener("click", () => {
+        wrapper.querySelector(".ai-card-inner").classList.toggle("is-flipped");
+      });
+      grid.appendChild(wrapper);
+    });
+
+  } catch(err) {
+    status.style.display = "block";
+    status.textContent = "Error: " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Generate New Deck";
+  }
+});
 
 document.addEventListener("DOMContentLoaded", init);
