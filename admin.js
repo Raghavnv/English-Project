@@ -20,6 +20,11 @@ function showPopup(message) {
   setTimeout(() => popup.classList.remove("show"), 2800);
 }
 
+function escHtml(str) {
+  if (!str) return "";
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
 // ===== TAB SWITCH =====
 function switchTab(tab) {
   const isLessons = tab === "lessons";
@@ -62,7 +67,8 @@ async function loadClassAnalytics() {
 // ════════════════════════════════════════════════════════════════════
 
 let questionCount = 0;
-let editingLessonId = null; // track if we're editing an existing lesson
+let flashcardCount = 0;
+let editingLessonId = null;
 
 function addQuestion(type = "text") {
   questionCount++;
@@ -126,6 +132,36 @@ function removeQuestion(row) {
   questionCount = container.querySelectorAll(".question-row").length;
 }
 
+// ── NEW FLASHCARD FUNCTIONS ──
+function addFlashcard(frontText = "", backText = "") {
+  flashcardCount++;
+  const hint = document.getElementById("noFlashcardsHint");
+  if (hint) hint.remove();
+
+  const container = document.getElementById("flashcardsContainer");
+  const row = document.createElement("div");
+  row.className = "flashcard-row";
+  row.innerHTML = `
+    <div>
+      <span style="font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent-deep);display:block;margin-bottom:6px;">Front (Word/Concept)</span>
+      <textarea class="fc-front" placeholder="e.g., Apple">${escHtml(frontText)}</textarea>
+    </div>
+    <div>
+      <span style="font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent-deep);display:block;margin-bottom:6px;">Back (Definition/Translation)</span>
+      <textarea class="fc-back" placeholder="e.g., A red or green fruit">${escHtml(backText)}</textarea>
+    </div>
+    <button class="remove-q-btn" title="Remove">✕</button>
+  `;
+  row.querySelector(".remove-q-btn").addEventListener("click", () => {
+    row.remove();
+    if (container.querySelectorAll(".flashcard-row").length === 0) {
+      container.innerHTML = '<p class="no-questions-hint" id="noFlashcardsHint">No flashcards yet — click "Add Flashcard" to add one.</p>';
+    }
+  });
+  container.appendChild(row);
+}
+
+
 // ── EDIT MODE ──
 function startEditLesson(lesson) {
   editingLessonId = lesson.id;
@@ -172,10 +208,19 @@ function startEditLesson(lesson) {
     container.appendChild(row);
   });
 
+  // Repopulate Flashcards
+  const fcContainer = document.getElementById("flashcardsContainer");
+  fcContainer.innerHTML = "";
+  flashcardCount = 0;
+  if (lesson.flashcards && lesson.flashcards.length > 0) {
+    lesson.flashcards.forEach(fc => addFlashcard(fc.front, fc.back));
+  } else {
+    fcContainer.innerHTML = '<p class="no-questions-hint" id="noFlashcardsHint">No flashcards yet — click "Add Flashcard" to add one.</p>';
+  }
+
   // Update button and heading
   document.getElementById("addBtn").textContent = "Update Lesson";
   document.querySelector(".admin-card h2").textContent = "Edit Lesson";
-
 
   // Show cancel button
   let cancelBtn = document.getElementById("cancelEditBtn");
@@ -200,6 +245,11 @@ function cancelEdit() {
   document.getElementById("questionsContainer").innerHTML =
     `<p class="no-questions-hint" id="noQuestionsHint">No questions yet — click "Add Question" to add one.</p>`;
   questionCount = 0;
+  
+  document.getElementById("flashcardsContainer").innerHTML =
+    '<p class="no-questions-hint" id="noFlashcardsHint">No flashcards yet — click "Add Flashcard" to add one.</p>';
+  flashcardCount = 0;
+
   document.getElementById("addBtn").textContent = "Save Lesson";
   document.querySelector(".admin-card h2").textContent = "Create Lesson";
   const cancelBtn = document.getElementById("cancelEditBtn");
@@ -221,16 +271,22 @@ async function addLesson() {
     if (text) questions.push({ prompt: text, type, order: i });
   });
 
+  const flashcards = [];
+  document.querySelectorAll(".flashcard-row").forEach(row => {
+    const front = row.querySelector(".fc-front").value.trim();
+    const back = row.querySelector(".fc-back").value.trim();
+    if (front && back) flashcards.push({ front, back });
+  });
+
   btn.textContent = editingLessonId ? "Updating…" : "Saving…";
   btn.disabled = true;
 
   try {
     if (editingLessonId) {
-      // Delete old and recreate (simplest approach for full edit)
       await Lessons.delete(editingLessonId);
     }
-    await Lessons.create(className, title, content, questions);
-    showPopup(editingLessonId ? "✓ Lesson updated" : "✓ Lesson saved — " + questions.length + " question(s) added");
+    await Lessons.create(className, title, content, questions, flashcards);
+    showPopup(editingLessonId ? "✓ Lesson updated" : `✓ Lesson saved — ${questions.length} question(s), ${flashcards.length} flashcard(s)`);
     cancelEdit();
     await renderSavedLessons();
   } catch (err) {
@@ -290,7 +346,7 @@ async function renderSavedLessons() {
           card.innerHTML = `
             <div class="saved-lesson-info">
               <strong>${escHtml(lesson.title)}</strong>
-              <span>${lesson.questions ? lesson.questions.length : 0} question(s)</span>
+              <span>${lesson.questions ? lesson.questions.length : 0} question(s), ${lesson.flashcards ? lesson.flashcards.length : 0} flashcard(s)</span>
             </div>
             <div style="display:flex;gap:8px;">
               <button class="edit-lesson-btn" data-id="${lesson.id}" style="min-height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(80,58,40,0.18);background:rgba(255,255,255,0.6);font-size:0.82rem;font-weight:700;cursor:pointer;">✏️ Edit</button>
@@ -370,7 +426,6 @@ async function runAIGenerate() {
 
     resultsEl.innerHTML = "";
     questions.forEach((q, i) => {
-      // Each item may be "TEXT: ..." or "SPEECH: ..." when mix mode is used
       let rowType = qType === "mix"
         ? (q.startsWith("SPEECH:") ? "speech" : "text")
         : qType;
@@ -460,11 +515,6 @@ function insertSelectedQuestions() {
 // ═══════════════════════════════════════════
 //  STUDENT PROGRESS
 // ═══════════════════════════════════════════
-
-function escHtml(str) {
-  if (!str) return "";
-  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
 
 function openAddStudent() {
   document.getElementById("addStudentForm").style.display = "";

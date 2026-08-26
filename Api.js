@@ -23,7 +23,7 @@ async function apiFetch(path, options = {}) {
   
   const fetchOptions = {
     ...options,
-    mode: 'cors', // Explicitly set CORS mode
+    mode: 'cors',
     headers: { 
       "Content-Type": "application/json", 
       ...(options.headers || {}) 
@@ -67,7 +67,6 @@ const Auth = {
       body: JSON.stringify({ username, password })
     });
   },
-
   async login(username, password) {
     const data = await apiFetch("/api/auth/login", {
       method: "POST",
@@ -77,16 +76,13 @@ const Auth = {
     localStorage.setItem("adminSession", JSON.stringify({ username: data.username }));
     return data;
   },
-
   logout() {
     clearAdminToken();
     localStorage.removeItem("adminSession");
   },
-
   async me() {
     return apiFetch("/api/auth/me");
   },
-
   isLoggedIn() {
     return !!getAdminToken();
   }
@@ -107,15 +103,12 @@ const Students = {
     localStorage.setItem("student", JSON.stringify({ id: data.id, name: data.name, school: data.school }));
     return data;
   },
-
   async getProfile(studentId) {
     return apiFetch(`/api/students/${studentId}/profile`);
   },
-
   async getProgress(studentId) {
     return apiFetch(`/api/students/${studentId}/progress`);
   },
-
   async saveProgress(studentId, lessonId, answers) {
     const answersArray = Object.entries(answers).map(([question_id, text]) => ({
       question_id, text: text || ""
@@ -125,18 +118,15 @@ const Students = {
       body: JSON.stringify({ lesson_id: lessonId, answers: answersArray })
     });
   },
-
   async resetProgress(studentId, lessonIds = []) {
     return apiFetch(`/api/students/${studentId}/progress`, {
       method: "DELETE",
       body: JSON.stringify(lessonIds)
     });
   },
-
   async list() {
     return apiFetch("/api/students/");
   },
-
   async delete(studentId) {
     return apiFetch(`/api/students/${studentId}`, { method: "DELETE" });
   }
@@ -150,42 +140,36 @@ const Lessons = {
   async getAll() {
     return apiFetch("/api/lessons/");
   },
-
   async getClasses() {
     return apiFetch("/api/lessons/classes");
   },
-
   async getOne(lessonId) {
     return apiFetch(`/api/lessons/${lessonId}`);
   },
-
-  async create(classLabel, title, description, questions) {
+  async create(classLabel, title, description, questions, flashcards = []) {
     return apiFetch("/api/lessons/", {
       method: "POST",
       body: JSON.stringify({
         class_label: classLabel,
         title,
         description,
-        questions
+        questions,
+        flashcards
       })
     });
   },
-
   async delete(lessonId) {
     return apiFetch(`/api/lessons/${lessonId}`, { method: "DELETE" });
   },
-  
   async deleteClass(classId) {
     return apiFetch(`/api/lessons/classes/${classId}`, { method: "DELETE" });
   },
-
   async addQuestion(lessonId, prompt, type = "text") {
     return apiFetch(`/api/lessons/${lessonId}/questions`, {
       method: "POST",
       body: JSON.stringify({ prompt, type })
     });
   },
-
   async deleteQuestion(lessonId, questionId) {
     return apiFetch(`/api/lessons/${lessonId}/questions/${questionId}`, {
       method: "DELETE"
@@ -208,33 +192,27 @@ const AI = {
       })
     });
   },
-
   async getHint(questionId, lessonTitle = "") {
     return apiFetch("/api/ai/hint", {
       method: "POST",
       body: JSON.stringify({ question_id: questionId, lesson_title: lessonTitle })
     });
   },
-
   async getGuide(questionId, lessonTitle = "") {
     return apiFetch("/api/ai/guide", {
       method: "POST",
       body: JSON.stringify({ question_id: questionId, lesson_title: lessonTitle })
     });
   },
-
   async getEncouragement() {
     return apiFetch("/api/ai/encouragement", { method: "POST" });
   },
-
   async getAnalysis(studentId) {
     return apiFetch(`/api/ai/analysis/${studentId}`);
   },
-  
   async getClassAnalysis() {
     return apiFetch("/api/ai/class-analysis");
   },
-
   async generateQuestions(lessonTitle, lessonDescription, classLabel, count = 5, questionType = "text") {
     return apiFetch("/api/ai/generate-questions", {
       method: "POST",
@@ -247,7 +225,6 @@ const AI = {
       })
     });
   },
-
   async chat(messages, lessonTitle = "", studentName = "") {
     return apiFetch("/api/ai/chat", {
       method: "POST",
@@ -258,7 +235,6 @@ const AI = {
       })
     });
   },
-
   async getRelearn(lessonId, lessonTitle = "", lessonDescription = "") {
     return apiFetch("/api/ai/relearn", {
       method: "POST",
@@ -278,17 +254,14 @@ const AI = {
 const Speech = {
   recognition: null,
   isListening: false,
-
   isSupported() {
     return "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
   },
-
   start(onResult, onEnd) {
     if (!this.isSupported()) {
       alert("Your browser doesn't support voice input. Try Chrome.");
       return;
     }
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     this.recognition = new SpeechRecognition();
     this.recognition.lang = "en-IN";
@@ -299,12 +272,10 @@ const Speech = {
       const transcript = event.results[0][0].transcript;
       if (onResult) onResult(transcript);
     };
-
     this.recognition.onend = () => {
       this.isListening = false;
       if (onEnd) onEnd();
     };
-
     this.recognition.onerror = (event) => {
       this.isListening = false;
       if (onEnd) onEnd();
@@ -312,11 +283,9 @@ const Speech = {
         console.warn("Speech error:", event.error);
       }
     };
-
     this.recognition.start();
     this.isListening = true;
   },
-
   stop() {
     if (this.recognition) {
       this.recognition.stop();
