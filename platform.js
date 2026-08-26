@@ -468,6 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btn) btn.addEventListener("click", getAiFeedbackAnalysis);
 });
 
+
 // ===== AI PANEL (TRANSFORMED INTO AI STUDY COMPANION) =====
 function renderAIPanel(module) {
   const focusEl    = document.getElementById("aiLessonFocus");
@@ -479,7 +480,8 @@ function renderAIPanel(module) {
 
   if (!module) return;
 
-  if (focusEl) focusEl.innerHTML = "🧠 AI Study Companion";
+  // Updated heading to Learn with AI
+  if (focusEl) focusEl.innerHTML = "🧠 Learn with AI";
   if (hintEl) hintEl.textContent = "Select a lesson below to review core concepts or practice with smart flashcards.";
   
   if (statusEl) statusEl.style.display = "none"; 
@@ -529,7 +531,7 @@ function injectStudyModals() {
       .relearn-modal .ai-modal-title { color: #e0f2fe; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; }
       .flashcard-modal { background: linear-gradient(145deg, #f5f3ff, #ede9fe); border: 1px solid rgba(139, 92, 246, 0.4); }
       .flashcard-modal .ai-modal-header { border-bottom: 1px solid rgba(139, 92, 246, 0.15); }
-      .flashcard-modal .ai-modal-title { color: #4c1d95; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; }
+      .flashcard-modal .ai-modal-title { color: #4c1d95; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; align-items: center; }
       .flashcard-modal .ai-modal-close { background: rgba(76, 29, 149, 0.1); color: #4c1d95; }
       .relearn-content { color: #cbd5e1; font-size: 1rem; line-height: 1.8; }
       .relearn-content .rl-section { margin-bottom: 24px; }
@@ -572,7 +574,10 @@ function injectStudyModals() {
       <div class="ai-modal-content flashcard-modal">
         <div class="ai-modal-header">
           <h3 class="ai-modal-title">✨ <span id="flashcardModalTitle">Smart Flashcards</span></h3>
-          <button class="ai-modal-close" onclick="closeStudyModals()">✕</button>
+          <div style="display: flex; gap: 10px;">
+            <button id="regenerateFlashcardsBtn" style="padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.1); color: #4c1d95; font-weight: 700; cursor: pointer; display: none; font-size: 0.85rem; transition: background 0.2s;">🔄 Generate New</button>
+            <button class="ai-modal-close" onclick="closeStudyModals()">✕</button>
+          </div>
         </div>
         <div class="ai-modal-body">
           <div id="flashcardContentArea" class="ai-card-grid"></div>
@@ -696,8 +701,14 @@ async function openFlashcards(title, desc) {
   const modal = document.getElementById("modalFlashcards");
   const titleEl = document.getElementById("flashcardModalTitle");
   const contentArea = document.getElementById("flashcardContentArea");
+  const regenBtn = document.getElementById("regenerateFlashcardsBtn");
 
   if (titleEl) titleEl.textContent = title + " Deck";
+  if (regenBtn) {
+    regenBtn.style.display = "none"; 
+    regenBtn.onclick = () => openFlashcards(title, desc); 
+  }
+  
   if (contentArea) {
     contentArea.innerHTML = `
       <div class="ai-loading-state" style="grid-column: 1 / -1;">
@@ -731,6 +742,7 @@ async function openFlashcards(title, desc) {
         contentArea.appendChild(wrapper);
       });
     }
+    if (regenBtn) regenBtn.style.display = "block"; // Show the generate new button once loaded
   } catch (err) {
     if (contentArea) contentArea.innerHTML = `<div style="color: #dc2626; text-align: center; padding: 20px; grid-column: 1 / -1;">Error creating deck: ${escapeHtml(err.message)}</div>`;
   }
