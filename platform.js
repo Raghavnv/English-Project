@@ -33,6 +33,34 @@ function doLogout() {
   window.location.href = "login.html";
 }
 
+// ── TAB SWITCHING ──
+function switchTab(tabId) {
+  const isLessons = tabId === "lessons";
+  const isPractice = tabId === "practice";
+
+  const tabLessons = document.getElementById("tabLessons");
+  const tabPractice = document.getElementById("tabPractice");
+
+  if (tabLessons) {
+    tabLessons.classList.toggle("active", isLessons);
+  }
+
+  if (tabPractice) {
+    tabPractice.classList.toggle("active", isPractice);
+  }
+
+  const panelLessons = document.getElementById("panelLessons");
+  const panelPractice = document.getElementById("panelPractice");
+
+  if (panelLessons) {
+    panelLessons.classList.toggle("active", isLessons);
+  }
+
+  if (panelPractice) {
+    panelPractice.classList.toggle("active", isPractice);
+  }
+}
+
 // ── DATA LOADING ──
 async function loadDashboardData() {
   try {
@@ -44,7 +72,8 @@ async function loadDashboardData() {
     allClasses = classesRes || [];
     studentProgress = progressRes || {};
 
-    renderLessons();
+    renderLessonsTab();
+    renderPracticeTab();
 
   } catch (err) {
     const container = document.getElementById("lessonsContainer");
@@ -67,8 +96,8 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-// ── RENDER LESSONS VIEW ──
-function renderLessons() {
+// ── RENDER TAB 1: MY LESSONS ──
+function renderLessonsTab() {
   const container = document.getElementById("lessonsContainer");
   
   if (!container) {
@@ -115,10 +144,6 @@ function renderLessons() {
         btnText = "Continue Lesson →";
       }
 
-      const safeId = escapeHtml(lesson.id);
-      const safeTitle = escapeHtml(lesson.title).replace(/'/g, "\\'");
-      const safeDesc = escapeHtml(lesson.description || "").replace(/'/g, "\\'");
-
       const card = document.createElement("div");
       card.className = "lesson-card";
       card.innerHTML = `
@@ -126,10 +151,6 @@ function renderLessons() {
         <h3 class="lesson-card-title">${escapeHtml(lesson.title)}</h3>
         <p class="lesson-card-desc">${escapeHtml(lesson.description || "No description provided.")}</p>
         <button class="lesson-action-btn">${btnText}</button>
-        <div class="card-extra-actions">
-          <button class="extra-btn btn-relearn-card" onclick="openRelearn('${safeId}', '${safeTitle}', '${safeDesc}')">📖 Re-Learn</button>
-          <button class="extra-btn btn-flash-card" onclick="openFlashcards('${safeTitle}', '${safeDesc}')">✨ Flashcards</button>
-        </div>
       `;
 
       card.querySelector(".lesson-action-btn").addEventListener("click", () => {
@@ -143,6 +164,52 @@ function renderLessons() {
     section.appendChild(grid);
     container.appendChild(section);
   });
+}
+
+// ── RENDER TAB 2: PRACTICE HUB ──
+function renderPracticeTab() {
+  const container = document.getElementById("practiceContainer");
+  
+  if (!container) {
+    return;
+  }
+  
+  container.innerHTML = "";
+
+  const allLessons = allClasses.flatMap(cls => cls.lessons || []);
+
+  if (allLessons.length === 0) {
+    container.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--muted);">No lessons available for practice yet.</div>`;
+    return;
+  }
+
+  const grid = document.createElement("div");
+  grid.className = "lesson-grid";
+
+  allLessons.forEach(lesson => {
+    const card = document.createElement("div");
+    card.className = "lesson-card";
+    
+    const safeId = escapeHtml(lesson.id);
+    const safeTitle = escapeHtml(lesson.title).replace(/'/g, "\\'");
+    const safeDesc = escapeHtml(lesson.description || "").replace(/'/g, "\\'");
+
+    card.innerHTML = `
+      <h3 class="lesson-card-title">${escapeHtml(lesson.title)}</h3>
+      <p class="lesson-card-desc">${escapeHtml(lesson.description || "Review this topic.")}</p>
+      <div class="practice-actions">
+        <button class="practice-btn btn-relearn" onclick="openRelearn('${safeId}', '${safeTitle}', '${safeDesc}')">
+          📖 Re-Learn
+        </button>
+        <button class="practice-btn btn-flashcards" onclick="openFlashcards('${safeTitle}', '${safeDesc}')">
+          ✨ Flashcards
+        </button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  container.appendChild(grid);
 }
 
 // ── MODAL LOGIC ──
