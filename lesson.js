@@ -818,8 +818,8 @@ document.getElementById("generateAIFlashcardsBtn")?.addEventListener("click", as
       wrapper.style.animationDelay = `${i * 0.12}s`; 
       wrapper.innerHTML = `
         <div class="ai-card-inner">
-          <div class="ai-card-front">${escHtml(card.front)}</div>
-          <div class="ai-card-back">${escHtml(card.back)}</div>
+          <div class="ai-card-front">${escapeHtml(card.front)}</div>
+          <div class="ai-card-back">${escapeHtml(card.back)}</div>
         </div>
       `;
       wrapper.addEventListener("click", () => {
