@@ -25,6 +25,11 @@ function escHtml(str) {
   return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
+// Add this line so escapeHtml works seamlessly:
+function escapeHtml(str) {
+  return escHtml(str);
+}
+
 // ===== TAB SWITCH =====
 function switchTab(tab) {
   const isLessons = tab === "lessons";
@@ -44,8 +49,8 @@ function switchTab(tab) {
   if (isProgress) loadProgressData();
   if (isAnalytics) {
     loadClassAnalytics();
-    loadPredictiveAlerts();   // <-- Add this
-    loadClassroomHeatmap();   // <-- Add this
+    loadPredictiveAlerts();   
+    loadClassroomHeatmap();   
   }
 }
 
