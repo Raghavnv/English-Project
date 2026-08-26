@@ -12,7 +12,7 @@ from app.auth import get_current_admin, require_authenticated_requester, require
 load_dotenv()
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-MODEL = "openai/gpt-oss-20b"
+MODEL = "llama3-8b-8192"
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
@@ -258,25 +258,38 @@ class GenerateQuestionsRequest(BaseModel):
 def generate_questions(body: GenerateQuestionsRequest, current_admin=Depends(get_current_admin)):
     qtype = (body.question_type or "text").lower()
     if qtype == "speech":
-        type_instr = "All questions must be open-ended SPEECH prompts (describe, tell, explain, share opinion). Prefix each line with 'SPEECH: '"
+        type_instr = "All questions must be open-ended SPEECH prompts. Start EVERY question with 'SPEECH: '"
     elif qtype == "mix":
-        type_instr = "Generate a mix. Prefix TEXT questions with 'TEXT: ' and SPEECH questions with 'SPEECH: '. Alternate roughly half and half."
+        type_instr = "Generate a mix. Start text questions with 'TEXT: ' and speech questions with 'SPEECH: '."
     else:
-        type_instr = "All questions must be TEXT questions asking students to write sentences or short answers. No prefix needed."
+        type_instr = "All questions must be TEXT questions asking for short written answers."
 
-    prompt = f"""Lesson: "{body.lesson_title}" | Level: "{body.class_label or 'General'}" | Description: "{body.lesson_description or ''}"
-Generate exactly {body.count} English practice questions for school children in Bangalore.
+    prompt = f"""Lesson: "{body.lesson_title}"
+Level: "{body.class_label or 'General'}"
+Description: "{body.lesson_description or ''}"
+
+Task: Generate exactly {body.count} English practice questions.
 {type_instr}
-Rules: age-appropriate, simple clear English, 1-2 sentences each, no numbers or bullets."""
+
+Format Requirements:
+1. Output ONLY the questions, separated by new lines.
+2. Do NOT include any numbering (1., 2., etc.) or bullet points.
+3. Do NOT include any introductions like 'Here are your questions:'."""
 
     try:
         raw = ask_groq(prompt, max_tokens=400,
-            system="Output only the requested questions, nothing else.")
-        questions = [
-            line.strip().lstrip("-•*0123456789.) ")
-            for line in raw.split("\n")
-            if line.strip() and len(line.strip()) > 10
-        ][:body.count]
+            system="You are a strict curriculum generator. Follow the formatting rules exactly.")
+        
+        questions = []
+        for line in raw.replace("\r", "\n").split("\n"):
+            # Clean up the line by removing stray markdown, numbers, or bullets
+            clean = line.strip().lstrip("-•*0123456789.) ")
+            if len(clean) > 5:  # Reduced length threshold to be more forgiving
+                questions.append(clean)
+        
+        # Ensure we only return up to the requested count
+        questions = questions[:body.count]
+        
         return {"questions": questions}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
