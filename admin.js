@@ -42,7 +42,11 @@ function switchTab(tab) {
   if (tabAnalytics) tabAnalytics.classList.toggle("active", isAnalytics);
 
   if (isProgress) loadProgressData();
-  if (isAnalytics) loadClassAnalytics();
+  if (isAnalytics) {
+    loadClassAnalytics();
+    loadPredictiveAlerts();   // <-- Add this
+    loadClassroomHeatmap();   // <-- Add this
+  }
 }
 
 async function loadClassAnalytics() {
@@ -826,5 +830,151 @@ function handleAdminBuddyKey(e) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     sendAdminBuddy();
+  }
+}
+
+// ===== LOAD PREDICTIVE RISK ALERTS =====
+async function loadPredictiveAlerts() {
+  const container = document.getElementById("aiRiskAlertsList");
+  const section = document.getElementById("aiRiskAlertsSection");
+  if (!container || !section) return;
+
+  try {
+    const res = await apiFetch("/api/ai/predictive-flags");
+    const flags = res.flags || [];
+
+    if (flags.length === 0) {
+      section.style.display = "none";
+      return;
+    }
+
+    section.style.display = "block";
+    container.innerHTML = "";
+
+    flags.forEach(flag => {
+      const isHigh = flag.alert_level?.toLowerCase() === "high";
+      const card = document.createElement("div");
+      card.style.cssText = `
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: ${isHigh ? "rgba(239, 68, 68, 0.08)" : "rgba(234, 179, 8, 0.08)"};
+        border: 1px solid ${isHigh ? "rgba(239, 68, 68, 0.25)" : "rgba(234, 179, 8, 0.3)"};
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      `;
+
+      card.innerHTML = `
+        <div>
+          <strong style="color: ${isHigh ? "#b91c1c" : "#854d0e"}; font-size: 0.92rem;">
+            ${escapeHtml(flag.student_name)} · ${escapeHtml(flag.alert_level || "Attention")}
+          </strong>
+          <p style="margin: 3px 0 0; color: var(--text); font-size: 0.86rem; line-height: 1.4;">
+            ${escapeHtml(flag.reason)}
+          </p>
+        </div>
+        <span style="font-size: 1.2rem;">${isHigh ? "🚨" : "⚠️"}</span>
+      `;
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.warn("Could not load predictive alerts:", err);
+    section.style.display = "none";
+  }
+}
+
+// ===== RENDER CLASSROOM HEATMAP MATRIX =====
+async function loadClassroomHeatmap() {
+  const container = document.getElementById("heatmapContainer");
+  if (!container) return;
+
+  try {
+    const data = await apiFetch("/api/students/heatmap-data");
+    const lessons = data.lessons || [];
+    const students = data.students || [];
+
+    if (students.length === 0 || lessons.length === 0) {
+      container.innerHTML = `<p style="color: var(--muted); text-align: center; margin: 20px 0;">No student activity recorded yet to build heatmap.</p>`;
+      return;
+    }
+
+    // Dynamic CSS Grid Layout: First column for Student Names, rest for Lessons
+    let html = `
+      <div style="display: grid; grid-template-columns: minmax(140px, 180px) repeat(${lessons.length}, minmax(80px, 1fr)); gap: 8px; align-items: center;">
+        <!-- Header Row -->
+        <div style="font-weight: 800; font-size: 0.82rem; color: var(--muted); text-transform: uppercase;">Student</div>
+    `;
+
+    // Lesson Header Columns
+    lessons.forEach((l, idx) => {
+      html += `
+        <div title="${escapeHtml(l.title)}" style="font-weight: 800; font-size: 0.78rem; color: var(--muted); text-align: center; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; padding: 4px;">
+          L${idx + 1}
+        </div>
+      `;
+    });
+
+    // Student Rows
+    students.forEach(s => {
+      html += `<div style="font-weight: 700; font-size: 0.9rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(s.name)}</div>`;
+
+      lessons.forEach(l => {
+        const prog = s.lessons[l.id];
+
+        let bg = "rgba(80,58,40,0.08)";
+        let textColor = "var(--muted)";
+        let cellText = "—";
+        let tooltip = `${s.name}: Not Started`;
+
+        if (prog && prog.answered_count > 0) {
+          const score = prog.avg_score || 0;
+          if (score >= 4) {
+            bg = "#22c55e";
+            textColor = "#ffffff";
+            cellText = `${score}★`;
+          } else if (score >= 3) {
+            bg = "#eab308";
+            textColor = "#ffffff";
+            cellText = `${score}★`;
+          } else if (score > 0) {
+            bg = "#ef4444";
+            textColor = "#ffffff";
+            cellText = `${score}★`;
+          } else {
+            bg = "rgba(188,93,45,0.15)";
+            textColor = "var(--accent-deep)";
+            cellText = "In Prog";
+          }
+
+          tooltip = `${s.name} - ${l.title}\nStatus: ${prog.completed ? "Completed" : "In Progress"}\nAvg Score: ${score}/5\nHints Used: ${prog.hint_count}`;
+        }
+
+        html += `
+          <div title="${escapeHtml(tooltip)}" style="
+            height: 38px;
+            border-radius: 8px;
+            background: ${bg};
+            color: ${textColor};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.15s ease, filter 0.15s ease;
+          " onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+            ${cellText}
+          </div>
+        `;
+      });
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+
+  } catch (err) {
+    container.innerHTML = `<p style="color: #ef4444; text-align: center;">Error loading heatmap: ${escapeHtml(err.message)}</p>`;
   }
 }

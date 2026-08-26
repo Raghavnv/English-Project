@@ -267,3 +267,33 @@ def reset_all_progress(student_id: str, class_lesson_ids: list[str] | None = Non
     q.delete(synchronize_session=False)
     db.commit()
     return {"reset": True}
+
+@router.get("/heatmap-data")
+def get_heatmap_data(db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):
+    students = db.query(Student).order_by(Student.name).all()
+    lessons = db.query(Lesson).order_by(Lesson.order).all()
+    
+    heatmap = []
+    for s in students:
+        student_data = {
+            "id": s.id, 
+            "name": s.name, 
+            "lessons": {}
+        }
+        for p in s.progress:
+            scores = [a.ai_score for a in p.answers if a.ai_score and a.ai_score > 0]
+            avg_score = round(sum(scores) / len(scores), 1) if scores else 0
+            
+            student_data["lessons"][p.lesson_id] = {
+                "completed": p.completed,
+                "answered_count": p.answered_count,
+                "avg_score": avg_score,
+                "hint_count": p.hint_count or 0,
+                "time_spent": p.time_spent_seconds or 0
+            }
+        heatmap.append(student_data)
+    
+    return {
+        "lessons": [{"id": l.id, "title": l.title} for l in lessons], 
+        "students": heatmap
+    }

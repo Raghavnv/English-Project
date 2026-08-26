@@ -77,11 +77,16 @@ class Question(Base):
 # ── PROGRESS ─────────────────────────────────────────────────────────────────
 class Progress(Base):
     __tablename__ = "progress"
-    id           = Column(String, primary_key=True, default=new_uuid)
-    student_id   = Column(String, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
-    lesson_id    = Column(String, ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False)
-    completed    = Column(Boolean, default=False)
+    id             = Column(String, primary_key=True, default=new_uuid)
+    student_id     = Column(String, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
+    lesson_id      = Column(String, ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False)
+    completed      = Column(Boolean, default=False)
     answered_count = Column(Integer, default=0)
+    
+    # NEW METRICS FOR PREDICTIVE AI
+    hint_count         = Column(Integer, default=0)
+    time_spent_seconds = Column(Integer, default=0)
+    
     updated_at   = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
     student = relationship("Student", back_populates="progress")
@@ -101,6 +106,10 @@ class Answer(Base):
     text        = Column(Text, default="")
     ai_feedback = Column(Text, default="")
     ai_score    = Column(Integer, default=0)
+    
+    # NEW METRIC FOR PREDICTIVE AI
+    retry_count = Column(Integer, default=0)
+    
     updated_at  = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
     progress  = relationship("Progress", back_populates="answers")

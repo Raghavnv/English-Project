@@ -486,3 +486,64 @@ Write a short, professional summary (2-3 sentences) for the teacher about the cl
         "average_score": avg_score, 
         "ai_summary": summary
     }
+
+@router.get("/predictive-flags")
+def get_predictive_flags(db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):
+    from app.models.models import Student as StudentModel
+    import json
+    
+    students = db.query(StudentModel).all()
+    class_data = []
+    
+    for s in students:
+        total_hints = 0
+        total_score = 0
+        scored_answers = 0
+        
+        for p in s.progress:
+            total_hints += (p.hint_count or 0)
+            for a in p.answers:
+                if a.ai_score and a.ai_score > 0:
+                    total_score += a.ai_score
+                    scored_answers += 1
+                    
+        avg_score = round(total_score / scored_answers, 1) if scored_answers > 0 else 0
+        
+        if scored_answers > 0:
+            class_data.append({
+                "student_name": s.name,
+                "lessons_completed": sum(1 for p in s.progress if p.completed),
+                "total_hints_used": total_hints,
+                "average_score": avg_score
+            })
+            
+    if not class_data:
+        return {"flags": []}
+
+    prompt = f"""You are an educational AI classifying student risk. 
+Analyze the following student data and flag ANY student who meets these conditions:
+1. Average score is 2.5 or lower.
+2. OR they are using an unusually high number of hints compared to lessons completed (e.g., >3 hints per lesson).
+
+Data:
+{json.dumps(class_data)}
+
+Return ONLY a valid JSON array of objects for the flagged students. If no one is flagged, return an empty array [].
+Format:
+[
+  {{"student_name": "Name", "alert_level": "High/Medium", "reason": "Specific actionable reason."}}
+]"""
+
+    try:
+        raw = ask_groq(prompt, max_tokens=500, system="You are a strict JSON data classifier.")
+        
+        # Clean up any potential markdown formatting from the AI
+        clean_json = raw.strip()
+        match = re.search(r'\[.*\]', clean_json, re.DOTALL)
+        if match:
+            clean_json = match.group(0)
+            
+        flags = json.loads(clean_json)
+        return {"flags": flags}
+    except Exception as e:
+        return {"flags": [], "error": str(e)}
