@@ -1,16 +1,13 @@
 // ===== LOGIN CHECK =====
 const student = getStudentData();
-
 if (!student) { 
   window.location.href = "login.html"; 
 }
-
 if (student && !getStudentToken()) { 
   window.location.href = "login.html"; 
 }
 
 const currentLesson = JSON.parse(localStorage.getItem("currentLesson"));
-
 if (!currentLesson) { 
   window.location.href = "platform.html"; 
 }
@@ -39,7 +36,6 @@ async function init() {
       const allProgress = await Students.getProgress(student.id);
       savedProgress = allProgress[lesson.id] || {};
       answers = { ...savedProgress.answers };
-      
       Object.keys(answers).forEach(qid => {
         if (typeof answers[qid] === "object") {
           answers[qid] = answers[qid].text || "";
@@ -52,10 +48,72 @@ async function init() {
     renderQuestions(lesson, savedProgress);
     initBuddy();
     initRelearn(lesson);
+    loadFlashcards(lesson.id);
 
   } catch (err) {
     document.getElementById("questionStack").innerHTML = 
       `<p class="empty-state">Could not load lesson: ${err.message}</p>`;
+  }
+}
+
+// ===== FLASHCARDS =====
+let currentFlashcards = [];
+let currentCardIndex = 0;
+
+async function loadFlashcards(lessonId) {
+  try {
+    currentFlashcards = await apiFetch(`/api/lessons/${lessonId}/flashcards/due?student_id=${student.id}`);
+    const section = document.getElementById("flashcardSection");
+    
+    if (currentFlashcards && currentFlashcards.length > 0) {
+      section.style.display = "block";
+      showFlashcard(0);
+    } else {
+      section.style.display = "none";
+    }
+  } catch (e) {
+    console.error("Failed to load flashcards", e);
+  }
+}
+
+function showFlashcard(index) {
+  if (index >= currentFlashcards.length) {
+    document.getElementById("flashcardContainer").style.display = "none";
+    document.getElementById("flashcardControls").style.display = "none";
+    document.getElementById("flashcardCompleteMsg").style.display = "block";
+    return;
+  }
+  
+  const card = currentFlashcards[index];
+  document.getElementById("flashcardFront").innerText = card.front;
+  document.getElementById("flashcardBack").innerText = card.back;
+  
+  const inner = document.getElementById("flashcardInner");
+  inner.classList.remove("is-flipped");
+  document.getElementById("flashcardControls").style.display = "none";
+  currentCardIndex = index;
+}
+
+document.getElementById("flashcardContainer")?.addEventListener("click", () => {
+  const inner = document.getElementById("flashcardInner");
+  if (inner.classList.contains("is-flipped")) return; // Already flipped
+  
+  inner.classList.add("is-flipped");
+  document.getElementById("flashcardControls").style.display = "flex";
+});
+
+async function submitFlashcardReview(quality) {
+  const card = currentFlashcards[currentCardIndex];
+  // Move to next card immediately to keep UI snappy
+  showFlashcard(currentCardIndex + 1);
+  
+  try {
+    await apiFetch(`/api/lessons/flashcards/${card.id}/review`, {
+      method: "POST",
+      body: JSON.stringify({ student_id: student.id, quality: quality })
+    });
+  } catch (e) {
+    console.error("Failed to submit review", e);
   }
 }
 
@@ -171,7 +229,6 @@ function renderQuestions(lesson, savedProgress) {
 
   function updateProgress() {
     let answered = 0;
-    
     lesson.questions.forEach(q => {
       if (q.type === "speech") {
         const t = document.getElementById(`transcript_${q.id}`);
@@ -189,17 +246,14 @@ function renderQuestions(lesson, savedProgress) {
     document.getElementById("progressText").textContent = `${answered} of ${total} answered`;
     document.getElementById("progressPct").textContent = pct + "%";
     document.getElementById("progressFill").style.width = pct + "%";
-    
     return answered;
   }
 
   let autosaveTimer = null;
   function triggerAutosave() {
     clearTimeout(autosaveTimer);
-    
     autosaveTimer = setTimeout(async () => {
       updateProgress();
-      
       try {
         await Students.saveProgress(student.id, lesson.id, answers);
         const ind = document.getElementById("autosaveIndicator");
@@ -334,7 +388,6 @@ function renderQuestions(lesson, savedProgress) {
   // Save button
   doneBtn.addEventListener("click", async () => {
     clearTimeout(autosaveTimer);
-    
     lesson.questions.forEach(q => {
       if (q.type === "speech") {
         const t = document.getElementById(`transcript_${q.id}`);
@@ -348,7 +401,6 @@ function renderQuestions(lesson, savedProgress) {
     
     try {
       const result = await Students.saveProgress(student.id, lesson.id, answers);
-      
       if (result.completed) {
         completionMsg.style.display = "block";
         doneBtn.textContent = "✓ All Done!";
@@ -366,7 +418,6 @@ function renderQuestions(lesson, savedProgress) {
   });
 
   updateProgress();
-  
   if (isComplete) {
     doneBtn.textContent = "✓ Already Completed";
     doneBtn.disabled = true;
@@ -382,9 +433,7 @@ function toggleSpeechRecord(qid) {
   if (activeSpeechQid === qid) {
     stopSpeechRecord(qid);
   } else { 
-    if (activeSpeechQid) {
-      stopSpeechRecord(activeSpeechQid);
-    }
+    if (activeSpeechQid) stopSpeechRecord(activeSpeechQid); 
     startSpeechRecord(qid); 
   }
 }
@@ -430,18 +479,12 @@ function startSpeechRecord(qid) {
   };
 
   speechRecognition.onerror = (e) => {
-    if (e.error !== "no-speech") {
-      setSpeechStatus(qid, `⚠️ Error: ${e.error}`);
-    }
+    if (e.error !== "no-speech") setSpeechStatus(qid, `⚠️ Error: ${e.error}`);
   };
 
   speechRecognition.onend = () => {
     if (activeSpeechQid === qid) {
-      try { 
-        speechRecognition.start(); 
-      } catch (e) {
-        console.warn("Could not restart speech recognition", e);
-      }
+      try { speechRecognition.start(); } catch {}
     }
   };
 
@@ -450,7 +493,6 @@ function startSpeechRecord(qid) {
 
 function stopSpeechRecord(qid) {
   activeSpeechQid = null;
-  
   if (speechRecognition) { 
     speechRecognition.onend = null; 
     speechRecognition.stop(); 
@@ -477,17 +519,12 @@ function stopSpeechRecord(qid) {
 }
 
 function clearSpeech(qid) {
-  if (activeSpeechQid === qid) {
-    stopSpeechRecord(qid);
-  }
-  
+  if (activeSpeechQid === qid) stopSpeechRecord(qid);
   const t = document.getElementById(`transcript_${qid}`);
-  
   if (t) { 
     t.dataset.transcript = ""; 
     t.innerHTML = '<span style="color:var(--muted);font-style:italic;">Your spoken answer will appear here…</span>'; 
   }
-  
   answers[qid] = "";
   setSpeechStatus(qid, "");
 }
@@ -514,25 +551,25 @@ async function toggleRelearn() {
   const contentEl = document.getElementById("relearnContent");
 
   if (relearnOpen) {
+    // Collapse
     body.classList.remove("open");
     btn.textContent = "✨ Start Re-Learning";
     relearnOpen = false;
     return;
   }
 
+  // Expand
   relearnOpen = true;
   body.classList.add("open");
   btn.textContent = "✕ Close";
 
-  if (relearnLoaded) {
-    return; 
-  }
+  if (relearnLoaded) return; // already fetched
 
+  // Show loading state
   contentEl.innerHTML = `<div class="relearn-loading"><div class="rl-spinner"></div> Preparing your lesson recap…</div>`;
 
   try {
     btn.classList.add("loading");
-    
     const res = await AI.getRelearn(
       currentLesson_module?.id || "",
       currentLesson_module?.title || lessonTitle,
@@ -572,10 +609,7 @@ function renderRelearnContent(text, el) {
   let buffer = [];
 
   function flushSection() {
-    if (!currentSection || !buffer.length) {
-      return;
-    }
-    
+    if (!currentSection || !buffer.length) return;
     const icon = sectionIcons[currentSection] || "📌";
     html += `<div class="rl-section">`;
     html += `<div class="rl-header">${icon} ${currentSection}</div>`;
@@ -593,7 +627,6 @@ function renderRelearnContent(text, el) {
       });
       html += `</ul>`;
     }
-    
     html += `</div>`;
     buffer = [];
   }
@@ -611,9 +644,7 @@ function renderRelearnContent(text, el) {
       matchedAny = true;
     } else if (currentSection) {
       const clean = line.replace(/^[-•*\d.]\s*/, "").trim();
-      if (clean.length > 2) {
-        buffer.push(clean);
-      }
+      if (clean.length > 2) buffer.push(clean);
     } else {
       html += `<p style="color:rgba(147,197,253,0.9); margin-bottom:12px;">${escapeHtml(line)}</p>`;
     }
@@ -637,7 +668,6 @@ function initBuddy() {
     `Hello! 😊 I'm Buddy — here to help you with "${lessonTitle}". Ask me questions, ask for hints, or just say hi!`,
     `Welcome! 🌟 Stuck on a question? Just ask me for a hint or explanation. I'm always here!`,
   ];
-  
   const msg = welcomes[Math.floor(Math.random() * welcomes.length)];
   appendBuddyMsg("bot", msg);
   buddyHistory.push({ role: "assistant", content: msg });
@@ -670,22 +700,20 @@ function showBuddyTyping() {
 
 function hideBuddyTyping() { 
   const el = document.getElementById("buddyTyping"); 
-  if (el) {
-    el.remove(); 
-  }
+  if (el) el.remove(); 
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
 function formatAIText(raw) {
-  if (!raw) {
-    return "";
-  }
-  
+  if (!raw) return "";
   let t = escapeHtml(raw);
   t = t.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   t = t.replace(/__(.+?)__/g, "<strong>$1</strong>");
   t = t.replace(/\*([^*\n]+?)\*/g, "<em>$1</em>");
   t = t.replace(/_([^_\n]+?)_/g, "<em>$1</em>");
-  
   const lines = t.split(/\r?\n/);
   const out   = [];
   let inList  = false;
@@ -696,30 +724,19 @@ function formatAIText(raw) {
     const trimmed  = line.trim();
     
     if (bullet || numbered) {
-      if (!inList) { 
-        out.push('<ul class="ai-list">'); 
-        inList = true; 
-      }
+      if (!inList) { out.push('<ul class="ai-list">'); inList = true; }
       out.push(`<li>${bullet ? bullet[1] : numbered[1]}</li>`);
     } else {
-      if (inList) { 
-        out.push("</ul>"); 
-        inList = false; 
-      }
+      if (inList) { out.push("</ul>"); inList = false; }
       if (trimmed === "") {
-        if (out.length && out[out.length - 1] !== "") {
-          out.push("");
-        }
+        if (out.length && out[out.length - 1] !== "") out.push("");
       } else {
         out.push(`<p>${trimmed}</p>`);
       }
     }
   });
   
-  if (inList) {
-    out.push("</ul>");
-  }
-  
+  if (inList) out.push("</ul>");
   return out.filter((l, i, arr) => !(l === "" && arr[i - 1] === "")).join("");
 }
 
@@ -757,26 +774,67 @@ function handleBuddyKey(e) {
   }
 }
 
+// ── CONVERSATION QUICK ACTIONS ──
 function startConversationPractice() {
   const input = document.getElementById("buddyInput");
   input.value = "Let's practice a conversation! You pick a topic.";
   sendBuddy();
-  
-  const quickActions = document.getElementById("buddyQuickActions");
-  if (quickActions) {
-    quickActions.style.display = "none";
-  }
+  document.getElementById("buddyQuickActions").style.display = "none";
 }
 
 function askForGrammarCheck() {
   const input = document.getElementById("buddyInput");
   input.value = "Can you help me check my grammar?";
   sendBuddy();
-  
-  const quickActions = document.getElementById("buddyQuickActions");
-  if (quickActions) {
-    quickActions.style.display = "none";
-  }
+  document.getElementById("buddyQuickActions").style.display = "none";
 }
+
+// ── NEW: DYNAMIC AI FLASHCARDS ──
+document.getElementById("generateAIFlashcardsBtn")?.addEventListener("click", async () => {
+  const btn = document.getElementById("generateAIFlashcardsBtn");
+  const status = document.getElementById("aiFlashcardStatus");
+  const grid = document.getElementById("aiFlashcardGrid");
+
+  btn.disabled = true;
+  btn.textContent = "Generating...";
+  status.style.display = "block";
+  status.textContent = "AI is thinking of fun concepts to learn...";
+  grid.innerHTML = "";
+
+  try {
+    const res = await AI.generateFlashcards(lessonTitle, module?.description || "", 6);
+    const cards = res.flashcards || [];
+    status.style.display = "none";
+
+    if(cards.length === 0) {
+      status.style.display = "block";
+      status.textContent = "Couldn't generate cards right now. Try again!";
+      return;
+    }
+
+    cards.forEach((card, i) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "ai-card-wrapper";
+      wrapper.style.animationDelay = `${i * 0.12}s`; 
+      wrapper.innerHTML = `
+        <div class="ai-card-inner">
+          <div class="ai-card-front">${escapeHtml(card.front)}</div>
+          <div class="ai-card-back">${escapeHtml(card.back)}</div>
+        </div>
+      `;
+      wrapper.addEventListener("click", () => {
+        wrapper.querySelector(".ai-card-inner").classList.toggle("is-flipped");
+      });
+      grid.appendChild(wrapper);
+    });
+
+  } catch(err) {
+    status.style.display = "block";
+    status.textContent = "Error: " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Generate New Deck";
+  }
+});
 
 document.addEventListener("DOMContentLoaded", init);
