@@ -828,6 +828,9 @@
       <button class="tab-btn" id="tabProgress" onclick="switchTab('progress')">
         📊 Student Progress
       </button>
+      <button class="tab-btn" id="tabAnalytics" onclick="switchTab('analytics')">
+        📈 Class Analytics
+      </button>
     </div>
 
     <!-- ══════════════════════════════════════════
@@ -943,6 +946,30 @@
         </div>
 
         <div id="progressContainer" style="margin-top:18px;display:grid;gap:12px;"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         TAB 3 — CLASS ANALYTICS
+    ══════════════════════════════════════════ -->
+    <div class="tab-panel" id="panelAnalytics">
+      <div class="admin-card">
+        <h2>Class Analytics</h2>
+        <p class="admin-card-subtitle">Get a bird's-eye view of how your students are performing as a whole.</p>
+
+        <div style="margin-top:20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; background: rgba(80,58,40,0.03); padding: 22px; border-radius: 18px; border: 1px solid rgba(80,58,40,0.08); text-align: center;">
+          <div><span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 6px;">Total Students</span><strong id="analyticsTotalStudents" style="font-size: 1.8rem; font-weight: 800; color: var(--accent-deep);">0</strong></div>
+          <div><span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 6px;">Lessons Completed</span><strong id="analyticsLessonsCompleted" style="font-size: 1.8rem; font-weight: 800; color: var(--accent-deep);">0</strong></div>
+          <div><span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 6px;">Answers Written</span><strong id="analyticsTotalAnswers" style="font-size: 1.8rem; font-weight: 800; color: var(--accent-deep);">0</strong></div>
+          <div><span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 6px;">Class Avg Score</span><strong id="analyticsAvgScore" style="font-size: 1.8rem; font-weight: 800; color: var(--accent-deep);">0/5</strong></div>
+        </div>
+
+        <div style="margin-top: 20px; background: rgba(255,255,255,0.8); border: 1px solid rgba(80,58,40,0.1); padding: 24px; border-radius: 18px; box-shadow: var(--shadow-soft);">
+          <p style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--accent-deep); margin: 0 0 10px; letter-spacing: 0.05em;">✨ AI Class Report</p>
+          <p id="analyticsAiSummary" style="font-size: 1rem; line-height: 1.7; color: var(--text); margin: 0;">Click refresh to generate an AI summary of class performance.</p>
+        </div>
+
+        <button class="primary-action" style="margin-top: 24px; width: 100%;" onclick="loadClassAnalytics()">↻ Refresh Analytics</button>
       </div>
     </div>
 

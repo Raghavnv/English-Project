@@ -230,6 +230,10 @@ const AI = {
   async getAnalysis(studentId) {
     return apiFetch(`/api/ai/analysis/${studentId}`);
   },
+  
+  async getClassAnalysis() {
+    return apiFetch("/api/ai/class-analysis");
+  },
 
   async generateQuestions(lessonTitle, lessonDescription, classLabel, count = 5, questionType = "text") {
     return apiFetch("/api/ai/generate-questions", {

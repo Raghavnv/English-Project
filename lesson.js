@@ -576,7 +576,6 @@ function appendBuddyMsg(role, text) {
   const body = document.getElementById("buddyBody");
   const div  = document.createElement("div");
   div.className = `buddy-msg ${role}`;
-  // Bot messages may contain markdown — format them; user messages escape only
   const html = role === "bot" ? formatAIText(text) : escapeHtml(text);
   div.innerHTML = `<div class="buddy-bubble">${html}</div>`;
   body.appendChild(div);
@@ -599,48 +598,33 @@ function escapeHtml(str) {
   return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
-// Convert AI markdown responses into clean HTML
 function formatAIText(raw) {
   if (!raw) return "";
-
-  // 1. Escape HTML first so user content can't inject tags
   let t = escapeHtml(raw);
-
-  // 2. Bold: **text** or __text__
   t = t.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   t = t.replace(/__(.+?)__/g, "<strong>$1</strong>");
-
-  // 3. Italic: *text* or _text_
   t = t.replace(/\*([^*\n]+?)\*/g, "<em>$1</em>");
   t = t.replace(/_([^_\n]+?)_/g, "<em>$1</em>");
-
-  // 4. Split into lines for block-level processing
   const lines = t.split(/\r?\n/);
   const out   = [];
   let inList  = false;
-
   lines.forEach(line => {
     const bullet = line.match(/^[-•*]\s+(.+)/);
     const numbered = line.match(/^\d+[.)]\s+(.+)/);
     const trimmed  = line.trim();
-
     if (bullet || numbered) {
       if (!inList) { out.push('<ul class="ai-list">'); inList = true; }
       out.push(`<li>${bullet ? bullet[1] : numbered[1]}</li>`);
     } else {
       if (inList) { out.push("</ul>"); inList = false; }
       if (trimmed === "") {
-        // blank line → spacing between paragraphs, skip excess blanks
         if (out.length && out[out.length - 1] !== "") out.push("");
       } else {
         out.push(`<p>${trimmed}</p>`);
       }
     }
   });
-
   if (inList) out.push("</ul>");
-
-  // Remove consecutive empty strings, collapse to single breaks
   return out.filter((l, i, arr) => !(l === "" && arr[i - 1] === "")).join("");
 }
 
@@ -666,7 +650,6 @@ async function sendBuddy() {
     appendBuddyMsg("bot", "Sorry, I couldn't respond right now. Try again in a moment!");
   } finally {
     btn.disabled = false;
-    // NO input.focus() here — that was causing the page scroll
   }
 }
 
@@ -675,5 +658,20 @@ function handleBuddyKey(e) {
 }
 
 function goBack() { window.location.href = "platform.html"; }
+
+// ── NEW: CONVERSATION QUICK ACTIONS ──
+function startConversationPractice() {
+  const input = document.getElementById("buddyInput");
+  input.value = "Let's practice a conversation! You pick a topic.";
+  sendBuddy();
+  document.getElementById("buddyQuickActions").style.display = "none";
+}
+
+function askForGrammarCheck() {
+  const input = document.getElementById("buddyInput");
+  input.value = "Can you help me check my grammar?";
+  sendBuddy();
+  document.getElementById("buddyQuickActions").style.display = "none";
+}
 
 document.addEventListener("DOMContentLoaded", init);

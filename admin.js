@@ -1,7 +1,4 @@
 // ===== AUTH CHECK (DISABLED FOR DEMO — RESTORE BEFORE GOING LIVE) =====
-// if (!Auth.isLoggedIn()) {
-//   window.location.href = "admin-login.html";
-// }
 if (!Auth.isLoggedIn()) {
   window.location.href = "admin-login.html";
 }
@@ -26,16 +23,43 @@ function showPopup(message) {
 // ===== TAB SWITCH =====
 function switchTab(tab) {
   const isLessons = tab === "lessons";
+  const isProgress = tab === "progress";
+  const isAnalytics = tab === "analytics";
+
   document.getElementById("panelLessons").classList.toggle("active", isLessons);
-  document.getElementById("panelProgress").classList.toggle("active", !isLessons);
+  document.getElementById("panelProgress").classList.toggle("active", isProgress);
+  const panelAnalytics = document.getElementById("panelAnalytics");
+  if (panelAnalytics) panelAnalytics.classList.toggle("active", isAnalytics);
+
   document.getElementById("tabLessons").classList.toggle("active", isLessons);
-  document.getElementById("tabProgress").classList.toggle("active", !isLessons);
-  if (!isLessons) loadProgressData();
+  document.getElementById("tabProgress").classList.toggle("active", isProgress);
+  const tabAnalytics = document.getElementById("tabAnalytics");
+  if (tabAnalytics) tabAnalytics.classList.toggle("active", isAnalytics);
+
+  if (isProgress) loadProgressData();
+  if (isAnalytics) loadClassAnalytics();
 }
 
-// ═══════════════════════════════════════════
+async function loadClassAnalytics() {
+    const summaryEl = document.getElementById("analyticsAiSummary");
+    if (!summaryEl) return;
+    summaryEl.textContent = "Analyzing class data...";
+    
+    try {
+        const data = await AI.getClassAnalysis();
+        document.getElementById("analyticsTotalStudents").textContent = data.total_students;
+        document.getElementById("analyticsLessonsCompleted").textContent = data.total_lessons_completed;
+        document.getElementById("analyticsTotalAnswers").textContent = data.total_answers;
+        document.getElementById("analyticsAvgScore").textContent = data.average_score + "/5";
+        summaryEl.textContent = data.ai_summary;
+    } catch (err) {
+        summaryEl.textContent = "Error loading analytics: " + err.message;
+    }
+}
+
+// ════════════════════════════════════════════════════════════════════
 //  LESSON MANAGEMENT
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 
 let questionCount = 0;
 let editingLessonId = null; // track if we're editing an existing lesson
@@ -426,10 +450,9 @@ function insertSelectedQuestions() {
     container.appendChild(row);
   });
 
-  // Clear AI results and collapse
   document.getElementById("aiGenResults").innerHTML = "";
   document.getElementById("aiGenInsertRow").style.display = "none";
-  toggleAIGen(); // collapse the box
+  toggleAIGen();
   showPopup(`✓ ${checked.length} question(s) added to lesson`);
 }
 

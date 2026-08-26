@@ -16,7 +16,6 @@ MODEL = "openai/gpt-oss-20b"
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
-
 class FeedbackRequest(BaseModel):
     question_id: str
     answer_text: str
@@ -30,7 +29,6 @@ class HintRequest(BaseModel):
 class GuideRequest(BaseModel):
     question_id: str
     lesson_title: Optional[str] = ""
-
 
 def get_question_or_404(question_id: str, db: Session) -> Question:
     q = db.query(Question).filter(Question.id == question_id).first()
@@ -57,14 +55,7 @@ def ask_groq(prompt: str, max_tokens: int = 150, system: str = SYSTEM_PROMPT) ->
     )
     return response.choices[0].message.content.strip()
 
-
 def grade_answer(question, answer_text: str) -> tuple[int, str]:
-    """
-    Shared scorer used by both the /feedback endpoint (when a student clicks
-    "Check with AI") and the /analysis endpoint (to auto-grade answers that
-    were saved as part of a completed lesson but never individually checked).
-    Returns (score 1-5, feedback text).
-    """
     difficulty = question.difficulty or "medium"
     diff_guide = {
         "easy":   "This is an easy question — be strict but still kind. If there are grammar errors, point them out clearly.",
@@ -97,7 +88,6 @@ def grade_answer(question, answer_text: str) -> tuple[int, str]:
     score = max(1, min(5, score))
     return score, feedback_text
 
-
 @router.post("/feedback")
 def get_feedback(body: FeedbackRequest, db: Session = Depends(get_db)):
     question = get_question_or_404(body.question_id, db)
@@ -123,7 +113,6 @@ def get_feedback(body: FeedbackRequest, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
-
 @router.post("/hint")
 def get_hint(body: HintRequest, db: Session = Depends(get_db), requester=Depends(require_authenticated_requester)):
     question = get_question_or_404(body.question_id, db)
@@ -135,7 +124,6 @@ Give a short helpful hint without giving away the answer. 1-2 sentences. Simple 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
-
 @router.post("/guide")
 def get_guide(body: GuideRequest, db: Session = Depends(get_db), requester=Depends(require_authenticated_requester)):
     question = get_question_or_404(body.question_id, db)
@@ -146,7 +134,6 @@ Explain what this question is asking in very simple English for a young student 
         return {"guide": ask_groq(prompt, max_tokens=120)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
-
 
 @router.post("/encouragement")
 def get_encouragement(requester=Depends(require_authenticated_requester)):
@@ -163,11 +150,7 @@ def get_encouragement(requester=Depends(require_authenticated_requester)):
     ]
     return {"message": random.choice(messages)}
 
-
-
-
 # ── STUDENT AI CHAT ───────────────────────────────────────────────────────────
-
 class ChatMessage(BaseModel):
     role: str   # "user" or "assistant"
     content: str
@@ -194,8 +177,9 @@ Your rules:
 - Keep every reply SHORT — 2-3 sentences maximum
 - Use simple English that a school child can easily read
 - Be encouraging, positive, and fun
+- If the student wants to practice conversation, act as a friendly roleplay partner.
+- ALWAYS gently correct any grammar or spelling mistakes the student makes in their message before continuing the conversation.
 - Only discuss topics related to English learning, the lesson, or general school topics
-- If asked about something off-topic, gently steer back to English learning
 - Never be harsh. Always end with something encouraging or a follow-up question to keep them engaged"""
     else:
         admin_name = f" named {body.student_name}" if body.student_name else ""
@@ -226,7 +210,6 @@ Your rules:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
 # ── RE-LEARN (Student) ────────────────────────────────────────────────────────
-
 class RelearnRequest(BaseModel):
     lesson_id: str
     lesson_title: Optional[str] = ""
@@ -263,9 +246,7 @@ Each section: 2-4 bullet points. Simple English. Be warm and encouraging."""
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
-
 # ── GENERATE QUESTIONS WITH TYPE ─────────────────────────────────────────────
-
 class GenerateQuestionsRequest(BaseModel):
     lesson_title: str
     lesson_description: Optional[str] = ""
@@ -300,22 +281,17 @@ Rules: age-appropriate, simple clear English, 1-2 sentences each, no numbers or 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
-
 @router.get("/analysis/{student_id}")
 def get_student_analysis(student_id: str, db: Session = Depends(get_db), requester=Depends(require_student_or_admin)):
-    """
-    Computes real accuracy/progress stats for a student from the database
-    and asks the AI for a short, encouraging written analysis based on actual answers.
-    """
     from app.models.models import Student as StudentModel
-    from app.models.models import Question as QuestionModel # Make sure to import the Question model
+    from app.models.models import Question as QuestionModel
 
     student = db.query(StudentModel).filter(StudentModel.id == student_id).first()
+    progresses = student.progress if student else []
     
     lessons_total     = len(progresses)
     lessons_completed = sum(1 for p in progresses if p.completed)
 
-    # ── AUTO-GRADE ANY ANSWERED-BUT-UNCHECKED ANSWERS ──
     AUTO_GRADE_LIMIT = 15
     auto_graded = 0
     for p in progresses:
@@ -339,19 +315,15 @@ def get_student_analysis(student_id: str, db: Session = Depends(get_db), request
         db.commit()
 
     scored_answers = []
-    recent_q_and_a = [] # We will store the actual questions and answers here
+    recent_q_and_a = []
 
     for p in progresses:
         for a in p.answers:
             if a.text and a.text.strip():
                 if a.ai_score:
                     scored_answers.append(a.ai_score)
-                
-                # Fetch the actual question text so the AI knows what the student was asked
                 q = db.query(QuestionModel).filter(QuestionModel.id == a.question_id).first()
                 q_text = q.prompt if q else "Question"
-                
-                # Bundle them together
                 recent_q_and_a.append(f"Q: {q_text}\nStudent's Answer: {a.text}\n")
 
     answered_count = sum(1 for p in progresses for a in p.answers if a.text and a.text.strip())
@@ -367,7 +339,7 @@ def get_student_analysis(student_id: str, db: Session = Depends(get_db), request
         "correct_count":       correct_count,
         "average_score":       avg_score,
         "accuracy_percentage": accuracy_percentage,
-        "streak_days":         student.streak_days or 0,
+        "streak_days":         student.streak_days if student else 0,
     }
 
     if len(scored_answers) == 0:
@@ -383,10 +355,8 @@ def get_student_analysis(student_id: str, db: Session = Depends(get_db), request
             )
         return stats
 
-    # Get the last 5 questions and answers to give the AI context without overwhelming the token limit
     recent_context = "\n".join(recent_q_and_a[-5:])
 
-    # The updated prompt that forces the AI to read the text
     prompt = f"""Student name: {student.name}
 Lessons completed: {lessons_completed} of {lessons_total}
 Questions answered and AI-checked: {len(scored_answers)}
@@ -401,9 +371,45 @@ Write a short progress analysis (2-3 sentences) for this student's teacher/paren
 Be specific by referencing the actual content of their answers above. Be warm and encouraging. Point out one strength and, if accuracy is below 70%, one gentle area to keep practising. Simple English."""
 
     try:
-        # I slightly increased max_tokens to give the AI room to reference the text
         stats["ai_summary"] = ask_groq(prompt, max_tokens=250)
     except Exception as e:
         stats["ai_summary"] = f"Could not generate AI summary right now ({str(e)})."
 
     return stats
+
+@router.get("/class-analysis")
+def get_class_analysis(db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):
+    from app.models.models import Student as StudentModel
+    
+    students = db.query(StudentModel).all()
+    progresses = db.query(Progress).all()
+    answers = db.query(Answer).filter(Answer.text != "").all()
+
+    total_students = len(students)
+    total_lessons_completed = sum(1 for p in progresses if p.completed)
+    total_answers = len(answers)
+    
+    scored_answers = [a.ai_score for a in answers if a.ai_score]
+    avg_score = round(sum(scored_answers) / len(scored_answers), 2) if scored_answers else 0
+
+    prompt = f"""You are an AI assistant for teachers.
+Class Stats:
+Total Students: {total_students}
+Total Lessons Completed: {total_lessons_completed}
+Total Answers Written: {total_answers}
+Average Score (out of 5): {avg_score}
+
+Write a short, professional summary (2-3 sentences) for the teacher about the class's overall engagement and performance. Be encouraging but grounded in these numbers."""
+    
+    try:
+        summary = ask_groq(prompt, max_tokens=150)
+    except Exception:
+        summary = "Could not generate class summary at this time."
+
+    return {
+        "total_students": total_students,
+        "total_lessons_completed": total_lessons_completed,
+        "total_answers": total_answers,
+        "average_score": avg_score,
+        "ai_summary": summary
+    }
