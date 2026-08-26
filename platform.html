@@ -54,61 +54,7 @@
       margin: 0;
     }
 
-    /* ── TAB NAVIGATION ── */
-    .tab-bar {
-      display: flex;
-      gap: 12px;
-      padding: 8px;
-      border-radius: 24px;
-      background: rgba(255,251,246,0.88);
-      border: 1px solid rgba(255,255,255,0.7);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .tab-btn {
-      flex: 1;
-      min-height: 54px;
-      border-radius: 18px;
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 1.05rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .tab-btn.active {
-      background: var(--accent-deep);
-      color: #fffaf2;
-      box-shadow: 0 8px 24px rgba(126,52,24,0.25);
-    }
-
-    .tab-btn:not(.active):hover {
-      background: rgba(255,255,255,0.6);
-      color: var(--text);
-    }
-
-    /* ── TAB PANELS ── */
-    .tab-panel {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .tab-panel.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── LESSON CARDS ── */
+    /* ── CLASS SECTIONS & LESSON GRID ── */
     .class-section {
       margin-bottom: 32px;
     }
@@ -172,9 +118,20 @@
       width: fit-content;
     }
 
-    .status-completed { background: rgba(111,124,74,0.15); color: #3a5018; }
-    .status-progress { background: rgba(188,93,45,0.12); color: var(--accent-deep); }
-    .status-new { background: rgba(80,58,40,0.08); color: var(--muted); }
+    .status-completed { 
+      background: rgba(111,124,74,0.15); 
+      color: #3a5018; 
+    }
+
+    .status-progress { 
+      background: rgba(188,93,45,0.12); 
+      color: var(--accent-deep); 
+    }
+
+    .status-new { 
+      background: rgba(80,58,40,0.08); 
+      color: var(--muted); 
+    }
 
     .lesson-action-btn {
       min-height: 44px;
@@ -196,47 +153,45 @@
       background: var(--text);
     }
 
-    /* ── PRACTICE HUB ACTIONS ── */
-    .practice-actions {
+    /* ── QUICK ACTION BUTTONS ON CARDS ── */
+    .card-extra-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: auto;
+      gap: 8px;
+      margin-top: 10px;
     }
 
-    .practice-btn {
-      min-height: 44px;
-      border-radius: 12px;
+    .extra-btn {
+      min-height: 38px;
+      border-radius: 10px;
+      font-size: 0.82rem;
       font-weight: 700;
-      font-size: 0.9rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 4px;
       transition: all 0.15s ease;
     }
 
-    .btn-relearn {
+    .btn-relearn-card {
       background: rgba(56,189,248,0.1);
       border: 1px solid rgba(56,189,248,0.3);
       color: #0284c7;
     }
 
-    .btn-relearn:hover {
-      background: rgba(56,189,248,0.2);
-      border-color: rgba(56,189,248,0.6);
+    .btn-relearn-card:hover { 
+      background: rgba(56,189,248,0.2); 
     }
 
-    .btn-flashcards {
+    .btn-flash-card {
       background: rgba(139,92,246,0.1);
       border: 1px solid rgba(139,92,246,0.3);
       color: #6d28d9;
     }
 
-    .btn-flashcards:hover {
-      background: rgba(139,92,246,0.2);
-      border-color: rgba(139,92,246,0.6);
+    .btn-flash-card:hover { 
+      background: rgba(139,92,246,0.2); 
     }
 
     /* ── MODALS (Re-Learn & Flashcards) ── */
@@ -310,12 +265,12 @@
       flex: 1;
     }
 
-    /* Re-Learn Modal Specifics */
+    /* Re-Learn Modal Theme */
     .relearn-modal {
       background: linear-gradient(135deg, #0f2027 0%, #1a3a4a 50%, #0f2027 100%);
       border: 1px solid rgba(56,189,248,0.3);
     }
-    
+
     .relearn-modal .modal-header {
       border-bottom: 1px solid rgba(56,189,248,0.15);
     }
@@ -326,11 +281,10 @@
       font-weight: 800;
       margin: 0;
       display: flex;
-      align-items: center;
       gap: 10px;
     }
 
-    /* Flashcard Modal Specifics */
+    /* Flashcard Modal Theme */
     .flashcard-modal {
       background: linear-gradient(145deg, #f5f3ff, #ede9fe);
       border: 1px solid rgba(139, 92, 246, 0.4);
@@ -346,7 +300,6 @@
       font-weight: 800;
       margin: 0;
       display: flex;
-      align-items: center;
       gap: 10px;
     }
 
@@ -355,33 +308,165 @@
       color: #4c1d95;
     }
 
-    .flashcard-modal .modal-close:hover {
-      background: rgba(76, 29, 149, 0.2);
+    /* Re-Learn Content Styles */
+    .relearn-content { 
+      color: #cbd5e1; 
+      font-size: 1rem; 
+      line-height: 1.8; 
     }
 
-    /* ── AI CONTENT STYLES ── */
-    .relearn-content { color: #cbd5e1; font-size: 1rem; line-height: 1.8; }
-    .relearn-content .rl-section { margin-bottom: 24px; }
-    .relearn-content .rl-header { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #7dd3fc; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(56,189,248,0.12); }
-    .relearn-content ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
-    .relearn-content ul li { display: flex; gap: 10px; align-items: flex-start; }
-    .relearn-content ul li::before { content: "→"; color: #38bdf8; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
-    .relearn-content .rl-example { background: rgba(255,255,255,0.04); border: 1px solid rgba(56,189,248,0.1); border-radius: 12px; padding: 12px 16px; font-style: italic; color: #a5f3fc; margin-bottom: 10px; }
+    .relearn-content .rl-section { 
+      margin-bottom: 24px; 
+    }
 
-    .ai-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; perspective: 1000px; }
-    .ai-card-wrapper { width: 100%; height: 180px; cursor: pointer; perspective: 1000px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; }
-    .ai-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; border-radius: 18px; box-shadow: 0 8px 20px rgba(46, 16, 101, 0.12); }
-    .ai-card-wrapper:hover .ai-card-inner { box-shadow: 0 12px 28px rgba(46, 16, 101, 0.2); transform: translateY(-3px); }
-    .ai-card-inner.is-flipped { transform: rotateY(180deg); }
-    .ai-card-front, .ai-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 18px; display: flex; align-items: center; justify-content: center; padding: 20px; font-size: 1.25rem; font-weight: 700; text-align: center; }
-    .ai-card-front { background: #ffffff; border: 2px solid rgba(139, 92, 246, 0.3); color: #4c1d95; }
-    .ai-card-back { background: linear-gradient(135deg, #7c3aed, #5b21b6); border: 2px solid rgba(109, 40, 217, 0.6); color: #ffffff; transform: rotateY(180deg); font-size: 1.05rem; line-height: 1.45; }
+    .relearn-content .rl-header { 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      font-size: 0.85rem; 
+      font-weight: 800; 
+      letter-spacing: 0.08em; 
+      text-transform: uppercase; 
+      color: #7dd3fc; 
+      margin-bottom: 12px; 
+      padding-bottom: 8px; 
+      border-bottom: 1px solid rgba(56,189,248,0.12); 
+    }
 
-    .ai-loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 16px; text-align: center; }
-    .spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; animation: spin 0.8s linear infinite; }
-    .spinner.purple { border-color: rgba(139,92,246,0.2); border-top-color: #7c3aed; }
-    .spinner.blue { border-color: rgba(56,189,248,0.2); border-top-color: #38bdf8; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .relearn-content ul { 
+      list-style: none; 
+      padding: 0; 
+      margin: 0; 
+      display: grid; 
+      gap: 10px; 
+    }
+
+    .relearn-content ul li { 
+      display: flex; 
+      gap: 10px; 
+      align-items: flex-start; 
+    }
+
+    .relearn-content ul li::before { 
+      content: "→"; 
+      color: #38bdf8; 
+      font-weight: 800; 
+      flex-shrink: 0; 
+      margin-top: 2px; 
+    }
+
+    .relearn-content .rl-example { 
+      background: rgba(255,255,255,0.04); 
+      border: 1px solid rgba(56,189,248,0.1); 
+      border-radius: 12px; 
+      padding: 12px 16px; 
+      font-style: italic; 
+      color: #a5f3fc; 
+      margin-bottom: 10px; 
+    }
+
+    /* Flashcard Grid Styles */
+    .ai-card-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+      gap: 20px; 
+      perspective: 1000px; 
+    }
+
+    .ai-card-wrapper { 
+      width: 100%; 
+      height: 180px; 
+      cursor: pointer; 
+      perspective: 1000px; 
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; 
+    }
+
+    .ai-card-inner { 
+      position: relative; 
+      width: 100%; 
+      height: 100%; 
+      transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); 
+      transform-style: preserve-3d; 
+      border-radius: 18px; 
+      box-shadow: 0 8px 20px rgba(46, 16, 101, 0.12); 
+    }
+
+    .ai-card-wrapper:hover .ai-card-inner { 
+      box-shadow: 0 12px 28px rgba(46, 16, 101, 0.2); 
+      transform: translateY(-3px); 
+    }
+
+    .ai-card-inner.is-flipped { 
+      transform: rotateY(180deg); 
+    }
+
+    .ai-card-front, .ai-card-back { 
+      position: absolute; 
+      width: 100%; 
+      height: 100%; 
+      backface-visibility: hidden; 
+      border-radius: 18px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 20px; 
+      font-size: 1.25rem; 
+      font-weight: 700; 
+      text-align: center; 
+    }
+
+    .ai-card-front { 
+      background: #ffffff; 
+      border: 2px solid rgba(139, 92, 246, 0.3); 
+      color: #4c1d95; 
+    }
+
+    .ai-card-back { 
+      background: linear-gradient(135deg, #7c3aed, #5b21b6); 
+      border: 2px solid rgba(109, 40, 217, 0.6); 
+      color: #ffffff; 
+      transform: rotateY(180deg); 
+      font-size: 1.05rem; 
+      line-height: 1.45; 
+    }
+
+    /* Loading Spinner Styles */
+    .ai-loading-state { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      padding: 40px 0; 
+      gap: 16px; 
+      text-align: center; 
+    }
+
+    .spinner { 
+      width: 36px; 
+      height: 36px; 
+      border: 3px solid rgba(255,255,255,0.2); 
+      border-radius: 50%; 
+      animation: spin 0.8s linear infinite; 
+    }
+
+    .spinner.purple { 
+      border-color: rgba(139,92,246,0.2); 
+      border-top-color: #7c3aed; 
+    }
+
+    .spinner.blue { 
+      border-color: rgba(56,189,248,0.2); 
+      border-top-color: #38bdf8; 
+    }
+
+    @keyframes spin { 
+      to { transform: rotate(360deg); } 
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -416,30 +501,9 @@
       </div>
     </div>
 
-    <!-- TAB BAR -->
-    <div class="tab-bar">
-      <button class="tab-btn active" id="tabLessons" onclick="switchTab('lessons')">
-        📚 My Lessons
-      </button>
-      <button class="tab-btn" id="tabPractice" onclick="switchTab('practice')">
-        🧠 Practice Hub
-      </button>
-    </div>
-
-    <!-- TAB 1: MY LESSONS -->
-    <div class="tab-panel active" id="panelLessons">
-      <div id="lessonsContainer">
-        <div style="padding: 40px; text-align: center; color: var(--muted);">Loading your lessons...</div>
-      </div>
-    </div>
-
-    <!-- TAB 2: PRACTICE HUB -->
-    <div class="tab-panel" id="panelPractice">
-      <div style="margin-bottom: 20px; padding: 20px; border-radius: 20px; background: linear-gradient(135deg, rgba(236,253,245,0.7), rgba(209,250,229,0.5)); border: 1px solid rgba(167,243,208,0.8);">
-        <h3 style="margin: 0 0 8px; color: #065f46; font-size: 1.2rem; font-weight: 800;">Welcome to the Practice Hub! ✨</h3>
-        <p style="margin: 0; color: #047857; font-size: 0.95rem; line-height: 1.5;">Review the topics you've covered. Click <strong>Re-Learn</strong> for a quick AI summary, or <strong>Flashcards</strong> to test your memory with dynamic flipping cards.</p>
-      </div>
-      <div id="practiceContainer"></div>
+    <!-- ORIGINAL LESSONS VIEW CONTAINER -->
+    <div id="lessonsContainer">
+      <div style="padding: 40px; text-align: center; color: var(--muted);">Loading your lessons...</div>
     </div>
 
   </main>
