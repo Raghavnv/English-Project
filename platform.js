@@ -319,7 +319,7 @@ function renderResourceLibrary() {
     panel.style.display = "";
     if (pill) pill.textContent = relevant.length;
     list.innerHTML = relevant.map(r => `
-      <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" style="display:block;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);text-decoration:none;color:inherit;">
+      <a href="${escapeHtml(r.url)}" ${r.fileName ? `download="${escapeHtml(r.fileName)}"` : `target="_blank" rel="noopener"`} style="display:block;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);text-decoration:none;color:inherit;">
         <strong style="font-size:0.85rem;">${RESOURCE_ICONS[r.type] || "📄"} ${escapeHtml(r.title)}</strong>
         ${r.notes ? `<p style="margin:4px 0 0;font-size:0.8rem;color:var(--muted);line-height:1.5;">${escapeHtml(r.notes)}</p>` : ""}
       </a>
@@ -351,13 +351,13 @@ function renderResourceFullPage() {
   }
 
   container.innerHTML = relevant.map(r => `
-    <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" class="workspace-panel" style="display:block; padding:22px; border-radius:20px; text-decoration:none; color:inherit; transition: transform 0.15s ease;">
+    <a href="${escapeHtml(r.url)}" ${r.fileName ? `download="${escapeHtml(r.fileName)}"` : `target="_blank" rel="noopener"`} class="workspace-panel" style="display:block; padding:22px; border-radius:20px; text-decoration:none; color:inherit; transition: transform 0.15s ease;">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
         <span style="font-size:1.4rem;">${RESOURCE_ICONS[r.type] || "📄"}</span>
         <h3 style="margin:0; font-family:'Newsreader', serif; font-size:1.1rem;">${escapeHtml(r.title)}</h3>
       </div>
       ${r.notes ? `<p style="margin:0 0 10px; color: var(--muted); line-height:1.6; font-size:0.92rem;">${escapeHtml(r.notes)}</p>` : ""}
-      <span style="font-size:0.78rem; color: var(--accent-deep); font-weight:800;">Open resource →</span>
+      <span style="font-size:0.78rem; color: var(--accent-deep); font-weight:800;">${r.fileName ? `⬇️ Download (${r.fileName})` : "Open resource →"}</span>
     </a>
   `).join("");
 }

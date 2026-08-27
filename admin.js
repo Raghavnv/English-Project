@@ -151,29 +151,80 @@ function setResources(list) {
 
 function saveResource() {
   const title = document.getElementById("resourceTitle").value.trim();
-  const url = document.getElementById("resourceUrl").value.trim();
   const notes = document.getElementById("resourceNotes").value.trim();
   const targetClass = document.getElementById("resourceClass").value;
   const type = document.querySelector('input[name="resourceType"]:checked')?.value || "pdf";
+  const source = document.querySelector('input[name="resourceSource"]:checked')?.value || "link";
 
-  if (!title || !url) {
-    showPopup("Please add a title and a link.");
+  if (!title) {
+    showPopup("Please add a title.");
     return;
   }
 
-  const list = getResources();
-  list.unshift({
-    id: "r_" + Date.now(),
-    title, url, notes, class: targetClass, type,
-    date: new Date().toISOString()
-  });
-  setResources(list);
+  const finishSave = (url, fileName) => {
+    const list = getResources();
+    list.unshift({
+      id: "r_" + Date.now(),
+      title, url, notes, class: targetClass, type,
+      fileName: fileName || null,
+      date: new Date().toISOString()
+    });
+    setResources(list);
 
-  document.getElementById("resourceTitle").value = "";
-  document.getElementById("resourceUrl").value = "";
-  document.getElementById("resourceNotes").value = "";
-  showPopup("Resource added!");
-  renderResources();
+    document.getElementById("resourceTitle").value = "";
+    document.getElementById("resourceUrl").value = "";
+    document.getElementById("resourceNotes").value = "";
+    document.getElementById("resourceFile").value = "";
+    showPopup("Resource added!");
+    renderResources();
+  };
+
+  if (source === "upload") {
+    const fileInput = document.getElementById("resourceFile");
+    const file = fileInput.files[0];
+    if (!file) {
+      showPopup("Please choose a file to upload.");
+      return;
+    }
+    const MAX_BYTES = 4 * 1024 * 1024; // ~4MB, localStorage-safe
+    if (file.size > MAX_BYTES) {
+      showPopup("That file is too large (max ~4MB). Try a Link instead.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => finishSave(reader.result, file.name);
+    reader.onerror = () => showPopup("Couldn't read that file — please try again.");
+    reader.readAsDataURL(file);
+  } else {
+    const url = document.getElementById("resourceUrl").value.trim();
+    if (!url) {
+      showPopup("Please add a link.");
+      return;
+    }
+    finishSave(url, null);
+  }
+}
+
+function toggleResourceSource() {
+  const source = document.querySelector('input[name="resourceSource"]:checked')?.value || "link";
+  document.getElementById("resourceUrlField").style.display = source === "link" ? "" : "none";
+  document.getElementById("resourceUploadField").style.display = source === "upload" ? "" : "none";
+}
+
+function handleResourceFileSelect(event) {
+  const file = event.target.files[0];
+  const hint = document.getElementById("resourceFileHint");
+  if (!hint) return;
+  if (!file) {
+    hint.textContent = "Max ~4MB per file (stored directly in the browser). For larger files, use a Link instead.";
+    return;
+  }
+  const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+  const tooBig = file.size > 4 * 1024 * 1024;
+  hint.textContent = tooBig
+    ? `⚠️ ${file.name} is ${sizeMB}MB — too large. Max ~4MB, please use a Link instead.`
+    : `Selected: ${file.name} (${sizeMB}MB)`;
+  hint.style.color = tooBig ? "#c0392b" : "var(--muted)";
 }
 
 function deleteResource(id) {
@@ -195,7 +246,11 @@ function renderResources() {
     <div class="question-row">
       <div>
         <strong>${RESOURCE_ICONS[r.type] || "📄"} ${escHtml(r.title)}</strong>
-        <p style="margin:4px 0 6px;"><a href="${escHtml(r.url)}" target="_blank" rel="noopener" style="color:var(--accent-deep);font-weight:700;">${escHtml(r.url)}</a></p>
+        <p style="margin:4px 0 6px;">${
+          r.fileName
+            ? `<a href="${escHtml(r.url)}" download="${escHtml(r.fileName)}" style="color:var(--accent-deep);font-weight:700;">⬇️ ${escHtml(r.fileName)}</a>`
+            : `<a href="${escHtml(r.url)}" target="_blank" rel="noopener" style="color:var(--accent-deep);font-weight:700;">${escHtml(r.url)}</a>`
+        }</p>
         ${r.notes ? `<p style="margin:0 0 6px;color:var(--muted);font-size:0.9rem;">${escHtml(r.notes)}</p>` : ""}
         <span style="font-size:0.75rem;color:var(--muted);">
           ${r.class ? escHtml(r.class) : "All Classes"} · ${new Date(r.date).toLocaleString()}

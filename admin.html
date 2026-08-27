@@ -138,6 +138,40 @@
       background: #fff;
     }
 
+    /* ── FILE UPLOAD ── */
+    .admin-file-input {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1.5px dashed rgba(80,58,40,0.28);
+      background: rgba(255,255,255,0.6);
+      font-family: inherit;
+      font-size: 0.88rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .admin-file-input:hover {
+      border-color: rgba(188,93,45,0.5);
+      background: rgba(255,255,255,0.85);
+    }
+
+    .admin-file-input::file-selector-button {
+      margin-right: 12px;
+      min-height: 34px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent-deep);
+      color: #fffaf2;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
     /* ── FORM ── */
     .form-label {
       display: block;
@@ -1348,8 +1382,22 @@
         <label class="form-label" for="resourceTitle">Title</label>
         <input id="resourceTitle" placeholder="e.g. Unit 3 Reading Guide">
 
-        <label class="form-label" for="resourceUrl">Link / URL</label>
-        <input id="resourceUrl" placeholder="https://…">
+        <label class="form-label">Source</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+          <label class="ai-type-pill"><input type="radio" name="resourceSource" value="link" checked onchange="toggleResourceSource()"><span>🔗 Link / URL</span></label>
+          <label class="ai-type-pill"><input type="radio" name="resourceSource" value="upload" onchange="toggleResourceSource()"><span>⬆️ Upload File</span></label>
+        </div>
+
+        <div id="resourceUrlField">
+          <label class="form-label" for="resourceUrl">Link / URL</label>
+          <input id="resourceUrl" placeholder="https://…">
+        </div>
+
+        <div id="resourceUploadField" style="display:none;">
+          <label class="form-label" for="resourceFile">Upload File</label>
+          <input type="file" id="resourceFile" class="admin-file-input" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.mp3,.wav,.m4a,.txt" onchange="handleResourceFileSelect(event)">
+          <p id="resourceFileHint" style="font-size:0.78rem;color:var(--muted);margin:6px 0 0;">Max ~4MB per file (stored directly in the browser). For larger files, use a Link instead.</p>
+        </div>
 
         <label class="form-label" for="resourceNotes">Notes (optional)</label>
         <textarea id="resourceNotes" placeholder="Any extra instructions for students…"></textarea>
