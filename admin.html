@@ -97,6 +97,47 @@
       margin-bottom: 4px;
     }
 
+    /* ── SELECT / DROPDOWN ── */
+    .admin-select {
+      display: block;
+      width: 100%;
+      min-height: 50px;
+      margin-top: 6px;
+      padding: 0 42px 0 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(80,58,40,0.16);
+      background-color: rgba(255,255,255,0.75);
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'><path d='M1 1L7 7L13 1' stroke='%237E3418' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 12px;
+      appearance: none;
+      -webkit-appearance: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    .admin-select:hover {
+      background-color: rgba(255,255,255,0.95);
+      border-color: rgba(80,58,40,0.28);
+    }
+
+    .admin-select:focus {
+      outline: none;
+      border-color: var(--accent-deep);
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(188,93,45,0.15);
+    }
+
+    .admin-select option {
+      color: var(--text);
+      background: #fff;
+    }
+
     /* ── FORM ── */
     .form-label {
       display: block;
@@ -1145,7 +1186,7 @@
         <p class="admin-card-subtitle">Monitor streaks, completion rates, and flag students who need help. Progress is stored in the student's own browser — only students who have used this device will appear here.</p>
 
         <div class="progress-controls" style="margin-top:18px;">
-          <select id="classFilter" onchange="renderProgress()">
+          <select id="classFilter" class="admin-select" style="width:auto;min-width:200px;" onchange="renderProgress()">
             <option value="">All Classes</option>
           </select>
           <button class="refresh-btn" onclick="loadProgressData()">↻ Refresh</button>
@@ -1255,7 +1296,7 @@
         <p class="admin-card-subtitle">Push announcements, daily goals, or reminders straight to student dashboards.</p>
 
         <label class="form-label" for="broadcastClass">Send To</label>
-        <select id="broadcastClass">
+        <select id="broadcastClass" class="admin-select">
           <option value="">All Classes</option>
         </select>
 
@@ -1292,7 +1333,7 @@
         <p class="admin-card-subtitle">Upload or link supplemental PDF worksheets, reading guides, or audio materials for your classes.</p>
 
         <label class="form-label" for="resourceClass">Class</label>
-        <select id="resourceClass">
+        <select id="resourceClass" class="admin-select">
           <option value="">All Classes</option>
         </select>
 

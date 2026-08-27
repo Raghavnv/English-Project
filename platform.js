@@ -251,20 +251,54 @@ function renderBroadcasts() {
   const pill  = document.getElementById("broadcastCountPill");
   if (!panel || !list) return;
 
+  const relevant = getRelevantBroadcasts();
+
+  if (relevant.length === 0) { panel.style.display = "none"; }
+  else {
+    panel.style.display = "";
+    if (pill) pill.textContent = relevant.length;
+    list.innerHTML = relevant.slice(0, 5).map(b => `
+      <div style="padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);">
+        <strong style="font-size:0.85rem;">${BROADCAST_ICONS[b.type] || "📣"} ${escapeHtml(b.title)}</strong>
+        <p style="margin:4px 0 0;font-size:0.82rem;color:var(--muted);line-height:1.5;">${escapeHtml(b.message)}</p>
+      </div>
+    `).join("");
+  }
+
+  const railBadge = document.getElementById("broadcastRailBadge");
+  if (railBadge) {
+    if (relevant.length > 0) { railBadge.textContent = relevant.length; railBadge.style.display = "flex"; }
+    else railBadge.style.display = "none";
+  }
+}
+
+function getRelevantBroadcasts() {
   let broadcasts = [];
   try { broadcasts = JSON.parse(localStorage.getItem("broadcasts") || "[]"); } catch {}
-
   const selectedClass = getSelectedClass();
-  const relevant = broadcasts.filter(b => !b.class || b.class === selectedClass?.label);
+  return broadcasts.filter(b => !b.class || b.class === selectedClass?.label);
+}
 
-  if (relevant.length === 0) { panel.style.display = "none"; return; }
-  panel.style.display = "";
-  if (pill) pill.textContent = relevant.length;
+function renderBroadcastFullPage() {
+  const container = document.getElementById("broadcastFullList");
+  if (!container) return;
+  const relevant = getRelevantBroadcasts();
 
-  list.innerHTML = relevant.slice(0, 5).map(b => `
-    <div style="padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);">
-      <strong style="font-size:0.85rem;">${BROADCAST_ICONS[b.type] || "📣"} ${escapeHtml(b.title)}</strong>
-      <p style="margin:4px 0 0;font-size:0.82rem;color:var(--muted);line-height:1.5;">${escapeHtml(b.message)}</p>
+  if (relevant.length === 0) {
+    container.innerHTML = `<p class="empty-state">No broadcasts yet — your teacher hasn't sent anything to your class.</p>`;
+    return;
+  }
+
+  container.innerHTML = relevant.map(b => `
+    <div class="workspace-panel" style="padding:24px; border-radius:20px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <span style="font-size:1.4rem;">${BROADCAST_ICONS[b.type] || "📣"}</span>
+        <h3 style="margin:0; font-family:'Newsreader', serif; font-size:1.25rem;">${escapeHtml(b.title)}</h3>
+      </div>
+      <p style="margin:0 0 10px; color: var(--text); line-height:1.7;">${escapeHtml(b.message)}</p>
+      <span style="font-size:0.78rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; font-weight:700;">
+        ${b.class ? escapeHtml(b.class) : "All Classes"} · ${new Date(b.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+      </span>
     </div>
   `).join("");
 }
@@ -278,20 +312,52 @@ function renderResourceLibrary() {
   const pill  = document.getElementById("resourceCountPill");
   if (!panel || !list) return;
 
+  const relevant = getRelevantResources();
+
+  if (relevant.length === 0) { panel.style.display = "none"; }
+  else {
+    panel.style.display = "";
+    if (pill) pill.textContent = relevant.length;
+    list.innerHTML = relevant.map(r => `
+      <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" style="display:block;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);text-decoration:none;color:inherit;">
+        <strong style="font-size:0.85rem;">${RESOURCE_ICONS[r.type] || "📄"} ${escapeHtml(r.title)}</strong>
+        ${r.notes ? `<p style="margin:4px 0 0;font-size:0.8rem;color:var(--muted);line-height:1.5;">${escapeHtml(r.notes)}</p>` : ""}
+      </a>
+    `).join("");
+  }
+
+  const railBadge = document.getElementById("resourceRailBadge");
+  if (railBadge) {
+    if (relevant.length > 0) { railBadge.textContent = relevant.length; railBadge.style.display = "flex"; }
+    else railBadge.style.display = "none";
+  }
+}
+
+function getRelevantResources() {
   let resources = [];
   try { resources = JSON.parse(localStorage.getItem("resources") || "[]"); } catch {}
-
   const selectedClass = getSelectedClass();
-  const relevant = resources.filter(r => !r.class || r.class === selectedClass?.label);
+  return resources.filter(r => !r.class || r.class === selectedClass?.label);
+}
 
-  if (relevant.length === 0) { panel.style.display = "none"; return; }
-  panel.style.display = "";
-  if (pill) pill.textContent = relevant.length;
+function renderResourceFullPage() {
+  const container = document.getElementById("resourceFullList");
+  if (!container) return;
+  const relevant = getRelevantResources();
 
-  list.innerHTML = relevant.map(r => `
-    <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" style="display:block;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);text-decoration:none;color:inherit;">
-      <strong style="font-size:0.85rem;">${RESOURCE_ICONS[r.type] || "📄"} ${escapeHtml(r.title)}</strong>
-      ${r.notes ? `<p style="margin:4px 0 0;font-size:0.8rem;color:var(--muted);line-height:1.5;">${escapeHtml(r.notes)}</p>` : ""}
+  if (relevant.length === 0) {
+    container.innerHTML = `<p class="empty-state">No resources yet — your teacher hasn't shared anything with your class.</p>`;
+    return;
+  }
+
+  container.innerHTML = relevant.map(r => `
+    <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" class="workspace-panel" style="display:block; padding:22px; border-radius:20px; text-decoration:none; color:inherit; transition: transform 0.15s ease;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <span style="font-size:1.4rem;">${RESOURCE_ICONS[r.type] || "📄"}</span>
+        <h3 style="margin:0; font-family:'Newsreader', serif; font-size:1.1rem;">${escapeHtml(r.title)}</h3>
+      </div>
+      ${r.notes ? `<p style="margin:0 0 10px; color: var(--muted); line-height:1.6; font-size:0.92rem;">${escapeHtml(r.notes)}</p>` : ""}
+      <span style="font-size:0.78rem; color: var(--accent-deep); font-weight:800;">Open resource →</span>
     </a>
   `).join("");
 }

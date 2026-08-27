@@ -127,6 +127,12 @@
     <button class="rail-btn" data-tooltip="Story Corner" onclick="switchAppView('view-story', this)">📖</button>
     <button class="rail-btn" data-tooltip="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️</button>
     <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('view-translator', this)">🌐</button>
+    <button class="rail-btn" data-tooltip="Broadcasts" onclick="switchAppView('view-broadcast', this)" style="position:relative;">
+      📣<span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
+    </button>
+    <button class="rail-btn" data-tooltip="Resources" onclick="switchAppView('view-resources', this)" style="position:relative;">
+      📚<span id="resourceRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
+    </button>
   </nav>
 
   <div class="platform-shell">
@@ -310,7 +316,7 @@
           </section>
         </section>
       </main>
-
+    </div><!-- /view-dashboard -->
 
 
     <!-- ════════════════════════════════════════════════════════════ -->
@@ -383,6 +389,36 @@
       </div>
     </section>
 
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ── VIEW 5: BROADCASTS ── -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section id="view-broadcast" class="app-view">
+      <div class="page-container">
+        <div class="page-header">
+          <p class="panel-label" style="color: var(--accent-deep); font-size: 0.9rem;">📣 From your teacher</p>
+          <h1>Broadcasts</h1>
+          <p>Announcements, daily goals, and reminders your teacher has sent to your class.</p>
+        </div>
+
+        <div id="broadcastFullList" style="display:grid; gap:16px;"></div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ── VIEW 6: RESOURCE LIBRARY ── -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section id="view-resources" class="app-view">
+      <div class="page-container">
+        <div class="page-header">
+          <p class="panel-label" style="color: var(--accent-deep); font-size: 0.9rem;">📚 Extra materials</p>
+          <h1>Resource Library</h1>
+          <p>Worksheets, reading guides, and audio materials your teacher has shared with your class.</p>
+        </div>
+
+        <div id="resourceFullList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px;"></div>
+      </div>
+    </section>
+
   </div>
 
   <!-- Original AI Analysis Modal -->
@@ -436,6 +472,12 @@
       // Load Word Bank automatically if accessed
       if (viewId === 'view-wordbank' && typeof loadWordBank === 'function') {
         loadWordBank();
+      }
+      if (viewId === 'view-broadcast' && typeof renderBroadcastFullPage === 'function') {
+        renderBroadcastFullPage();
+      }
+      if (viewId === 'view-resources' && typeof renderResourceFullPage === 'function') {
+        renderResourceFullPage();
       }
     }
   </script>
