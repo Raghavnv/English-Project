@@ -11,159 +11,106 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="platform.css">
   <style>
+    /* ── LAYOUT & APP RAIL ── */
+    body { padding-left: 84px; } /* Make room for the fixed rail */
+    
+    .app-rail {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 84px;
+      background: linear-gradient(180deg, #1f1a16 0%, #3d2c20 100%);
+      z-index: 9999; display: flex; flex-direction: column; align-items: center;
+      padding: 24px 0; gap: 16px; border-right: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+    }
+    .rail-logo { font-size: 1.8rem; margin-bottom: 12px; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); width: 50px; text-align: center; }
+    .rail-btn {
+      width: 50px; height: 50px; border-radius: 16px; border: none; background: transparent;
+      font-size: 1.4rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .rail-btn:hover { background: rgba(255,255,255,0.1); color: #fff; transform: translateY(-2px); }
+    .rail-btn.active {
+      background: linear-gradient(135deg, var(--accent-deep), var(--accent)); color: #fff;
+      box-shadow: 0 4px 14px rgba(188,93,45,0.4);
+    }
+    .rail-btn::after {
+      content: attr(data-tooltip); position: absolute; left: 64px;
+      background: #1f1a16; color: #fff; padding: 8px 14px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 700; white-space: nowrap; opacity: 0; pointer-events: none;
+      transform: translateX(-10px); transition: all 0.2s; box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255,255,255,0.1); z-index: 10000;
+    }
+    .rail-btn:hover::after { opacity: 1; transform: translateX(0); }
+
     /* ── STUDENT CHIP ── */
     .student-chip {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 6px 14px 6px 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.55);
-      border: 1px solid rgba(80,58,40,0.12);
-      font-size: 0.86rem;
+      display: flex; align-items: center; gap: 9px; padding: 6px 14px 6px 8px;
+      border-radius: 999px; background: rgba(255,255,255,0.55); border: 1px solid rgba(80,58,40,0.12); font-size: 0.86rem;
     }
     .student-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(188,93,45,0.18), rgba(111,124,74,0.22));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: var(--accent-deep);
-      flex-shrink: 0;
+      width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, rgba(188,93,45,0.18), rgba(111,124,74,0.22));
+      display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: var(--accent-deep); flex-shrink: 0;
     }
-    .student-chip-info strong {
-      display: block;
-      font-size: 0.84rem;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-    .student-chip-info span {
-      font-size: 0.76rem;
-      color: var(--muted);
-    }
+    .student-chip-info strong { display: block; font-size: 0.84rem; font-weight: 700; line-height: 1.1; }
+    .student-chip-info span { font-size: 0.76rem; color: var(--muted); }
     .logout-btn {
-      min-height: 32px;
-      padding: 0 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(188,93,45,0.2);
-      background: rgba(188,93,45,0.07);
-      color: var(--accent-deep);
-      font-size: 0.82rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s ease;
+      min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(188,93,45,0.2);
+      background: rgba(188,93,45,0.07); color: var(--accent-deep); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s ease;
     }
     .logout-btn:hover { background: rgba(188,93,45,0.14); }
 
-    /* ── AI PANEL WIRED ── */
-    .ai-thinking {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 0.86rem;
-    }
-    .ai-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: ai-pulse 1.2s ease-in-out infinite;
-    }
-    .ai-dot:nth-child(2) { animation-delay: 0.2s; }
-    .ai-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes ai-pulse {
-      0%,100% { opacity: 0.25; transform: scale(0.8); }
-      50%      { opacity: 1;    transform: scale(1.1); }
-    }
-    .hint-revealed {
-      padding: 14px 16px;
-      border-radius: 12px;
-      background: rgba(111,124,74,0.1);
-      border: 1px solid rgba(111,124,74,0.2);
-      color: var(--text);
-      font-size: 0.92rem;
-      line-height: 1.65;
-      margin-top: 10px;
-    }
-
     /* ── ACHIEVEMENTS (BADGES) ── */
-    .badges-grid { 
-      display: grid; 
-      grid-template-columns: repeat(2, 1fr); 
-      gap: 10px; 
-      margin-top: 14px; 
-    }
-    .badge-card {
-      padding: 12px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(80, 58, 40, 0.1);
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
-    .badge-icon { 
-      font-size: 1.8rem; 
-    }
-    .badge-name { 
-      font-size: 0.8rem; 
-      font-weight: 800; 
-      color: var(--accent-deep); 
-      line-height: 1.1; 
-    }
+    .badges-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .badge-card { padding: 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(80, 58, 40, 0.1); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .badge-icon { font-size: 1.8rem; }
+    .badge-name { font-size: 0.8rem; font-weight: 800; color: var(--accent-deep); line-height: 1.1; }
 
+    /* ── FEATURE MODALS (Translator, Word Bank, Story) ── */
+    .feature-modal-content {
+      width: min(calc(100% - 32px), 700px); max-height: 90vh; overflow-y: auto; padding: 36px;
+      border-radius: 28px; background: linear-gradient(145deg, #fffaf2, #fdf4e7);
+      border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 30px 70px rgba(75,48,26,0.28);
+      transform: translateY(16px); transition: transform 0.25s ease; position: relative;
+    }
+    .feature-input {
+      width: 100%; min-height: 100px; padding: 16px; border-radius: 18px; border: 1px solid rgba(80,58,40,0.15);
+      background: rgba(255,255,255,0.8); font-family: 'Outfit', sans-serif; font-size: 1rem; resize: none;
+      margin-bottom: 16px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .feature-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(188,93,45,0.1); }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }
+    .word-card {
+      background: #fff; border: 1px solid rgba(80,58,40,0.1); border-radius: 18px; padding: 16px;
+      box-shadow: var(--shadow-soft); transition: transform 0.2s; cursor: pointer;
+    }
+    .word-card:hover { transform: translateY(-3px); border-color: rgba(188,93,45,0.3); }
+    
     /* ── MOBILE ── */
     @media (max-width: 768px) {
+      body { padding-left: 0; padding-bottom: 80px; }
+      .app-rail {
+        top: auto; bottom: 0; width: 100%; height: 80px; flex-direction: row; justify-content: space-around;
+        padding: 0 16px; border-right: none; border-top: 1px solid rgba(255,255,255,0.1);
+      }
+      .rail-logo { display: none; }
+      .rail-btn::after { display: none; }
       .platform-main { grid-template-columns: 1fr !important; }
       .platform-sidebar { display: none; }
       .platform-sidebar.mobile-open { display: flex; }
-      .mobile-sidebar-toggle {
-        display: inline-flex !important;
-      }
-    }
-    .mobile-sidebar-toggle {
-      display: none;
-      align-items: center;
-      gap: 6px;
-      min-height: 34px;
-      padding: 0 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(80,58,40,0.14);
-      background: rgba(255,255,255,0.55);
-      font-size: 0.84rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .module-card.is-locked {
-      opacity: 0.55;
-      cursor: not-allowed;
-      pointer-events: none;
-      position: relative;
-    }
-    .module-card.is-locked::after {
-      content: "🔒 Complete previous lessons first";
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--muted);
-      background: rgba(255,251,246,0.7);
-      border-radius: inherit;
-      pointer-events: none;
+      .mobile-sidebar-toggle { display: inline-flex !important; }
     }
   </style>
 </head>
 <body>
+
+  <!-- ── APP RAIL NAVIGATION ── -->
+  <nav class="app-rail">
+    <div class="rail-logo">📚</div>
+    <button class="rail-btn active" data-tooltip="Dashboard" onclick="switchAppView('dashboard', this)">🏠</button>
+    <button class="rail-btn" data-tooltip="Story Corner" onclick="switchAppView('modalStory', this)">📖</button>
+    <button class="rail-btn" data-tooltip="Personal Word Bank" onclick="switchAppView('modalWordBank', this)">🗂️</button>
+    <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('modalTranslator', this)">🌐</button>
+  </nav>
+
   <div class="platform-shell">
     <header class="platform-header">
       <div style="display: flex; align-items: center; gap: 16px;">
@@ -176,9 +123,7 @@
             <span>Learning Platform</span>
           </div>
         </div>
-        <!-- Divider -->
         <div style="width: 1.5px; height: 32px; background: rgba(80,58,40,0.15); border-radius: 2px;"></div>
-        <!-- Placeholder for SenseSys Logo -->
         <img src="sensesyslogo.png" alt="SenseSys Logo" style="height: 24px; object-fit: contain; margin-top: 2px;">
       </div>
 
@@ -244,50 +189,42 @@
             <p class="empty-state" style="grid-column: 1 / -1; padding: 12px; margin-top: 10px;">No badges yet. Start learning to earn some!</p>
           </div>
         </section>
-
       </aside>
 
       <section class="platform-content">
 
-        <!-- AI ANALYSIS MODAL OVERLAY -->
-        <div class="modal-overlay" id="aiAnalysisModal" style="position:fixed; inset:0; z-index:1001; background:rgba(31,26,22,0.6); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s ease;">
-          <div style="width:min(calc(100% - 32px), 640px); max-height: 85vh; overflow-y: auto; padding: 32px; border-radius: 26px; background: linear-gradient(145deg, #fffaf2, #fdf4e7); border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 30px 70px rgba(75,48,26,0.28); transform:translateY(16px); transition:transform 0.25s ease; position: relative;">
-            <button id="closeAnalysisModalBtn" style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.15); background: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted);">✕</button>
-            
-            <p class="panel-label" style="margin-top: 0; color: var(--accent-deep); font-weight: 800; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;">AI Insights</p>
-            <h3 style="font-family: 'Newsreader', serif; font-size: 1.8rem; margin: 4px 0 20px; color: var(--text);">Your Progress Analysis</h3>
-            
-            <div style="margin-bottom:20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: rgba(80,58,40,0.04); padding: 16px; border-radius: 16px; text-align: center;">
-              <div><span style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 4px;">Answers Checked</span><strong id="statScored" style="font-size: 1.4rem; font-weight: 800; color: var(--accent-deep);">0</strong></div>
-              <div><span style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 4px;">Correct</span><strong id="statCorrect" style="font-size: 1.4rem; font-weight: 800; color: var(--accent-deep);">0</strong></div>
-              <div><span style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 4px;">Accuracy</span><strong id="statAccuracy" style="font-size: 1.4rem; font-weight: 800; color: var(--accent-deep);">0%</strong></div>
-              <div><span style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 4px;">Avg Score</span><strong id="statAvgScore" style="font-size: 1.4rem; font-weight: 800; color: var(--accent-deep);">0/5</strong></div>
+        <!-- DASHBOARD TOP WIDGETS ROW -->
+        <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 24px;">
+          <!-- CURRENT CLASS PLAN WIDGET -->
+          <section class="hero-band" style="flex: 1 1 450px; display: flex; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px; margin-bottom: 0;">
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+              <p class="panel-label" style="margin-bottom: 6px;">Current Class Plan</p>
+              <h2 id="classHeading" style="margin: 0; line-height: 1.1; font-size: 1.8rem; font-family: 'Newsreader', serif;">No class yet</h2>
             </div>
-            
-            <div style="background: rgba(255,255,255,0.8); border: 1px solid rgba(80,58,40,0.1); padding: 22px; border-radius: 18px; box-shadow: var(--shadow-soft);">
-              <p style="font-weight: 800; font-size: 0.82rem; text-transform: uppercase; color: var(--accent-deep); margin: 0 0 8px; letter-spacing: 0.05em;">AI Evaluation Summary</p>
-              <p id="aiAnalysisText" style="font-size: 0.96rem; line-height: 1.7; color: var(--text); margin: 0;">Click "Refresh AI Analysis" below to run your history assessment.</p>
+            <div class="hero-band-stats" style="margin-left: auto;">
+              <div><span>Lessons</span><strong id="lessonCount">0</strong></div>
+              <div><span>Completed</span><strong id="completedCount">0</strong></div>
+              <div><span>Streak</span><strong id="streakCount">🔥 0</strong></div>
+              <div><span>AI Practice</span><strong>Enabled</strong></div>
             </div>
-            
-            <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
-              <button class="primary-action" type="button" id="getAiFeedbackBtn" style="min-height: 44px; padding: 0 24px; border-radius: 999px; border: none; background: var(--accent-deep); color: #fffaf2; font-weight: 700; cursor: pointer; transition: transform 0.15s;">✨ Refresh AI Analysis</button>
-            </div>
-          </div>
-        </div>
+          </section>
 
-        <!-- CURRENT CLASS PLAN WIDGET (Vertically centered and aligned) -->
-        <section class="hero-band" style="display: flex; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px; margin-bottom: 24px;">
-          <div style="display: flex; flex-direction: column; justify-content: center;">
-            <p class="panel-label" style="margin-bottom: 6px;">Current Class Plan</p>
-            <h2 id="classHeading" style="margin: 0; line-height: 1.1; font-size: 1.8rem; font-family: 'Newsreader', serif;">No class yet</h2>
-          </div>
-          <div class="hero-band-stats" style="margin-left: auto;">
-            <div><span>Lessons</span><strong id="lessonCount">0</strong></div>
-            <div><span>Completed</span><strong id="completedCount">0</strong></div>
-            <div><span>Streak</span><strong id="streakCount">🔥 0</strong></div>
-            <div><span>AI Practice</span><strong>Enabled</strong></div>
-          </div>
-        </section>
+          <!-- DAILY STUDY GOAL WIDGET -->
+          <section class="workspace-panel" style="flex: 1 1 250px; display: flex; align-items: center; justify-content: space-between; padding: 28px 24px; border-radius: 24px; margin-bottom: 0; background: linear-gradient(145deg, #fffcf8, #fdf4e7); border: 1px solid rgba(188,93,45,0.15); box-shadow: var(--shadow-soft);">
+            <div>
+              <p class="panel-label" style="margin-bottom: 6px; color: var(--accent-deep);">Daily Goal</p>
+              <h3 style="margin: 0 0 4px; font-size: 1.3rem; font-family: 'Newsreader', serif; color: var(--text);">Answer 5 Questions</h3>
+              <p style="margin: 0; font-size: 0.85rem; color: var(--muted);" id="dailyGoalSubtitle">Keep your streak alive!</p>
+            </div>
+            <div style="position: relative; width: 68px; height: 68px; flex-shrink: 0;">
+              <svg width="68" height="68" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(188,93,45,0.15)" stroke-width="12"></circle>
+                <circle id="dailyGoalRing" cx="50" cy="50" r="42" fill="none" stroke="var(--accent-deep)" stroke-width="12" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></circle>
+              </svg>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; color: var(--accent-deep);" id="dailyGoalText">0/5</div>
+            </div>
+          </section>
+        </div>
 
         <section class="content-section">
           <div class="section-head">
@@ -343,8 +280,137 @@
     </main>
   </div>
 
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- ── HIDDEN MODALS FOR THE NEW APP RAIL FEATURES (MOCKUPS) ── -->
+  <!-- ════════════════════════════════════════════════════════════ -->
+
+  <!-- 1. SMART TRANSLATOR MODAL -->
+  <div class="modal-overlay" id="modalTranslator" style="position:fixed; inset:0; z-index:1001; background:rgba(31,26,22,0.6); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center;">
+    <div class="feature-modal-content">
+      <button class="close-feature-btn" style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.15); background: rgba(255,255,255,0.7); cursor: pointer;" onclick="closeAppViews()">✕</button>
+      <p class="panel-label" style="color: var(--accent-deep); margin-bottom: 6px;">🌐 Smart Translator</p>
+      <h3 style="font-family: 'Newsreader', serif; font-size: 2rem; margin-bottom: 10px;">Translate & Learn</h3>
+      <p style="color: var(--muted); margin-bottom: 24px;">Type an English sentence below, and select your language. Buddy will translate it and explain the grammar!</p>
+      
+      <textarea class="feature-input" placeholder="Type something like: 'I am going to the market today.'"></textarea>
+      
+      <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 20px;">
+        <select style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(80,58,40,0.2); background: white;">
+          <option>Kannada</option>
+          <option>Hindi</option>
+          <option>Tamil</option>
+          <option>Telugu</option>
+          <option>Urdu</option>
+        </select>
+        <button style="min-height: 44px; padding: 0 24px; border-radius: 12px; border: none; background: var(--accent-deep); color: white; font-weight: 700; cursor: pointer;">✨ Translate</button>
+      </div>
+
+      <!-- Mock Result -->
+      <div style="padding: 20px; border-radius: 16px; background: rgba(111,124,74,0.08); border: 1px solid rgba(111,124,74,0.2);">
+        <p style="font-size: 0.8rem; font-weight: 800; color: #3d5220; text-transform: uppercase; margin-bottom: 6px;">Kannada Translation:</p>
+        <p style="font-size: 1.2rem; font-weight: 700; color: #1f1a16; margin-bottom: 12px;">ನಾನು ಇಂದು ಮಾರುಕಟ್ಟೆಗೆ ಹೋಗುತ್ತಿದ್ದೇನೆ.</p>
+        <p style="font-size: 0.8rem; font-weight: 800; color: #3d5220; text-transform: uppercase; margin-bottom: 6px;">Buddy's Grammar Tip 💡:</p>
+        <p style="font-size: 0.95rem; color: var(--text); line-height: 1.5; margin: 0;">Notice how we use <strong>"am going"</strong>. In English, we add "-ing" to the action when it is happening right now or planned for later today!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. PERSONAL WORD BANK MODAL -->
+  <div class="modal-overlay" id="modalWordBank" style="position:fixed; inset:0; z-index:1001; background:rgba(31,26,22,0.6); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center;">
+    <div class="feature-modal-content">
+      <button class="close-feature-btn" style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.15); background: rgba(255,255,255,0.7); cursor: pointer;" onclick="closeAppViews()">✕</button>
+      <p class="panel-label" style="color: var(--accent-deep); margin-bottom: 6px;">🗂️ Vocabulary</p>
+      <h3 style="font-family: 'Newsreader', serif; font-size: 2rem; margin-bottom: 10px;">My Word Bank</h3>
+      <p style="color: var(--muted); margin-bottom: 20px;">Words you've saved from your lessons. Click a word to review it.</p>
+      
+      <div style="display: flex; gap: 10px;">
+        <input type="text" placeholder="Add a new word..." style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(80,58,40,0.2);">
+        <button style="padding: 0 20px; border-radius: 12px; background: var(--text); color: white; font-weight: 700; border: none; cursor: pointer;">Add</button>
+      </div>
+
+      <div class="feature-grid">
+        <!-- Mock Word Cards -->
+        <div class="word-card">
+          <h4 style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent-deep);">Bustling</h4>
+          <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.4;">Full of busy activity.</p>
+        </div>
+        <div class="word-card">
+          <h4 style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent-deep);">Resilience</h4>
+          <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.4;">Being able to recover quickly from difficulties.</p>
+        </div>
+        <div class="word-card">
+          <h4 style="font-size: 1.2rem; margin-bottom: 4px; color: var(--accent-deep);">Curious</h4>
+          <p style="font-size: 0.85rem; color: var(--muted); line-height: 1.4;">Eager to know or learn something.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. SHORT STORY CORNER MODAL -->
+  <div class="modal-overlay" id="modalStory" style="position:fixed; inset:0; z-index:1001; background:rgba(31,26,22,0.6); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center;">
+    <div class="feature-modal-content">
+      <button class="close-feature-btn" style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.15); background: rgba(255,255,255,0.7); cursor: pointer;" onclick="closeAppViews()">✕</button>
+      <p class="panel-label" style="color: var(--accent-deep); margin-bottom: 6px;">📖 Reading Practice</p>
+      <h3 style="font-family: 'Newsreader', serif; font-size: 2rem; margin-bottom: 10px;">Short Story Corner</h3>
+      <p style="color: var(--muted); margin-bottom: 20px;">Tell Buddy what you want to read about, and he will write a custom story for your reading level!</p>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 24px;">
+        <input type="text" placeholder="e.g., A mystery at the Bangalore Palace..." style="flex: 1; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(80,58,40,0.2);">
+        <button style="padding: 0 24px; border-radius: 12px; background: linear-gradient(135deg, #38bdf8, #0284c7); color: #0f2027; font-weight: 800; border: none; cursor: pointer;">✍️ Generate</button>
+      </div>
+
+      <!-- Mock Story Box -->
+      <div style="padding: 24px; border-radius: 20px; background: #fff; border: 1px solid rgba(80,58,40,0.1); box-shadow: var(--shadow-soft);">
+        <h4 style="font-family: 'Newsreader', serif; font-size: 1.5rem; margin-bottom: 16px;">The Secret of the Palace</h4>
+        <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text); margin-bottom: 12px;">One sunny morning, Rohan decided to visit the grand Bangalore Palace. The palace was <span style="background: rgba(188,93,45,0.15); color: var(--accent-deep); padding: 2px 6px; border-radius: 4px; cursor: pointer;" title="Click to add to Word Bank">bustling</span> with tourists taking pictures of the beautiful wooden carvings.</p>
+        <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text);">While walking through a quiet hallway, he noticed a strange, shiny key resting on a velvet chair. He was very <span style="background: rgba(188,93,45,0.15); color: var(--accent-deep); padding: 2px 6px; border-radius: 4px; cursor: pointer;" title="Click to add to Word Bank">curious</span>. Where did it come from, and what door did it open?</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Original AI Analysis Modal is still here... -->
+  <div class="modal-overlay" id="aiAnalysisModal" style="position:fixed; inset:0; z-index:1001; background:rgba(31,26,22,0.6); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.25s ease;">
+    <!-- ... Content unchanged ... -->
+  </div>
+
   <script src="Api.js"></script>
   <script src="platform.js"></script>
+  
+  <script>
+    // Tiny script to handle switching views via the new App Rail
+    function switchAppView(viewId, btnElement) {
+      // Manage active states on buttons
+      document.querySelectorAll('.rail-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+
+      // Close all modals first
+      closeAppViews();
+
+      // If dashboard, do nothing else (modals are closed, showing main layout)
+      if (viewId === 'dashboard') return;
+
+      // Otherwise, open the specific modal
+      const modal = document.getElementById(viewId);
+      if (modal) {
+        modal.style.display = 'flex';
+        // Force reflow
+        void modal.offsetWidth;
+        modal.style.opacity = '1';
+      }
+    }
+
+    function closeAppViews() {
+      ['modalTranslator', 'modalWordBank', 'modalStory'].forEach(id => {
+        const m = document.getElementById(id);
+        if (m) m.style.display = 'none';
+      });
+      // Reset active button to dashboard when closing manually
+      document.querySelectorAll('.rail-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('.rail-btn[data-tooltip="Dashboard"]').classList.add('active');
+    }
+  </script>
 
   <!-- RESET MODAL -->
   <div class="modal-overlay" id="resetModal">
