@@ -158,7 +158,7 @@
       </div>
     </header>
 
-    <!-- ════════════════════════════════════════════════════════════ -->
+        <!-- ════════════════════════════════════════════════════════════ -->
     <!-- ── VIEW 1: MAIN DASHBOARD ── -->
     <!-- ════════════════════════════════════════════════════════════ -->
     <div id="view-dashboard" class="app-view active-view">
@@ -172,6 +172,38 @@
           </p>
       </div>
 
+      <!-- DASHBOARD TOP WIDGETS ROW (Now spanning full width above the split layout) -->
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px;">
+        <section class="hero-band" style="flex: 1 1 450px; display: flex; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px; margin-bottom: 0;">
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+            <p class="panel-label" style="margin-bottom: 6px;">Current Class Plan</p>
+            <h2 id="classHeading" style="margin: 0; line-height: 1.1; font-size: 1.8rem; font-family: 'Newsreader', serif;">No class yet</h2>
+          </div>
+          <div class="hero-band-stats" style="margin-left: auto;">
+            <div><span>Lessons</span><strong id="lessonCount">0</strong></div>
+            <div><span>Completed</span><strong id="completedCount">0</strong></div>
+            <div><span>Streak</span><strong id="streakCount">🔥 0</strong></div>
+            <div><span>AI Practice</span><strong>Enabled</strong></div>
+          </div>
+        </section>
+
+        <section class="workspace-panel" style="flex: 1 1 250px; display: flex; align-items: center; justify-content: space-between; padding: 28px 24px; border-radius: 24px; margin-bottom: 0; background: linear-gradient(145deg, #fffcf8, #fdf4e7); border: 1px solid rgba(188,93,45,0.15); box-shadow: var(--shadow-soft);">
+          <div>
+            <p class="panel-label" style="margin-bottom: 6px; color: var(--accent-deep);">Daily Goal</p>
+            <h3 style="margin: 0 0 4px; font-size: 1.3rem; font-family: 'Newsreader', serif; color: var(--text);">Answer 5 Questions</h3>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--muted);" id="dailyGoalSubtitle">Keep your streak alive!</p>
+          </div>
+          <div style="position: relative; width: 68px; height: 68px; flex-shrink: 0;">
+            <svg width="68" height="68" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(188,93,45,0.15)" stroke-width="12"></circle>
+              <circle id="dailyGoalRing" cx="50" cy="50" r="42" fill="none" stroke="var(--accent-deep)" stroke-width="12" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></circle>
+            </svg>
+            <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; color: var(--accent-deep);" id="dailyGoalText">0/5</div>
+          </div>
+        </section>
+      </div>
+
+      <!-- MAIN SPLIT GRID (Sidebar on left, Modules on right) -->
       <main class="platform-main" style="padding-top: 24px; display: grid;">
         <aside class="platform-sidebar" id="platformSidebar">
           
@@ -212,37 +244,6 @@
         </aside>
 
         <section class="platform-content">
-          <!-- DASHBOARD TOP WIDGETS ROW -->
-          <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 24px;">
-            <section class="hero-band" style="flex: 1 1 450px; display: flex; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px; margin-bottom: 0;">
-              <div style="display: flex; flex-direction: column; justify-content: center;">
-                <p class="panel-label" style="margin-bottom: 6px;">Current Class Plan</p>
-                <h2 id="classHeading" style="margin: 0; line-height: 1.1; font-size: 1.8rem; font-family: 'Newsreader', serif;">No class yet</h2>
-              </div>
-              <div class="hero-band-stats" style="margin-left: auto;">
-                <div><span>Lessons</span><strong id="lessonCount">0</strong></div>
-                <div><span>Completed</span><strong id="completedCount">0</strong></div>
-                <div><span>Streak</span><strong id="streakCount">🔥 0</strong></div>
-                <div><span>AI Practice</span><strong>Enabled</strong></div>
-              </div>
-            </section>
-
-            <section class="workspace-panel" style="flex: 1 1 250px; display: flex; align-items: center; justify-content: space-between; padding: 28px 24px; border-radius: 24px; margin-bottom: 0; background: linear-gradient(145deg, #fffcf8, #fdf4e7); border: 1px solid rgba(188,93,45,0.15); box-shadow: var(--shadow-soft);">
-              <div>
-                <p class="panel-label" style="margin-bottom: 6px; color: var(--accent-deep);">Daily Goal</p>
-                <h3 style="margin: 0 0 4px; font-size: 1.3rem; font-family: 'Newsreader', serif; color: var(--text);">Answer 5 Questions</h3>
-                <p style="margin: 0; font-size: 0.85rem; color: var(--muted);" id="dailyGoalSubtitle">Keep your streak alive!</p>
-              </div>
-              <div style="position: relative; width: 68px; height: 68px; flex-shrink: 0;">
-                <svg width="68" height="68" viewBox="0 0 100 100" style="transform: rotate(-90deg);">
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(188,93,45,0.15)" stroke-width="12"></circle>
-                  <circle id="dailyGoalRing" cx="50" cy="50" r="42" fill="none" stroke="var(--accent-deep)" stroke-width="12" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></circle>
-                </svg>
-                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; color: var(--accent-deep);" id="dailyGoalText">0/5</div>
-              </div>
-            </section>
-          </div>
-
           <section class="content-section">
             <div class="section-head">
               <div>
@@ -292,6 +293,7 @@
         </section>
       </main>
     </div>
+
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- ── VIEW 2: SMART TRANSLATOR ── -->
