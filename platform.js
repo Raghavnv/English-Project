@@ -621,46 +621,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ===== AI PANEL (TRANSFORMED INTO AI STUDY COMPANION) =====
 function renderAIPanel(module) {
-  const focusEl    = document.getElementById("aiLessonFocus");
-  const hintEl     = document.getElementById("aiHint");
-  const hintReveal = document.getElementById("hintReveal");
-  const encEl      = document.getElementById("aiEncouragement");
-  const statusEl   = document.getElementById("aiStatus");
-  const oldBtn     = document.getElementById("hintButton");
+  // Find the parent container
+  const aiPanel = document.querySelector(".workspace-panel.ai-panel");
+  if (!aiPanel || !module) return;
 
-  if (!module) return;
-
-  // Updated heading to Learn with AI
-  if (focusEl) focusEl.innerHTML = "🧠 Learn with AI";
-  if (hintEl) hintEl.textContent = "Select a lesson below to review core concepts or practice with smart flashcards.";
+  // Build the dropdown options
+  const allLessons = classes.flatMap(c => c.modules);
+  let optionsHtml = '<option value="">Select a lesson...</option>';
   
-  if (statusEl) statusEl.style.display = "none"; 
-  if (oldBtn) oldBtn.style.display = "none";
-  
-  if (encEl) encEl.textContent = "Powered by AI to help you learn faster and remember longer!";
+  allLessons.forEach(l => {
+    const isSelected = l.id === module.id ? "selected" : "";
+    optionsHtml += `<option value="${l.id}" data-title="${escapeHtml(l.title)}" data-desc="${escapeHtml(l.description || '')}" ${isSelected}>${escapeHtml(l.title)}</option>`;
+  });
 
-  if (hintReveal) {
-    const allLessons = classes.flatMap(c => c.modules);
-    let optionsHtml = '<option value="">Select a lesson...</option>';
-    
-    allLessons.forEach(l => {
-      const isSelected = l.id === module.id ? "selected" : "";
-      optionsHtml += `<option value="${l.id}" data-title="${escapeHtml(l.title)}" data-desc="${escapeHtml(l.description || '')}" ${isSelected}>${escapeHtml(l.title)}</option>`;
-    });
-
-    hintReveal.innerHTML = `
-      <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px; width: 100%;">
-        <select id="aiStudySelect" style="width: 100%; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(80,58,40,0.2); font-family: inherit; font-size: 0.95rem; background: rgba(255,255,255,0.8); color: var(--accent-deep); cursor: pointer;">
-          ${optionsHtml}
-        </select>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <button onclick="triggerStudyHub('relearn')" style="min-height: 40px; border-radius: 10px; border: none; background: rgba(56,189,248,0.1); color: #0284c7; font-weight: 700; cursor: pointer; border: 1px solid rgba(56,189,248,0.3); transition: all 0.2s ease;">📖 Re-Learn</button>
-          <button onclick="triggerStudyHub('flashcards')" style="min-height: 40px; border-radius: 10px; border: none; background: rgba(139,92,246,0.1); color: #6d28d9; font-weight: 700; cursor: pointer; border: 1px solid rgba(139,92,246,0.3); transition: all 0.2s ease;">✨ Flashcards</button>
-        </div>
+  // Inject the new, highly professional widget design
+  aiPanel.innerHTML = `
+    <div class="section-head" style="margin-bottom: 20px;">
+      <div>
+        <p class="panel-label" style="color: var(--accent-deep);">AI Study Companion</p>
+        <h3 style="font-family: 'Newsreader', serif; font-size: 1.8rem; color: var(--text);">Learn with Buddy</h3>
       </div>
-    `;
-  }
+      <div style="display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(34, 197, 94, 0.2);">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: ai-pulse 2s infinite;"></div>
+        <span style="font-size: 0.75rem; font-weight: 800; color: #15803d; text-transform: uppercase; letter-spacing: 0.05em;">AI Active</span>
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(145deg, #ffffff, #fdfbfa); border: 1px solid rgba(188,93,45,0.15); border-radius: 20px; padding: 24px; box-shadow: var(--shadow-soft);">
+      <p style="font-size: 0.95rem; color: var(--muted); margin: 0 0 16px; line-height: 1.5;">
+        Select a lesson below to generate personalized study guides or interactive memory decks.
+      </p>
+      
+      <select id="aiStudySelect" style="width: 100%; min-height: 52px; padding: 0 16px; margin-bottom: 24px; border-radius: 14px; border: 1px solid rgba(80,58,40,0.2); font-family: inherit; font-size: 1rem; font-weight: 600; background: #fff url('data:image/svg+xml;utf8,<svg fill=%23503a28 height=24 viewBox=0 0 24 24 width=24 xmlns=http://www.w3.org/2000/svg><path d=\"M7 10l5 5 5-5z\"/></svg>') no-repeat right 16px center; -webkit-appearance: none; appearance: none; color: var(--text); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); cursor: pointer; transition: border-color 0.2s;">
+        ${optionsHtml}
+      </select>
+
+      <div style="display: grid; gap: 14px;">
+        <!-- Re-Learn Card Button -->
+        <button onclick="triggerStudyHub('relearn')" style="display: flex; align-items: flex-start; gap: 16px; width: 100%; text-align: left; padding: 20px; border-radius: 16px; border: 1px solid rgba(56,189,248,0.3); background: linear-gradient(135deg, rgba(56,189,248,0.05), rgba(2,132,199,0.02)); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(56,189,248,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+          <div style="font-size: 1.8rem; background: #fff; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 1px solid rgba(56,189,248,0.2); flex-shrink: 0;">📖</div>
+          <div>
+            <strong style="display: block; font-size: 1.1rem; color: #0284c7; margin-bottom: 4px;">Lesson Recap & Quiz</strong>
+            <span style="font-size: 0.85rem; color: var(--muted); line-height: 1.45;">Get an AI-generated summary and take an infinite practice quiz.</span>
+          </div>
+        </button>
+
+        <!-- Flashcards Card Button -->
+        <button onclick="triggerStudyHub('flashcards')" style="display: flex; align-items: flex-start; gap: 16px; width: 100%; text-align: left; padding: 20px; border-radius: 16px; border: 1px solid rgba(139,92,246,0.3); background: linear-gradient(135deg, rgba(139,92,246,0.05), rgba(109,40,217,0.02)); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(139,92,246,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+          <div style="font-size: 1.8rem; background: #fff; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 1px solid rgba(139,92,246,0.2); flex-shrink: 0;">✨</div>
+          <div>
+            <strong style="display: block; font-size: 1.1rem; color: #6d28d9; margin-bottom: 4px;">Smart Flashcards</strong>
+            <span style="font-size: 0.85rem; color: var(--muted); line-height: 1.45;">Practice core concepts with a dynamic, interactive memory deck.</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Motivation Tip -->
+    <div style="margin-top: 24px; padding: 18px; border-radius: 16px; background: rgba(80,58,40,0.04); border: 1px solid rgba(80,58,40,0.08); display: flex; gap: 12px; align-items: center;">
+      <div style="font-size: 1.5rem;">💡</div>
+      <p style="margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.5;">Good progress comes from small, repeated practice. Finish one lesson at a time!</p>
+    </div>
+  `;
 }
+
 
 // ===== INJECT AI MODALS DYNAMICALLY =====
 function injectStudyModals() {
