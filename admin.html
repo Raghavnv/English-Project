@@ -1034,13 +1034,19 @@
     <!-- TAB BAR -->
     <div class="tab-bar">
       <button class="tab-btn active" id="tabLessons" onclick="switchTab('lessons')">
-        📝 Manage Lessons
+        📝 Lesson Studio
       </button>
       <button class="tab-btn" id="tabProgress" onclick="switchTab('progress')">
-        📊 Student Progress
+        🎯 Student Roster
       </button>
       <button class="tab-btn" id="tabAnalytics" onclick="switchTab('analytics')">
-        📈 Class Analytics
+        📈 Class Insights
+      </button>
+      <button class="tab-btn" id="tabBroadcast" onclick="switchTab('broadcast')">
+        📣 Broadcast
+      </button>
+      <button class="tab-btn" id="tabResources" onclick="switchTab('resources')">
+        📚 Resources
       </button>
     </div>
 
@@ -1049,8 +1055,8 @@
     ══════════════════════════════════════════ -->
     <div class="tab-panel active" id="panelLessons">
       <div class="admin-card">
-        <h2>Create Lesson</h2>
-        <p class="admin-card-subtitle">Add a new lesson to a class. Students will see the questions on the lesson page and save their answers.</p>
+        <h2>Lesson Studio & Manual Creator</h2>
+        <p class="admin-card-subtitle">Build a lesson by hand or let AI generate the questions or flashcards for you — everything for a class and lesson lives here.</p>
 
         <label class="form-label" for="title">Lesson Title</label>
         <input id="title" placeholder="e.g. Introducing Yourself">
@@ -1135,8 +1141,8 @@
     ══════════════════════════════════════════ -->
     <div class="tab-panel" id="panelProgress">
       <div class="admin-card">
-        <h2>Student Progress</h2>
-        <p class="admin-card-subtitle">See every student's answers and completion status across all lessons. Progress is stored in the student's own browser — only students who have used this device will appear here.</p>
+        <h2>Student Roster & Intervention Board</h2>
+        <p class="admin-card-subtitle">Monitor streaks, completion rates, and flag students who need help. Progress is stored in the student's own browser — only students who have used this device will appear here.</p>
 
         <div class="progress-controls" style="margin-top:18px;">
           <select id="classFilter" onchange="renderProgress()">
@@ -1174,8 +1180,8 @@
     ══════════════════════════════════════════ -->
     <div class="tab-panel" id="panelAnalytics">
       <div class="admin-card">
-        <h2>Class Analytics</h2>
-        <p class="admin-card-subtitle">Get a bird's-eye view of how your students are performing as a whole.</p>
+        <h2>Class Analytics & Insights</h2>
+        <p class="admin-card-subtitle">A central hub showing overall school or class engagement trends, accuracy percentages, and aggregate AI progress summaries.</p>
 
         <div style="margin-top:20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; background: rgba(80,58,40,0.03); padding: 22px; border-radius: 18px; border: 1px solid rgba(80,58,40,0.08); text-align: center;">
           <div><span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 6px;">Total Students</span><strong id="analyticsTotalStudents" style="font-size: 1.8rem; font-weight: 800; color: var(--accent-deep);">0</strong></div>
@@ -1237,6 +1243,84 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         TAB 4 — BROADCAST CENTER
+    ══════════════════════════════════════════ -->
+    <div class="tab-panel" id="panelBroadcast">
+      <div class="admin-card">
+        <h2>Broadcast Center</h2>
+        <p class="admin-card-subtitle">Push announcements, daily goals, or reminders straight to student dashboards.</p>
+
+        <label class="form-label" for="broadcastClass">Send To</label>
+        <select id="broadcastClass">
+          <option value="">All Classes</option>
+        </select>
+
+        <label class="form-label" for="broadcastType">Message Type</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+          <label class="ai-type-pill"><input type="radio" name="broadcastType" value="announcement" checked><span>📣 Announcement</span></label>
+          <label class="ai-type-pill"><input type="radio" name="broadcastType" value="goal"><span>🎯 Daily Goal</span></label>
+          <label class="ai-type-pill"><input type="radio" name="broadcastType" value="reminder"><span>⏰ Reminder</span></label>
+        </div>
+
+        <label class="form-label" for="broadcastTitle">Title</label>
+        <input id="broadcastTitle" placeholder="e.g. Quiz tomorrow!">
+
+        <label class="form-label" for="broadcastMessage">Message</label>
+        <textarea id="broadcastMessage" placeholder="What do you want students to see?"></textarea>
+
+        <button class="primary-action admin-submit" id="broadcastBtn" onclick="saveBroadcast()">Send Broadcast</button>
+
+        <div class="divider"></div>
+
+        <div class="lessons-list-section">
+          <h3>Active Broadcasts</h3>
+          <div id="broadcastListContainer" style="display:grid;gap:10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         TAB 5 — RESOURCE LIBRARY
+    ══════════════════════════════════════════ -->
+    <div class="tab-panel" id="panelResources">
+      <div class="admin-card">
+        <h2>Resource Library</h2>
+        <p class="admin-card-subtitle">Upload or link supplemental PDF worksheets, reading guides, or audio materials for your classes.</p>
+
+        <label class="form-label" for="resourceClass">Class</label>
+        <select id="resourceClass">
+          <option value="">All Classes</option>
+        </select>
+
+        <label class="form-label" for="resourceType">Resource Type</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+          <label class="ai-type-pill"><input type="radio" name="resourceType" value="pdf" checked><span>📄 PDF / Worksheet</span></label>
+          <label class="ai-type-pill"><input type="radio" name="resourceType" value="reading"><span>📖 Reading Guide</span></label>
+          <label class="ai-type-pill"><input type="radio" name="resourceType" value="audio"><span>🎧 Audio</span></label>
+          <label class="ai-type-pill"><input type="radio" name="resourceType" value="link"><span>🔗 Link</span></label>
+        </div>
+
+        <label class="form-label" for="resourceTitle">Title</label>
+        <input id="resourceTitle" placeholder="e.g. Unit 3 Reading Guide">
+
+        <label class="form-label" for="resourceUrl">Link / URL</label>
+        <input id="resourceUrl" placeholder="https://…">
+
+        <label class="form-label" for="resourceNotes">Notes (optional)</label>
+        <textarea id="resourceNotes" placeholder="Any extra instructions for students…"></textarea>
+
+        <button class="primary-action admin-submit" id="resourceBtn" onclick="saveResource()">Add to Library</button>
+
+        <div class="divider"></div>
+
+        <div class="lessons-list-section">
+          <h3>Saved Resources</h3>
+          <div id="resourceListContainer" style="display:grid;gap:10px;"></div>
+        </div>
+      </div>
     </div>
 
 <div id="popup" class="custom-popup"></div>

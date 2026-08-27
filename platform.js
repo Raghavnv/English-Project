@@ -242,6 +242,60 @@ function renderWelcomeBanner() {
   if (cEl) cEl.textContent = completed;
 }
 
+// ===== TEACHER BROADCASTS =====
+const BROADCAST_ICONS = { announcement: "📣", goal: "🎯", reminder: "⏰" };
+
+function renderBroadcasts() {
+  const panel = document.getElementById("broadcastPanel");
+  const list  = document.getElementById("broadcastList");
+  const pill  = document.getElementById("broadcastCountPill");
+  if (!panel || !list) return;
+
+  let broadcasts = [];
+  try { broadcasts = JSON.parse(localStorage.getItem("broadcasts") || "[]"); } catch {}
+
+  const selectedClass = getSelectedClass();
+  const relevant = broadcasts.filter(b => !b.class || b.class === selectedClass?.label);
+
+  if (relevant.length === 0) { panel.style.display = "none"; return; }
+  panel.style.display = "";
+  if (pill) pill.textContent = relevant.length;
+
+  list.innerHTML = relevant.slice(0, 5).map(b => `
+    <div style="padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);">
+      <strong style="font-size:0.85rem;">${BROADCAST_ICONS[b.type] || "📣"} ${escapeHtml(b.title)}</strong>
+      <p style="margin:4px 0 0;font-size:0.82rem;color:var(--muted);line-height:1.5;">${escapeHtml(b.message)}</p>
+    </div>
+  `).join("");
+}
+
+// ===== TEACHER RESOURCE LIBRARY =====
+const RESOURCE_ICONS = { pdf: "📄", reading: "📖", audio: "🎧", link: "🔗" };
+
+function renderResourceLibrary() {
+  const panel = document.getElementById("resourcePanel");
+  const list  = document.getElementById("resourceList");
+  const pill  = document.getElementById("resourceCountPill");
+  if (!panel || !list) return;
+
+  let resources = [];
+  try { resources = JSON.parse(localStorage.getItem("resources") || "[]"); } catch {}
+
+  const selectedClass = getSelectedClass();
+  const relevant = resources.filter(r => !r.class || r.class === selectedClass?.label);
+
+  if (relevant.length === 0) { panel.style.display = "none"; return; }
+  panel.style.display = "";
+  if (pill) pill.textContent = relevant.length;
+
+  list.innerHTML = relevant.map(r => `
+    <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener" style="display:block;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);text-decoration:none;color:inherit;">
+      <strong style="font-size:0.85rem;">${RESOURCE_ICONS[r.type] || "📄"} ${escapeHtml(r.title)}</strong>
+      ${r.notes ? `<p style="margin:4px 0 0;font-size:0.8rem;color:var(--muted);line-height:1.5;">${escapeHtml(r.notes)}</p>` : ""}
+    </a>
+  `).join("");
+}
+
 // ===== CLASS LIST =====
 function renderClassList() {
   const classListEl = document.getElementById("classList");
@@ -1109,6 +1163,8 @@ function render() {
   renderBadges();
   renderModules();
   renderLocalAnalysisStats();
+  renderBroadcasts();
+  renderResourceLibrary();
 
   const sc = getSelectedClass();
   const m  = sc?.modules.find(mod => mod.id === state.selectedModuleId);

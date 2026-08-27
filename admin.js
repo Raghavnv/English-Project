@@ -31,27 +31,179 @@ function escapeHtml(str) {
 }
 
 // ===== TAB SWITCH =====
+const ADMIN_TABS = ["lessons", "progress", "analytics", "broadcast", "resources"];
+
 function switchTab(tab) {
-  const isLessons = tab === "lessons";
-  const isProgress = tab === "progress";
-  const isAnalytics = tab === "analytics";
+  ADMIN_TABS.forEach(t => {
+    const isActive = t === tab;
+    const panel = document.getElementById("panel" + t.charAt(0).toUpperCase() + t.slice(1));
+    const btn   = document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1));
+    if (panel) panel.classList.toggle("active", isActive);
+    if (btn) btn.classList.toggle("active", isActive);
+  });
 
-  document.getElementById("panelLessons").classList.toggle("active", isLessons);
-  document.getElementById("panelProgress").classList.toggle("active", isProgress);
-  const panelAnalytics = document.getElementById("panelAnalytics");
-  if (panelAnalytics) panelAnalytics.classList.toggle("active", isAnalytics);
-
-  document.getElementById("tabLessons").classList.toggle("active", isLessons);
-  document.getElementById("tabProgress").classList.toggle("active", isProgress);
-  const tabAnalytics = document.getElementById("tabAnalytics");
-  if (tabAnalytics) tabAnalytics.classList.toggle("active", isAnalytics);
-
-  if (isProgress) loadProgressData();
-  if (isAnalytics) {
+  if (tab === "progress") loadProgressData();
+  if (tab === "analytics") {
     loadClassAnalytics();
-    loadPredictiveAlerts();   
-    loadClassroomHeatmap();   
+    loadPredictiveAlerts();
+    loadClassroomHeatmap();
   }
+  if (tab === "broadcast") { populateBroadcastClassOptions(); renderBroadcasts(); }
+  if (tab === "resources") { populateResourceClassOptions(); renderResources(); }
+}
+
+// ===== SHARED: pull known class names from saved lessons =====
+function getKnownClassNames() {
+  try {
+    const lessons = JSON.parse(localStorage.getItem("lessons") || "[]");
+    const names = new Set(lessons.map(l => l.class).filter(Boolean));
+    return Array.from(names);
+  } catch { return []; }
+}
+
+function populateClassSelect(selectEl) {
+  if (!selectEl) return;
+  const current = selectEl.value;
+  const names = getKnownClassNames();
+  selectEl.innerHTML = `<option value="">All Classes</option>` +
+    names.map(n => `<option value="${escHtml(n)}">${escHtml(n)}</option>`).join("");
+  if (names.includes(current)) selectEl.value = current;
+}
+
+function populateBroadcastClassOptions() {
+  populateClassSelect(document.getElementById("broadcastClass"));
+}
+function populateResourceClassOptions() {
+  populateClassSelect(document.getElementById("resourceClass"));
+}
+
+// ===== BROADCAST CENTER =====
+function getBroadcasts() {
+  try { return JSON.parse(localStorage.getItem("broadcasts") || "[]"); }
+  catch { return []; }
+}
+function setBroadcasts(list) {
+  localStorage.setItem("broadcasts", JSON.stringify(list));
+}
+
+function saveBroadcast() {
+  const title = document.getElementById("broadcastTitle").value.trim();
+  const message = document.getElementById("broadcastMessage").value.trim();
+  const targetClass = document.getElementById("broadcastClass").value;
+  const type = document.querySelector('input[name="broadcastType"]:checked')?.value || "announcement";
+
+  if (!title || !message) {
+    showPopup("Please add a title and a message.");
+    return;
+  }
+
+  const list = getBroadcasts();
+  list.unshift({
+    id: "b_" + Date.now(),
+    title, message, class: targetClass, type,
+    date: new Date().toISOString()
+  });
+  setBroadcasts(list);
+
+  document.getElementById("broadcastTitle").value = "";
+  document.getElementById("broadcastMessage").value = "";
+  showPopup("Broadcast sent!");
+  renderBroadcasts();
+}
+
+function deleteBroadcast(id) {
+  setBroadcasts(getBroadcasts().filter(b => b.id !== id));
+  renderBroadcasts();
+}
+
+const BROADCAST_ICONS = { announcement: "📣", goal: "🎯", reminder: "⏰" };
+
+function renderBroadcasts() {
+  const container = document.getElementById("broadcastListContainer");
+  if (!container) return;
+  const list = getBroadcasts();
+  if (list.length === 0) {
+    container.innerHTML = `<p class="no-questions-hint">No broadcasts yet — send one above.</p>`;
+    return;
+  }
+  container.innerHTML = list.map(b => `
+    <div class="question-row">
+      <div>
+        <strong>${BROADCAST_ICONS[b.type] || "📣"} ${escHtml(b.title)}</strong>
+        <p style="margin:4px 0 6px;color:var(--muted);font-size:0.9rem;">${escHtml(b.message)}</p>
+        <span style="font-size:0.75rem;color:var(--muted);">
+          ${b.class ? escHtml(b.class) : "All Classes"} · ${new Date(b.date).toLocaleString()}
+        </span>
+      </div>
+      <button class="add-question-btn" onclick="deleteBroadcast('${b.id}')">🗑️ Remove</button>
+    </div>
+  `).join("");
+}
+
+// ===== RESOURCE LIBRARY =====
+function getResources() {
+  try { return JSON.parse(localStorage.getItem("resources") || "[]"); }
+  catch { return []; }
+}
+function setResources(list) {
+  localStorage.setItem("resources", JSON.stringify(list));
+}
+
+function saveResource() {
+  const title = document.getElementById("resourceTitle").value.trim();
+  const url = document.getElementById("resourceUrl").value.trim();
+  const notes = document.getElementById("resourceNotes").value.trim();
+  const targetClass = document.getElementById("resourceClass").value;
+  const type = document.querySelector('input[name="resourceType"]:checked')?.value || "pdf";
+
+  if (!title || !url) {
+    showPopup("Please add a title and a link.");
+    return;
+  }
+
+  const list = getResources();
+  list.unshift({
+    id: "r_" + Date.now(),
+    title, url, notes, class: targetClass, type,
+    date: new Date().toISOString()
+  });
+  setResources(list);
+
+  document.getElementById("resourceTitle").value = "";
+  document.getElementById("resourceUrl").value = "";
+  document.getElementById("resourceNotes").value = "";
+  showPopup("Resource added!");
+  renderResources();
+}
+
+function deleteResource(id) {
+  setResources(getResources().filter(r => r.id !== id));
+  renderResources();
+}
+
+const RESOURCE_ICONS = { pdf: "📄", reading: "📖", audio: "🎧", link: "🔗" };
+
+function renderResources() {
+  const container = document.getElementById("resourceListContainer");
+  if (!container) return;
+  const list = getResources();
+  if (list.length === 0) {
+    container.innerHTML = `<p class="no-questions-hint">No resources yet — add one above.</p>`;
+    return;
+  }
+  container.innerHTML = list.map(r => `
+    <div class="question-row">
+      <div>
+        <strong>${RESOURCE_ICONS[r.type] || "📄"} ${escHtml(r.title)}</strong>
+        <p style="margin:4px 0 6px;"><a href="${escHtml(r.url)}" target="_blank" rel="noopener" style="color:var(--accent-deep);font-weight:700;">${escHtml(r.url)}</a></p>
+        ${r.notes ? `<p style="margin:0 0 6px;color:var(--muted);font-size:0.9rem;">${escHtml(r.notes)}</p>` : ""}
+        <span style="font-size:0.75rem;color:var(--muted);">
+          ${r.class ? escHtml(r.class) : "All Classes"} · ${new Date(r.date).toLocaleString()}
+        </span>
+      </div>
+      <button class="add-question-btn" onclick="deleteResource('${r.id}')">🗑️ Remove</button>
+    </div>
+  `).join("");
 }
 
 async function loadClassAnalytics() {
