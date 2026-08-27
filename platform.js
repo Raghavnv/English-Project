@@ -208,6 +208,35 @@ function renderClassList() {
 }
 
 // ===== PROGRESS SIDEBAR =====
+
+// daily goal 
+function updateDailyGoal(answeredCount) {
+  const goal = 5;
+  const todayCount = Math.min(answeredCount, goal); 
+  
+  const ring = document.getElementById("dailyGoalRing");
+  const text = document.getElementById("dailyGoalText");
+  const sub  = document.getElementById("dailyGoalSubtitle");
+  
+  if (ring && text && sub) {
+    text.textContent = `${todayCount}/${goal}`;
+    
+    // Calculate the SVG offset (264 is the total circumference of the circle)
+    const offset = 264 - (264 * (todayCount / goal));
+    ring.style.strokeDashoffset = offset;
+    
+    if (todayCount >= goal) {
+      sub.textContent = "Goal reached! 🔥";
+      sub.style.color = "#d97706";
+      sub.style.fontWeight = "700";
+    } else {
+      sub.textContent = "Keep your streak alive!";
+      sub.style.color = "var(--muted)";
+      sub.style.fontWeight = "normal";
+    }
+  }
+}
+
 function renderProgress() {
   const selectedClass     = getSelectedClass();
   const lessonCountEl     = document.getElementById("lessonCount");
@@ -233,9 +262,14 @@ function renderProgress() {
   const completed = selectedClass.modules.filter(m => getModuleProgress(m.id).completed).length;
   const percent   = total ? Math.round((completed / total) * 100) : 0;
 
+  // NEW: Calculate the total number of answered questions in this class
+  const totalAnswers = selectedClass.modules.reduce((sum, m) => {
+    return sum + (getModuleProgress(m.id).answeredCount || 0);
+  }, 0);
+
   if (lessonCountEl)     lessonCountEl.textContent     = total;
   if (completedCountEl)  completedCountEl.textContent  = completed;
-  
+
   const streakEl = document.getElementById("streakCount");
   if (streakEl) {
     const streak = studentProfile?.streak_days || student?.streak_days || 0;
@@ -247,7 +281,11 @@ function renderProgress() {
   if (activeClassPillEl) activeClassPillEl.textContent = selectedClass.label;
   if (classHeadingEl)    classHeadingEl.textContent    = selectedClass.label + " — Learning Path";
   if (classSummaryEl)    classSummaryEl.textContent    = `${total} lesson${total !== 1 ? "s" : ""} · ${completed} completed`;
+
+  
+  updateDailyGoal(totalAnswers);
 }
+
 
 // ===== BADGES & ACHIEVEMENTS =====
 function renderBadges() {
