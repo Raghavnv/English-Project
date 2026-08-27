@@ -580,3 +580,78 @@ Output ONLY a valid JSON array of objects in this exact format, with no markdown
         return {"quiz": quiz_data[:3]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate quiz: {str(e)}")
+
+# ════════════════════════════════════════════════════════════════════
+#  APP RAIL FEATURES (Translator, Word Bank, Story Corner)
+# ════════════════════════════════════════════════════════════════════
+
+# ── SMART TRANSLATOR ──
+class TranslateRequest(BaseModel):
+    text: str
+    target_language: str
+
+@router.post("/translate")
+def translate_text(body: TranslateRequest, requester=Depends(require_authenticated_requester)):
+    prompt = f"""Translate this English text to {body.target_language}: "{body.text}"
+    Return ONLY a JSON object in this format (no markdown, no other text):
+    {{
+        "translation": "The translated text in {body.target_language}",
+        "grammar_tip": "A short, 1-2 sentence tip explaining the English grammar or idiom used in simple terms for a child."
+    }}"""
+    try:
+        raw = ask_groq(prompt, max_tokens=300, system="You are a bilingual tutor. Output only valid JSON.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: 
+            clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
+
+
+# ── PERSONAL WORD BANK ──
+class WordDefRequest(BaseModel):
+    word: str
+
+@router.post("/word-bank/define")
+def define_word(body: WordDefRequest, requester=Depends(require_authenticated_requester)):
+    prompt = f"""Provide a kid-friendly definition and a short example sentence for the English word: "{body.word}".
+    Return ONLY a JSON object in this format (no markdown, no other text):
+    {{
+        "word": "{body.word}",
+        "definition": "Simple meaning",
+        "example": "A short, engaging example sentence."
+    }}"""
+    try:
+        raw = ask_groq(prompt, max_tokens=200, system="You are an English teacher. Output only valid JSON.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: 
+            clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Dictionary failed: {str(e)}")
+
+
+# ── SHORT STORY CORNER ──
+class StoryRequest(BaseModel):
+    topic: str
+
+@router.post("/story")
+def generate_story(body: StoryRequest, requester=Depends(require_authenticated_requester)):
+    prompt = f"""Write a short, engaging 2-paragraph story for a school child about: "{body.topic}".
+    Make the vocabulary age-appropriate but engaging.
+    Return ONLY a JSON object in this format (no markdown, no other text):
+    {{
+        "title": "Story Title",
+        "paragraphs": ["Paragraph 1 text", "Paragraph 2 text"]
+    }}"""
+    try:
+        raw = ask_groq(prompt, max_tokens=600, system="You are a storyteller. Output only valid JSON.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: 
+            clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Story generation failed: {str(e)}")
