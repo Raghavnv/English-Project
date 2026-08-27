@@ -1,3 +1,62 @@
+// ════════════════════════════════════════════════════════════════════
+//  TEXT TO SPEECH (TTS) HELPER
+// ════════════════════════════════════════════════════════════════════
+
+const BuddyVoice = {
+  activeButton: null,
+  
+  getLangCode(languageName) {
+    const map = {
+      "Kannada": "kn-IN",
+      "Hindi": "hi-IN",
+      "Tamil": "ta-IN",
+      "Telugu": "te-IN",
+      "Urdu": "ur-IN",
+      "English": "en-IN" // Use Indian English accent for familiarity
+    };
+    return map[languageName] || "en-IN";
+  },
+
+  speak(text, language = "English", btnElement = null) {
+    if (!("speechSynthesis" in window)) {
+      alert("Audio is not supported on this browser. Try using Chrome!");
+      return;
+    }
+
+    // Stop anything currently playing
+    window.speechSynthesis.cancel();
+    if (this.activeButton) {
+      this.activeButton.style.opacity = "0.5";
+      this.activeButton.classList.remove("speaking-pulse");
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = this.getLangCode(language);
+    utterance.rate = 0.85; // Slightly slower for language learners
+
+    if (btnElement) {
+      this.activeButton = btnElement;
+      btnElement.style.opacity = "1";
+      btnElement.classList.add("speaking-pulse");
+      
+      utterance.onend = () => {
+        btnElement.style.opacity = "0.5";
+        btnElement.classList.remove("speaking-pulse");
+        this.activeButton = null;
+      };
+    }
+
+    window.speechSynthesis.speak(utterance);
+  },
+
+  stop() {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+  }
+};
+
+
 // ===== LOGIN CHECK (DISABLED FOR DEMO — RESTORE BEFORE GOING LIVE) =====
 const student      = getStudentData();
 const adminSession = JSON.parse(localStorage.getItem("adminSession") || "null");
@@ -332,14 +391,11 @@ function renderProgress() {
   if (classHeadingEl)    classHeadingEl.textContent    = selectedClass.label + " — Learning Path";
   if (classSummaryEl)    classSummaryEl.textContent    = `${total} lesson${total !== 1 ? "s" : ""} · ${completed} completed`;
 
-  
   updateDailyGoal(totalAnswers);
 
   // Trigger achievements check
   const currentStreak = studentProfile?.streak_days || student?.streak_days || 0;
   evaluateAchievements(completed, totalAnswers, currentStreak);
-
-
 }
 
 
@@ -1060,8 +1116,10 @@ window.loadWordBank = function() {
   }
   
   words.reverse().forEach(item => {
+    // Added TTS Button
     wordGrid.innerHTML += `
-      <div class="word-card">
+      <div class="word-card" style="position: relative; padding-right: 50px;">
+        <button onclick="BuddyVoice.speak('${escapeHtml(item.word).replace(/'/g, "\\'")}. ${escapeHtml(item.definition).replace(/'/g, "\\'")}. For example: ${escapeHtml(item.example).replace(/'/g, "\\'")}', 'English', this)" style="position: absolute; right: 16px; top: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.2); background: rgba(80,58,40,0.05); font-size: 1.1rem; cursor: pointer; display:flex; align-items:center; justify-content:center;">🔊</button>
         <h4 style="font-size: 1.4rem; font-family: 'Newsreader', serif; margin-bottom: 6px; color: var(--accent-deep);">${escapeHtml(item.word)}</h4>
         <p style="font-size: 0.95rem; color: var(--text); font-weight: 600; margin-bottom: 8px;">${escapeHtml(item.definition)}</p>
         <p style="font-size: 0.9rem; color: var(--muted); font-style: italic;">"${escapeHtml(item.example)}"</p>
@@ -1093,10 +1151,18 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify({ text: text, target_language: lang })
         });
         
+        // Added TTS Buttons for translation and tip
         resultDiv.innerHTML = `
-          <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">${escapeHtml(lang)} Translation:</p>
-          <p style="font-size: 1.5rem; font-weight: 700; color: #1f1a16; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(111,124,74,0.2);">${escapeHtml(res.translation)}</p>
-          <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Buddy's Grammar Tip 💡:</p>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+            <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">${escapeHtml(lang)} Translation:</p>
+            <button onclick="BuddyVoice.speak('${escapeHtml(res.translation).replace(/'/g, "\\'")}', '${lang}', this)" style="background:none; border:none; font-size:1.4rem; cursor:pointer; opacity:0.5; transition:0.2s;">🔊</button>
+          </div>
+          <p style="font-size: 1.5rem; font-weight: 700; color: #1f1a16; margin-top:0; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(111,124,74,0.2);">${escapeHtml(res.translation)}</p>
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+            <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Buddy's Grammar Tip 💡:</p>
+            <button onclick="BuddyVoice.speak('${escapeHtml(res.grammar_tip).replace(/'/g, "\\'")}', 'English', this)" style="background:none; border:none; font-size:1.4rem; cursor:pointer; opacity:0.5; transition:0.2s;">🔊</button>
+          </div>
           <p style="font-size: 1.05rem; color: var(--text); line-height: 1.6; margin: 0;">${escapeHtml(res.grammar_tip)}</p>
         `;
       } catch (err) {
@@ -1168,9 +1234,15 @@ document.addEventListener("DOMContentLoaded", () => {
           paragraphsHtml += `<p style="font-size: 1.15rem; line-height: 1.8; color: var(--text); margin-bottom: 16px;">${escapeHtml(p)}</p>`;
         });
         
+        // Added TTS Button
+        const fullStoryText = res.title + ". " + res.paragraphs.join(" ");
+
         resultDiv.innerHTML = `
           <div style="padding: 40px; border-radius: 24px; background: #fff; border: 1px solid rgba(80,58,40,0.1); box-shadow: var(--shadow-soft); animation: popIn 0.3s ease;">
-            <h4 style="font-family: 'Newsreader', serif; font-size: 2.2rem; margin-bottom: 24px; color: var(--accent-deep);">${escapeHtml(res.title)}</h4>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px;">
+              <h4 style="font-family: 'Newsreader', serif; font-size: 2.2rem; color: var(--accent-deep); margin: 0;">${escapeHtml(res.title)}</h4>
+              <button onclick="BuddyVoice.speak('${escapeHtml(fullStoryText).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(111,124,74,0.3); background: rgba(111,124,74,0.1); color: #3d5220; font-weight: 700; cursor: pointer; display:flex; align-items:center; gap: 8px; flex-shrink: 0;">🔊 Read to me</button>
+            </div>
             ${paragraphsHtml}
           </div>
         `;
