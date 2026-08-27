@@ -547,3 +547,36 @@ Format:
         return {"flags": flags}
     except Exception as e:
         return {"flags": [], "error": str(e)}
+
+# ── AI QUICK-FIRE QUIZ ENDPOINT ──
+
+class QuizRequest(BaseModel):
+    lesson_id: str
+    lesson_title: Optional[str] = ""
+    lesson_description: Optional[str] = ""
+
+@router.post("/quick-quiz")
+def get_quick_quiz(body: QuizRequest, requester=Depends(require_authenticated_requester)):
+    prompt = f"""Lesson Title: "{body.lesson_title}"
+Description: "{body.lesson_description or ''}"
+
+Generate exactly 3 fun, multiple-choice quiz questions to test understanding of this lesson.
+Output ONLY a valid JSON array of objects in this exact format, with no markdown formatting or text outside the array:
+[
+  {{
+    "question": "What is the main goal of...?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "answer": "Option A"
+  }}
+]"""
+    try:
+        raw = ask_groq(prompt, max_tokens=600, system="You are a strict JSON data generator. Output only valid JSON.")
+        clean_json = raw.strip()
+        match = re.search(r'\[.*\]', clean_json, re.DOTALL)
+        if match:
+            clean_json = match.group(0)
+            
+        quiz_data = json.loads(clean_json)
+        return {"quiz": quiz_data[:3]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate quiz: {str(e)}")

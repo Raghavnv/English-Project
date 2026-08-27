@@ -627,6 +627,7 @@ async function triggerStudyHub(type) {
   }
 }
 
+// ── TWO-STEP RE-LEARN: SUMMARY + INFINITE QUIZ ──
 async function openRelearn(lessonId, title, desc) {
   const modal = document.getElementById("modalRelearn");
   const titleEl = document.getElementById("relearnModalTitle");
@@ -637,63 +638,185 @@ async function openRelearn(lessonId, title, desc) {
     contentArea.innerHTML = `
       <div class="ai-loading-state">
         <div class="spinner blue"></div>
-        <p style="color: #7dd3fc; margin: 0; font-weight: 600;">Buddy is writing a quick summary...</p>
+        <p style="color: #7dd3fc; margin: 0; font-weight: 600;">Buddy is preparing your lesson guide...</p>
       </div>
     `;
   }
   if (modal) modal.classList.add("show");
 
   try {
+    // STEP 1: Fetch the core learning summary first
     const res = await AI.getRelearn(lessonId, title, desc);
-    if (res && res.content) {
-      const sectionIcons = { "WHAT YOU WILL LEARN": "📚", "KEY CONCEPTS": "🔑", "HELPFUL EXAMPLES": "✏️", "QUICK TIPS": "💡" };
-      const lines = res.content.split("\n").map(l => l.trim()).filter(Boolean);
-      let html = "";
-      let currentSection = null;
-      let buffer = [];
+    if (!res || !res.content) throw new Error("Received empty response from AI");
 
-      function flushSection() {
-        if (!currentSection || !buffer.length) return;
-        const icon = sectionIcons[currentSection] || "📌";
-        html += `<div class="rl-section"><div class="rl-header">${icon} ${currentSection}</div>`;
-        if (currentSection === "HELPFUL EXAMPLES") {
-          buffer.forEach(line => {
-            const clean = line.replace(/^[-•*]\s*/, "").replace(/^[""'](.+)[""']$/, "$1");
-            html += `<div class="rl-example">"${escapeHtml(clean.replace(/^"|"$/g, ""))}"</div>`;
-          });
-        } else {
-          html += `<ul>`;
-          buffer.forEach(line => { html += `<li>${escapeHtml(line.replace(/^[-•*]\s*/, ""))}</li>`; });
-          html += `</ul>`;
-        }
-        html += `</div>`;
-        buffer = [];
+    const sectionIcons = { "WHAT YOU WILL LEARN": "📚", "KEY CONCEPTS": "🔑", "HELPFUL EXAMPLES": "✏️", "QUICK TIPS": "💡" };
+    const lines = res.content.split("\n").map(l => l.trim()).filter(Boolean);
+    let summaryHtml = "";
+    let currentSection = null;
+    let buffer = [];
+
+    function flushSection() {
+      if (!currentSection || !buffer.length) return;
+      const icon = sectionIcons[currentSection] || "📌";
+      summaryHtml += `<div class="rl-section"><div class="rl-header">${icon} ${currentSection}</div>`;
+      if (currentSection === "HELPFUL EXAMPLES") {
+        buffer.forEach(line => {
+          const clean = line.replace(/^[-•*]\s*/, "").replace(/^[""'](.+)[""']$/, "$1");
+          summaryHtml += `<div class="rl-example">"${escapeHtml(clean.replace(/^"|"$/g, ""))}"</div>`;
+        });
+      } else {
+        summaryHtml += `<ul>`;
+        buffer.forEach(line => { summaryHtml += `<li>${escapeHtml(line.replace(/^[-•*]\s*/, ""))}</li>`; });
+        summaryHtml += `</ul>`;
       }
+      summaryHtml += `</div>`;
+      buffer = [];
+    }
 
-      let matchedAny = false;
-      lines.forEach(line => {
-        const cleanLine = line.replace(/[*#_]/g, ""); 
-        const upperLine = cleanLine.toUpperCase().replace(/[📚🔑✏️💡]/gu, "").trim();
-        const matchedSection = Object.keys(sectionIcons).find(k => upperLine.includes(k));
+    let matchedAny = false;
+    lines.forEach(line => {
+      const cleanLine = line.replace(/[*#_]/g, ""); 
+      const upperLine = cleanLine.toUpperCase().replace(/[📚🔑✏️💡]/gu, "").trim();
+      const matchedSection = Object.keys(sectionIcons).find(k => upperLine.includes(k));
+      
+      if (matchedSection) {
+        flushSection();
+        currentSection = matchedSection;
+        matchedAny = true;
+      } else if (currentSection) {
+        const clean = line.replace(/^[-•*\d.]\s*/, "").trim();
+        if (clean.length > 2) buffer.push(clean);
+      } else {
+        summaryHtml += `<p style="color:rgba(147,197,253,0.9); margin-bottom:12px;">${escapeHtml(line)}</p>`;
+      }
+    });
+    flushSection();
+
+    if (!matchedAny && !summaryHtml) summaryHtml = `<div style="color:#cbd5e1; font-size:0.95rem; line-height:1.8;">${escapeHtml(res.content).replace(/\n/g, '<br>')}</div>`;
+
+    // Render the learning material alongside a call-to-action button to launch the quiz
+    contentArea.innerHTML = `
+      <div class="relearn-content">${summaryHtml}</div>
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(56,189,248,0.2); text-align: center;">
+        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px;">Finished reviewing? Test your understanding with dynamic practice questions!</p>
+        <button id="startQuizBtn" style="min-height: 44px; padding: 0 24px; border-radius: 999px; border: none; background: linear-gradient(135deg, #38bdf8, #0284c7); color: #0f2027; font-weight: 800; cursor: pointer; box-shadow: 0 4px 14px rgba(56,189,248,0.4);">
+          ⚡ Take Practice Quiz
+        </button>
+      </div>
+    `;
+
+    // STEP 2: When they click the quiz button, fetch a fresh, randomized set of questions
+    document.getElementById("startQuizBtn").addEventListener("click", async () => {
+      contentArea.innerHTML = `
+        <div class="ai-loading-state">
+          <div class="spinner blue"></div>
+          <p style="color: #7dd3fc; margin: 0; font-weight: 600;">Generating a fresh practice set...</p>
+        </div>
+      `;
+
+      try {
+        const quizRes = await apiFetch("/api/ai/quick-quiz", {
+          method: "POST",
+          body: JSON.stringify({ lesson_id: lessonId, lesson_title: title, lesson_description: desc })
+        });
         
-        if (matchedSection) {
-          flushSection();
-          currentSection = matchedSection;
-          matchedAny = true;
-        } else if (currentSection) {
-          const clean = line.replace(/^[-•*\d.]\s*/, "").trim();
-          if (clean.length > 2) buffer.push(clean);
-        } else {
-          html += `<p style="color:rgba(147,197,253,0.9); margin-bottom:12px;">${escapeHtml(line)}</p>`;
-        }
-      });
-      flushSection();
+        const questions = quizRes.quiz || [];
+        if (questions.length === 0) throw new Error("No quiz questions generated.");
 
-      if (!matchedAny && !html) html = `<div style="color:#cbd5e1; font-size:0.95rem; line-height:1.8;">${escapeHtml(res.content).replace(/\n/g, '<br>')}</div>`;
-      if (contentArea) contentArea.innerHTML = `<div class="relearn-content">${html}</div>`;
-    } else throw new Error("Received empty response from AI");
+        let currentQIndex = 0;
+        let score = 0;
+
+        function renderQuizLoop() {
+          if (currentQIndex >= questions.length) {
+            contentArea.innerHTML = `
+              <div style="text-align: center; padding: 30px 20px; animation: popIn 0.4s ease;">
+                <div style="font-size: 3rem; margin-bottom: 12px;">🏆</div>
+                <h3 style="color: #e0f2fe; font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;">Practice Complete!</h3>
+                <p style="color: #94a3b8; font-size: 1rem; margin-bottom: 20px;">You scored <strong>${score}</strong> out of <strong>${questions.length}</strong>.</p>
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                  <button id="retryQuizBtn" style="min-height: 42px; padding: 0 20px; border-radius: 12px; border: 1px solid rgba(56,189,248,0.4); background: rgba(56,189,248,0.1); color: #7dd3fc; font-weight: 700; cursor: pointer;">🔄 Try New Questions</button>
+                  <button id="backToSummaryBtn" style="min-height: 42px; padding: 0 20px; border-radius: 12px; border: none; background: #38bdf8; color: #0f2027; font-weight: 700; cursor: pointer;">📖 Review Notes</button>
+                </div>
+              </div>
+            `;
+            
+            document.getElementById("retryQuizBtn").onclick = () => document.getElementById("startQuizBtn").click();
+            document.getElementById("backToSummaryBtn").onclick = () => openRelearn(lessonId, title, desc);
+            return;
+          }
+
+          const q = questions[currentQIndex];
+          let optionsHtml = "";
+          
+          q.options.forEach((opt) => {
+            optionsHtml += `
+              <button class="quiz-option-btn" data-opt="${escapeHtml(opt)}" style="
+                width: 100%; text-align: left; padding: 14px 18px; border-radius: 14px; 
+                border: 1px solid rgba(56,189,248,0.25); background: rgba(255,255,255,0.05); 
+                color: #f1f5f9; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+              ">${escapeHtml(opt)}</button>
+            `;
+          });
+
+          contentArea.innerHTML = `
+            <div style="animation: popIn 0.3s ease;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 0.85rem; font-weight: 800; color: #7dd3fc; text-transform: uppercase; letter-spacing: 0.05em;">
+                <span>Question ${currentQIndex + 1} of ${questions.length}</span>
+                <span>Score: ${score}</span>
+              </div>
+              <h4 style="color: #ffffff; font-size: 1.15rem; font-weight: 700; line-height: 1.5; margin-bottom: 20px;">${escapeHtml(q.question)}</h4>
+              <div style="display: grid; gap: 10px;">
+                ${optionsHtml}
+              </div>
+            </div>
+          `;
+
+          contentArea.querySelectorAll(".quiz-option-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+              const selected = e.currentTarget.dataset.opt;
+              const correct = q.answer.trim();
+              const allBtns = contentArea.querySelectorAll(".quiz-option-btn");
+              
+              allBtns.forEach(b => b.disabled = true);
+
+              if (selected.trim() === correct) {
+                score++;
+                e.currentTarget.style.background = "rgba(34, 197, 94, 0.25)";
+                e.currentTarget.style.borderColor = "#22c55e";
+                e.currentTarget.style.color = "#4ade80";
+              } else {
+                e.currentTarget.style.background = "rgba(239, 68, 68, 0.25)";
+                e.currentTarget.style.borderColor = "#ef4444";
+                e.currentTarget.style.color = "#fca5a5";
+                
+                allBtns.forEach(b => {
+                  if (b.dataset.opt.trim() === correct) {
+                    b.style.background = "rgba(34, 197, 94, 0.2)";
+                    b.style.borderColor = "#22c55e";
+                    b.style.color = "#4ade80";
+                  }
+                });
+              }
+
+              setTimeout(() => {
+                currentQIndex++;
+                renderQuizLoop();
+              }, 1200);
+            });
+          });
+        }
+
+        renderQuizLoop();
+
+      } catch (quizErr) {
+        contentArea.innerHTML = `<div style="color: #fca5a5; text-align: center; padding: 20px;">Could not load quiz: ${escapeHtml(quizErr.message)}</div>`;
+      }
+    });
+
   } catch (err) {
-    if (contentArea) contentArea.innerHTML = `<div style="color: #fca5a5; text-align: center; padding: 20px;">Could not generate recap: ${escapeHtml(err.message)}</div>`;
+    if (contentArea) {
+      contentArea.innerHTML = `<div style="color: #fca5a5; text-align: center; padding: 20px;">Could not generate lesson guide: ${escapeHtml(err.message)}</div>`;
+    }
   }
 }
 
