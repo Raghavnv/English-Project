@@ -59,50 +59,6 @@
     }
     .logout-btn:hover { background: rgba(188,93,45,0.14); }
 
-    /* ── WELCOME BANNER ── */
-    .welcome-banner {
-      padding: 22px 26px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(188,93,45,0.08), rgba(111,124,74,0.07));
-      border: 1px solid rgba(188,93,45,0.12);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .welcome-banner h2 {
-      font-family: "Outfit", sans-serif;
-      font-size: 1.3rem;
-      margin: 0 0 3px;
-    }
-    .welcome-banner p {
-      color: var(--muted);
-      font-size: 0.88rem;
-      margin: 0;
-    }
-    .welcome-banner-stats {
-      display: flex;
-      gap: 20px;
-      flex-shrink: 0;
-    }
-    .welcome-banner-stats div {
-      text-align: center;
-    }
-    .welcome-banner-stats span {
-      display: block;
-      font-size: 0.74rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-    }
-    .welcome-banner-stats strong {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent-deep);
-    }
-
     /* ── AI PANEL WIRED ── */
     .ai-thinking {
       display: flex;
@@ -170,7 +126,6 @@
       .mobile-sidebar-toggle {
         display: inline-flex !important;
       }
-      .welcome-banner-stats { display: none; }
     }
     .mobile-sidebar-toggle {
       display: none;
@@ -240,15 +195,25 @@
       </div>
     </header>
 
-    <main class="platform-main">
+    <!-- EXPANDED FULL-WIDTH LEARNER WIDGET (Hero Banner) -->
+    <div class="workspace-panel" style="margin-top: 24px; padding: 36px 42px; border-radius: 24px; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(145deg, rgba(255, 251, 246, 0.98), rgba(249, 240, 227, 0.92)); border: 1px solid rgba(255,255,255,0.8);">
+        <p class="panel-label" style="margin-bottom: 8px; font-size: 0.85rem; color: var(--accent-deep);">Learner Portal</p>
+        <h1 id="sidebarWelcome" style="font-family: 'Newsreader', serif; font-size: 2.8rem; margin: 0 0 10px; color: var(--text); line-height: 1.1;">Welcome back!</h1>
+        <p style="color: var(--muted); font-size: 1.05rem; margin: 0; line-height: 1.6; max-width: 65ch;">
+          Choose the class you are attending from the sidebar. The platform will automatically load your learning plan, dynamic AI flashcards, and saved progress below.
+        </p>
+    </div>
+
+    <!-- MAIN PLATFORM GRID (Sidebar + Content) -->
+    <main class="platform-main" style="padding-top: 24px;">
       <aside class="platform-sidebar" id="platformSidebar">
-        <section class="sidebar-panel">
-          <p class="panel-label">Learner</p>
-          <h1 class="sidebar-title" id="sidebarWelcome">Welcome back!</h1>
-          <p class="sidebar-copy">
-            Choose the class you are attending below. The platform will show your lessons and saved progress.
-          </p>
-        </section>
+        
+        <!-- AI INSIGHTS TRIGGER BUTTON -->
+        <div style="width: 100%; display: flex; margin-bottom: 20px;" id="aiAnalysisSection">
+          <button id="openAnalysisModalBtn" style="width: 100%; min-height: 48px; padding: 0 16px; border-radius: 18px; border: none; background: linear-gradient(135deg, var(--accent-deep), var(--accent)); color: #fffaf2; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-soft); transition: transform 0.2s;">
+            ✨ View AI Progress Insights
+          </button>
+        </div>
 
         <section class="sidebar-panel">
           <div class="panel-head">
@@ -269,7 +234,7 @@
           <div class="progress-grid" id="progressGrid"></div>
         </section>
 
-        <!-- NEW ACHIEVEMENTS PANEL -->
+        <!-- ACHIEVEMENTS PANEL -->
         <section class="sidebar-panel achievements-panel">
           <div class="panel-head">
             <p class="panel-label">Achievements</p>
@@ -283,25 +248,6 @@
       </aside>
 
       <section class="platform-content">
-
-        <!-- WELCOME BANNER -->
-        <div class="welcome-banner" id="welcomeBanner" style="display:none;">
-          <div>
-            <h2 id="welcomeBannerTitle">Welcome back!</h2>
-            <p id="welcomeBannerSub">Pick up where you left off.</p>
-          </div>
-          <div class="welcome-banner-stats">
-            <div><span>Lessons</span><strong id="bannerLessonCount">0</strong></div>
-            <div><span>Done</span><strong id="bannerCompletedCount">0</strong></div>
-          </div>
-        </div>
-
-        <!-- AI INSIGHTS TRIGGER BUTTON -->
-        <div style="margin: 16px 0; display: flex; justify-content: flex-end;" id="aiAnalysisSection">
-          <button id="openAnalysisModalBtn" style="min-height: 44px; padding: 0 22px; border-radius: 14px; border: none; background: var(--accent-deep); color: #fffaf2; font-weight: 700; font-size: 0.92rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-soft); transition: transform 0.2s;">
-            ✨ View My AI Progress Insights
-          </button>
-        </div>
 
         <!-- AI ANALYSIS MODAL OVERLAY -->
         <div class="modal-overlay" id="aiAnalysisModal" style="position:fixed; inset:0; z-index:1001; background:rgba(31,26,22,0.6); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s ease;">
@@ -329,13 +275,13 @@
           </div>
         </div>
 
-        <section class="hero-band">
-          <div>
-            <p class="panel-label">Current Class Plan</p>
-            <h2 id="classHeading">No class yet</h2>
-            <p id="classSummary">Your teacher hasn't added any classes yet. Check back soon.</p>
+        <!-- CURRENT CLASS PLAN WIDGET (Vertically centered and aligned) -->
+        <section class="hero-band" style="display: flex; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px; margin-bottom: 24px;">
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+            <p class="panel-label" style="margin-bottom: 6px;">Current Class Plan</p>
+            <h2 id="classHeading" style="margin: 0; line-height: 1.1; font-size: 1.8rem; font-family: 'Newsreader', serif;">No class yet</h2>
           </div>
-          <div class="hero-band-stats">
+          <div class="hero-band-stats" style="margin-left: auto;">
             <div><span>Lessons</span><strong id="lessonCount">0</strong></div>
             <div><span>Completed</span><strong id="completedCount">0</strong></div>
             <div><span>Streak</span><strong id="streakCount">🔥 0</strong></div>
@@ -382,7 +328,7 @@
               <p class="ai-title">Learn again with AI</p>
               <p class="ai-copy" id="aiHint">Select a lesson first, then ask for a hint.</p>
               <div id="hintReveal"></div>
-              <button class="header-chip header-chip-strong full-width" type="button" id="hintButton" disabled>
+              <button class="header-chip header-chip-strong full-write" type="button" id="hintButton" disabled>
                 Get a Hint
               </button>
             </div>
