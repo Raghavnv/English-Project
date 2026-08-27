@@ -986,3 +986,144 @@ document.addEventListener("DOMContentLoaded", () => {
   renderStudentChip();
   loadData();
 });
+
+// ════════════════════════════════════════════════════════════════════
+//  NEW APP RAIL FEATURES (Translator, Word Bank, Story Corner)
+// ════════════════════════════════════════════════════════════════════
+
+// Global Word Bank Loader
+window.loadWordBank = function() {
+  const wordGrid = document.getElementById("wordGrid");
+  if (!wordGrid) return;
+  const words = JSON.parse(localStorage.getItem(`wordBank_${studentProfile?.id}`) || "[]");
+  wordGrid.innerHTML = "";
+  
+  if (words.length === 0) {
+    wordGrid.innerHTML = `<p style="grid-column: 1 / -1; color: var(--muted); font-size: 1.05rem;">Your bank is empty. Add a word above!</p>`;
+    return;
+  }
+  
+  words.reverse().forEach(item => {
+    wordGrid.innerHTML += `
+      <div class="word-card">
+        <h4 style="font-size: 1.4rem; font-family: 'Newsreader', serif; margin-bottom: 6px; color: var(--accent-deep);">${escapeHtml(item.word)}</h4>
+        <p style="font-size: 0.95rem; color: var(--text); font-weight: 600; margin-bottom: 8px;">${escapeHtml(item.definition)}</p>
+        <p style="font-size: 0.9rem; color: var(--muted); font-style: italic;">"${escapeHtml(item.example)}"</p>
+      </div>
+    `;
+  });
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  
+  // ── 1. SMART TRANSLATOR ──
+  const runTranslateBtn = document.getElementById("runTranslateBtn");
+  if (runTranslateBtn) {
+    runTranslateBtn.addEventListener("click", async () => {
+      const text = document.getElementById("transInput").value.trim();
+      const lang = document.getElementById("transLang").value;
+      const resultDiv = document.getElementById("transResult");
+      
+      if (!text) return;
+      
+      runTranslateBtn.textContent = "Translating...";
+      runTranslateBtn.disabled = true;
+      resultDiv.style.display = "block";
+      resultDiv.innerHTML = `<p style="color:var(--muted); font-size:1.05rem;">Buddy is translating...</p>`;
+      
+      try {
+        const res = await apiFetch("/api/ai/translate", {
+          method: "POST",
+          body: JSON.stringify({ text: text, target_language: lang })
+        });
+        
+        resultDiv.innerHTML = `
+          <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">${escapeHtml(lang)} Translation:</p>
+          <p style="font-size: 1.5rem; font-weight: 700; color: #1f1a16; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(111,124,74,0.2);">${escapeHtml(res.translation)}</p>
+          <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Buddy's Grammar Tip 💡:</p>
+          <p style="font-size: 1.05rem; color: var(--text); line-height: 1.6; margin: 0;">${escapeHtml(res.grammar_tip)}</p>
+        `;
+      } catch (err) {
+        resultDiv.innerHTML = `<p style="color:#ef4444;">Translation failed: ${escapeHtml(err.message)}</p>`;
+      } finally {
+        runTranslateBtn.textContent = "✨ Translate";
+        runTranslateBtn.disabled = false;
+      }
+    });
+  }
+
+  // ── 2. ADD TO WORD BANK ──
+  const addWordBtn = document.getElementById("addWordBtn");
+  if (addWordBtn) {
+    addWordBtn.addEventListener("click", async () => {
+      const input = document.getElementById("wordInput");
+      const word = input.value.trim();
+      if (!word) return;
+      
+      addWordBtn.textContent = "Loading...";
+      addWordBtn.disabled = true;
+      
+      try {
+        const res = await apiFetch("/api/ai/word-bank/define", {
+          method: "POST", body: JSON.stringify({ word: word })
+        });
+        
+        let words = JSON.parse(localStorage.getItem(`wordBank_${studentProfile?.id}`) || "[]");
+        words = words.filter(w => w.word.toLowerCase() !== res.word.toLowerCase());
+        words.push(res);
+        localStorage.setItem(`wordBank_${studentProfile?.id}`, JSON.stringify(words));
+        
+        input.value = "";
+        window.loadWordBank();
+      } catch (err) {
+        alert("Could not define word: " + err.message);
+      } finally {
+        addWordBtn.textContent = "Add to Bank";
+        addWordBtn.disabled = false;
+      }
+    });
+  }
+
+  // ── 3. SHORT STORY CORNER ──
+  const generateStoryBtn = document.getElementById("generateStoryBtn");
+  if (generateStoryBtn) {
+    generateStoryBtn.addEventListener("click", async () => {
+      const topic = document.getElementById("storyTopicInput").value.trim();
+      const resultDiv = document.getElementById("storyResult");
+      
+      if (!topic) return;
+      
+      generateStoryBtn.textContent = "Writing...";
+      generateStoryBtn.disabled = true;
+      resultDiv.innerHTML = `
+        <div class="ai-loading-state" style="padding: 30px;">
+          <div class="spinner blue"></div>
+          <p style="color: var(--muted); margin-top: 12px; font-size: 1.1rem;">Buddy is writing your story...</p>
+        </div>
+      `;
+      
+      try {
+        const res = await apiFetch("/api/ai/story", {
+          method: "POST", body: JSON.stringify({ topic: topic })
+        });
+        
+        let paragraphsHtml = "";
+        res.paragraphs.forEach(p => {
+          paragraphsHtml += `<p style="font-size: 1.15rem; line-height: 1.8; color: var(--text); margin-bottom: 16px;">${escapeHtml(p)}</p>`;
+        });
+        
+        resultDiv.innerHTML = `
+          <div style="padding: 40px; border-radius: 24px; background: #fff; border: 1px solid rgba(80,58,40,0.1); box-shadow: var(--shadow-soft); animation: popIn 0.3s ease;">
+            <h4 style="font-family: 'Newsreader', serif; font-size: 2.2rem; margin-bottom: 24px; color: var(--accent-deep);">${escapeHtml(res.title)}</h4>
+            ${paragraphsHtml}
+          </div>
+        `;
+      } catch (err) {
+        resultDiv.innerHTML = `<p style="color:#ef4444;">Could not write story: ${escapeHtml(err.message)}</p>`;
+      } finally {
+        generateStoryBtn.textContent = "✍️ Generate Story";
+        generateStoryBtn.disabled = false;
+      }
+    });
+  }
+});
