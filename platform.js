@@ -237,6 +237,56 @@ function updateDailyGoal(answeredCount) {
   }
 }
 
+// ===== ACHIEVEMENT SYSTEM =====
+function evaluateAchievements(totalCompleted, totalAnswers, streakDays) {
+  const badgesGrid = document.getElementById("badgesGrid");
+  const badgeCountPill = document.getElementById("badgeCountPill");
+  if (!badgesGrid || !badgeCountPill) return;
+
+  const earnedBadges = [];
+
+  // Rule 1: First Steps (Completed 1 lesson)
+  if (totalCompleted >= 1) {
+    earnedBadges.push({ icon: "🌟", name: "First Steps" });
+  }
+
+  // Rule 2: On Fire (3-day streak)
+  if (streakDays >= 3) {
+    earnedBadges.push({ icon: "🔥", name: "On Fire" });
+  }
+
+  // Rule 3: Practice Makes Perfect (Answered 10+ questions)
+  if (totalAnswers >= 10) {
+    earnedBadges.push({ icon: "🎯", name: "Sharp Shooter" });
+  }
+
+   // Rule 4: Word Wizard (Saved 5+ words to the Word Bank)
+  const studentId = studentProfile?.id || student?.id || "guest";
+  const wordBank = JSON.parse(localStorage.getItem(`wordBank_${studentId}`) || "[]");
+  if (wordBank.length >= 5) {
+    earnedBadges.push({ icon: "🗂️", name: "Word Wizard" });
+  }
+
+  // Update the UI
+  if (earnedBadges.length === 0) {
+    badgesGrid.innerHTML = `<p class="empty-state" style="grid-column: 1 / -1; padding: 12px; margin-top: 10px;">No badges yet. Start learning to earn some!</p>`;
+    badgeCountPill.textContent = "0";
+  } else {
+    badgesGrid.innerHTML = ""; // Clear empty state
+    badgeCountPill.textContent = earnedBadges.length;
+    
+    earnedBadges.forEach(badge => {
+      badgesGrid.innerHTML += `
+        <div class="badge-card" style="animation: popIn 0.4s ease;">
+          <div class="badge-icon">${badge.icon}</div>
+          <div class="badge-name">${badge.name}</div>
+        </div>
+      `;
+    });
+  }
+}
+
+
 function renderProgress() {
   const selectedClass     = getSelectedClass();
   const lessonCountEl     = document.getElementById("lessonCount");
@@ -284,6 +334,12 @@ function renderProgress() {
 
   
   updateDailyGoal(totalAnswers);
+
+  // Trigger achievements check
+  const currentStreak = studentProfile?.streak_days || student?.streak_days || 0;
+  evaluateAchievements(completed, totalAnswers, currentStreak);
+
+
 }
 
 
