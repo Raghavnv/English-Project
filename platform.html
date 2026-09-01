@@ -114,18 +114,18 @@
   <nav class="app-rail">
     <div class="rail-logo">📚</div>
     <button class="rail-btn active" data-tooltip="Dashboard" onclick="switchAppView('view-dashboard', this)">🏠</button>
-    <button class="rail-btn" data-tooltip="Story Corner" onclick="switchAppView('view-story', this)">📖</button>
-    <button class="rail-btn" data-tooltip="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️</button>
-    <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('view-translator', this)">🌐</button>
     <button class="rail-btn" data-tooltip="Pronunciation Lab" onclick="switchAppView('view-pronunciation', this)">🎙️</button>
-    <button class="rail-btn" data-tooltip="Broadcasts" onclick="switchAppView('view-broadcast', this)" style="position:relative;">
     <button class="rail-btn" data-tooltip="Roleplay Sandbox" onclick="switchAppView('view-roleplay', this)">🎭</button>
+    <button class="rail-btn" data-tooltip="Story Corner" onclick="switchAppView('view-story', this)">📖</button>
+    <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('view-translator', this)">🌐</button>
+    <button class="rail-btn" data-tooltip="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️</button>
     <button class="rail-btn" data-tooltip="Memory Deck" onclick="switchAppView('view-memory-deck', this)">🧠</button>
 
-      📣<span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
-    </button>
     <button class="rail-btn" data-tooltip="Resources" onclick="switchAppView('view-resources', this)" style="position:relative;">
       📚<span id="resourceRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
+    </button>
+    <button class="rail-btn" data-tooltip="Broadcasts" onclick="switchAppView('view-broadcast', this)" style="position:relative;">
+      📣<span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
   </nav>
 
@@ -296,23 +296,7 @@
             </div>
 
             <div class="workspace-panel ai-panel">
-              <div class="section-head">
-                <div>
-                  <p class="panel-label">AI Guide</p>
-                  <h3>Practice support</h3>
-                </div>
-                <span class="status-badge" id="aiStatus" style="font-size:0.75rem;">Ready</span>
-              </div>
-              <div class="ai-card">
-                <p class="ai-title">Learn again with AI</p>
-                <p class="ai-copy" id="aiHint">Select a lesson first, then ask for a hint.</p>
-                <div id="hintReveal"></div>
-                <button class="header-chip header-chip-strong full-write" type="button" id="hintButton" disabled>Get a Hint</button>
-              </div>
-              <div class="ai-card">
-                <p class="ai-title">Encouragement</p>
-                <p class="ai-copy" id="aiEncouragement">Good progress comes from small, repeated practice. Finish one lesson at a time.</p>
-              </div>
+              <!-- AI Panel Content dynamically generated -->
             </div>
           </section>
         </section>
@@ -406,7 +390,7 @@
       </div>
     </section>
 
-        <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════════════════════════ -->
     <!-- ── VIEW 6: CONVERSATIONAL ROLEPLAY ── -->
     <!-- ════════════════════════════════════════════════════════════ -->
     <section id="view-roleplay" class="app-view">
@@ -457,7 +441,6 @@
         </div>
       </div>
     </section>
-
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- ── VIEW 8: BROADCASTS ── -->
