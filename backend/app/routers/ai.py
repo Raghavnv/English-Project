@@ -719,4 +719,71 @@ def lightning_round(requester=Depends(require_authenticated_requester)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ── CONVERSATIONAL ROLEPLAY SANDBOX ──
+class RoleplayMessage(BaseModel):
+    role: str
+    content: str
+
+class RoleplayRequest(BaseModel):
+    scenario: str
+    messages: list[RoleplayMessage]
+
+@router.post("/roleplay-chat")
+def roleplay_chat(request: RoleplayRequest, requester=Depends(require_authenticated_requester)):
+    # Inject the scenario and strict instructions into the system prompt
+    system_prompt = f"""
+    You are Buddy, acting out a roleplay scenario with an English learner. 
+    Current Scenario: {request.scenario}.
+    Instructions:
+    1. Keep your responses brief (1-2 sentences maximum).
+    2. Use conversational, everyday English at a B1 level.
+    3. Do not break character. 
+    4. If the user makes a grammatical error, gently correct them by repeating the phrase naturally correctly, then continue the conversation.
+    """
+    
+    try:
+        # Format history for the LLM
+        formatted_history = [{"role": m.role, "content": m.content} for m in request.messages]
+        reply = ask_groq(system_prompt, history=formatted_history, max_tokens=150)
+        return {"reply": reply}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ── AUTOMATED REMEDIAL GROUPING ──
+class GroupingRequest(BaseModel):
+    class_data: str
+
+@router.post("/remedial-groups")
+def remedial_groups(req: GroupingRequest, requester=Depends(require_authenticated_requester)):
+    prompt = f"""You are an expert ESL teacher. Analyze this raw student progress data: {req.class_data}. 
+    Group the students into 2 to 3 small remedial groups based on similar struggles (e.g., low scores, uncompleted lessons, or specific topics).
+    Return ONLY a JSON object in this format (no markdown, no extra text):
+    {{"groups": [{{"group_name": "Group A", "students": ["Name 1", "Name 2"], "focus_topic": "Past Tense Verbs", "reason": "Brief explanation of why they are grouped together"}}]}}"""
+    try:
+        raw = ask_groq(prompt, max_tokens=600, system="Output valid JSON only.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ── PRONUNCIATION ANALYTICS ──
+class PronunciationRequest(BaseModel):
+    class_profile: str
+
+@router.post("/pronunciation-analytics")
+def pronunciation_analytics(req: PronunciationRequest, requester=Depends(require_authenticated_requester)):
+    prompt = f"""Based on this general class profile: {req.class_profile}, generate a realistic Pronunciation Analytics report identifying common phonetic struggles for these ESL students.
+    Identify 3 specific sounds, words, or phonemes they likely struggle with, and provide a quick teaching recommendation.
+    Return ONLY a JSON object in this format (no markdown):
+    {{"insights": [{{"sound": "th / v", "issue": "Brief description of the struggle", "recommendation": "Quick classroom exercise"}}]}}"""
+    try:
+        raw = ask_groq(prompt, max_tokens=500, system="Output valid JSON only.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 

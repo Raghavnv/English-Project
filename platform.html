@@ -119,6 +119,9 @@
     <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('view-translator', this)">🌐</button>
     <button class="rail-btn" data-tooltip="Pronunciation Lab" onclick="switchAppView('view-pronunciation', this)">🎙️</button>
     <button class="rail-btn" data-tooltip="Broadcasts" onclick="switchAppView('view-broadcast', this)" style="position:relative;">
+    <button class="rail-btn" data-tooltip="Roleplay Sandbox" onclick="switchAppView('view-roleplay', this)">🎭</button>
+    <button class="rail-btn" data-tooltip="Memory Deck" onclick="switchAppView('view-memory-deck', this)">🧠</button>
+
       📣<span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
     <button class="rail-btn" data-tooltip="Resources" onclick="switchAppView('view-resources', this)" style="position:relative;">
@@ -403,8 +406,61 @@
       </div>
     </section>
 
+        <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ── VIEW 6: CONVERSATIONAL ROLEPLAY ── -->
     <!-- ════════════════════════════════════════════════════════════ -->
-    <!-- ── VIEW 6: BROADCASTS ── -->
+    <section id="view-roleplay" class="app-view">
+      <div class="page-container">
+        <div class="page-header">
+          <p class="panel-label" style="color: var(--accent-deep); font-size: 0.9rem;">🎭 Conversational Practice</p>
+          <h1>Roleplay Sandbox</h1>
+          <p>Practice speaking in real-world situations without any pressure. Choose a scenario below, and Buddy will act it out with you!</p>
+        </div>
+        
+        <div class="workspace-panel" style="padding: 32px; border-radius: 24px; background: rgba(255,255,255,0.7); border: 1px solid rgba(80,58,40,0.1);">
+          <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
+            <select id="roleplayScenario" style="flex: 1; padding: 16px; border-radius: 16px; border: 1px solid rgba(80,58,40,0.2); background: white; font-size: 1.05rem; font-weight: 600; color: var(--text);">
+              <option value="Ordering food at a busy cafe">☕ Ordering food at a busy cafe</option>
+              <option value="Asking a stranger for directions to the train station">🗺️ Asking for directions</option>
+              <option value="Buying a ticket at a movie theater">🎟️ Buying a movie ticket</option>
+              <option value="Talking to a doctor about a mild cold">🩺 Visiting the doctor</option>
+            </select>
+            <button onclick="startRoleplay()" style="min-height: 56px; padding: 0 32px; border-radius: 16px; border: none; background: var(--accent-deep); color: white; font-size: 1.05rem; font-weight: 700; cursor: pointer; box-shadow: var(--shadow-soft);">Start Scenario</button>
+          </div>
+
+          <div id="roleplayChatArea" style="min-height: 300px; max-height: 500px; overflow-y: auto; padding: 20px; border-radius: 16px; background: rgba(80,58,40,0.03); border: 1px inset rgba(80,58,40,0.08); display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+            <div style="margin: auto; color: var(--muted); font-size: 1.1rem; text-align: center;">Select a scenario and click Start!</div>
+          </div>
+
+          <div id="roleplayInputContainer" style="display: none; gap: 12px; align-items: center;">
+            <button id="roleplayMicBtn" onclick="toggleRoleplayMic()" style="width: 52px; height: 52px; border-radius: 50%; border: none; background: #dc2626; color: white; font-size: 1.4rem; cursor: pointer; transition: 0.2s; flex-shrink: 0;">🎤</button>
+            <input type="text" id="roleplayInput" class="feature-input" style="min-height: 52px; padding: 0 20px; font-size: 1.05rem; border-radius: 999px;" placeholder="Type or speak your reply..." onkeydown="if(event.key==='Enter') sendRoleplayMessage()">
+            <button onclick="sendRoleplayMessage()" style="width: 52px; height: 52px; border-radius: 50%; border: none; background: var(--accent-deep); color: white; font-size: 1.2rem; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 10px rgba(188,93,45,0.3);">➤</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ── VIEW 7: SPACED REPETITION MEMORY DECK ── -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section id="view-memory-deck" class="app-view">
+      <div class="page-container">
+        <div class="page-header" style="text-align: center;">
+          <p class="panel-label" style="color: var(--accent-deep); font-size: 0.9rem;">🧠 Long-Term Retention</p>
+          <h1>Memory Deck</h1>
+          <p style="margin: 0 auto;">Review the words in your Personal Word Bank. The AI algorithm will show you the hardest words more often, and the easiest words less often.</p>
+        </div>
+
+        <div id="srsPlayArea" style="max-width: 600px; margin: 0 auto; text-align: center;">
+          <button onclick="startSpacedRepetition()" style="min-height: 60px; padding: 0 40px; border-radius: 999px; border: none; background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; font-size: 1.2rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 24px rgba(109,40,217,0.4);">▶️ Start Daily Review</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ── VIEW 8: BROADCASTS ── -->
     <!-- ════════════════════════════════════════════════════════════ -->
     <section id="view-broadcast" class="app-view">
       <div class="page-container">
@@ -419,7 +475,7 @@
     </section>
 
     <!-- ════════════════════════════════════════════════════════════ -->
-    <!-- ── VIEW 7: RESOURCE LIBRARY ── -->
+    <!-- ── VIEW 9: RESOURCE LIBRARY ── -->
     <!-- ════════════════════════════════════════════════════════════ -->
     <section id="view-resources" class="app-view">
       <div class="page-container">

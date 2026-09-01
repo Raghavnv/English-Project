@@ -1238,3 +1238,138 @@ function copyReportToClipboard() {
   document.execCommand("copy");
   showPopup("Report copied to clipboard!");
 }
+
+// ════════════════════════════════════════════════════════════════════
+//  AUTOMATED REMEDIAL GROUPING
+// ════════════════════════════════════════════════════════════════════
+
+async function generateRemedialGroups() {
+  const btn = document.getElementById("generateGroupsBtn");
+  const loading = document.getElementById("remedialGroupsLoading");
+  const resultArea = document.getElementById("remedialGroupsResult");
+  
+  if (!btn || !loading || !resultArea) return;
+  
+  btn.disabled = true;
+  resultArea.innerHTML = "";
+  loading.style.display = "block";
+
+  try {
+    // 1. Gather all student progress into a data string for the AI
+    const students = await Students.list();
+    let classDataString = "";
+    
+    for (const student of students) {
+      const progress = await Students.getProgress(student.id);
+      let avgScore = 0; let answered = 0;
+      
+      Object.values(progress || {}).forEach(p => {
+        if (!p.answers) return;
+        Object.values(p.answers).forEach(a => {
+          const score = typeof a === "object" ? (a.ai_score || 0) : 0;
+          if (score > 0) { avgScore += score; answered++; }
+        });
+      });
+      
+      avgScore = answered > 0 ? (avgScore / answered).toFixed(1) : 0;
+      classDataString += `[Student: ${student.name}, Questions Answered: ${answered}, Avg Score: ${avgScore}/5]; `;
+    }
+
+    if (!classDataString) throw new Error("Not enough student data to form groups yet.");
+
+    // 2. Fetch AI Groupings
+    const res = await apiFetch("/api/ai/remedial-groups", {
+      method: "POST",
+      body: JSON.stringify({ class_data: classDataString })
+    });
+
+    loading.style.display = "none";
+    
+    // 3. Render Groups
+    const groups = res.groups || [];
+    if (groups.length === 0) throw new Error("AI did not return any groups.");
+    
+    groups.forEach(g => {
+      const card = document.createElement("div");
+      card.style.cssText = "background: white; border-radius: 16px; padding: 16px; border: 1px solid rgba(34,197,94,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.03);";
+      
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <strong style="font-size:1.1rem; color:#14532d;">${escapeHtml(g.group_name)}</strong>
+          <span style="font-size:0.75rem; padding:4px 8px; border-radius:999px; background:#dcfce7; color:#166534; font-weight:800;">${g.students.length} Students</span>
+        </div>
+        <p style="font-size:0.85rem; font-weight:800; color:#16a34a; text-transform:uppercase; margin:0 0 4px;">Focus: ${escapeHtml(g.focus_topic)}</p>
+        <p style="font-size:0.9rem; color:var(--text); margin:0 0 12px; line-height:1.5;">${escapeHtml(g.reason)}</p>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          ${g.students.map(s => `<span style="font-size:0.8rem; background:rgba(80,58,40,0.06); padding:4px 10px; border-radius:8px; font-weight:600;">${escapeHtml(s)}</span>`).join("")}
+        </div>
+      `;
+      resultArea.appendChild(card);
+    });
+
+  } catch (err) {
+    loading.style.display = "none";
+    resultArea.innerHTML = `<p style="color:#dc2626;">Could not generate groups: ${escapeHtml(err.message)}</p>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  PRONUNCIATION LAB ANALYTICS
+// ════════════════════════════════════════════════════════════════════
+
+async function loadPronunciationAnalytics() {
+  const btn = document.getElementById("loadPronunciationBtn");
+  const loading = document.getElementById("pronunciationLoading");
+  const resultArea = document.getElementById("pronunciationResult");
+  
+  if (!btn || !loading || !resultArea) return;
+  
+  btn.disabled = true;
+  resultArea.style.display = "none";
+  loading.style.display = "block";
+
+  try {
+    const classFilter = document.getElementById("classFilter")?.options[document.getElementById("classFilter")?.selectedIndex]?.text || "Mixed ESL Class";
+    const students = await Students.list();
+    const classProfile = `Class: ${classFilter}. Total Students: ${students.length}.`;
+
+    const res = await apiFetch("/api/ai/pronunciation-analytics", {
+      method: "POST",
+      body: JSON.stringify({ class_profile: classProfile })
+    });
+
+    const insights = res.insights || [];
+    
+    loading.style.display = "none";
+    resultArea.style.display = "grid";
+    resultArea.innerHTML = "";
+
+    insights.forEach(insight => {
+      const row = document.createElement("div");
+      row.style.cssText = "display: flex; gap: 16px; padding: 16px; border-radius: 14px; background: rgba(80,58,40,0.03); border: 1px solid rgba(80,58,40,0.08); align-items: flex-start;";
+      
+      row.innerHTML = `
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: white; border: 1px solid rgba(80,58,40,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: var(--accent-deep); flex-shrink: 0; box-shadow: var(--shadow-soft);">
+          🗣️
+        </div>
+        <div>
+          <strong style="display: block; font-size: 1.05rem; color: var(--text); margin-bottom: 4px;">Target Sound: "${escapeHtml(insight.sound)}"</strong>
+          <p style="font-size: 0.9rem; color: var(--muted); margin: 0 0 8px; line-height: 1.5;"><strong>Issue:</strong> ${escapeHtml(insight.issue)}</p>
+          <div style="font-size: 0.85rem; color: #0284c7; background: rgba(56,189,248,0.1); padding: 8px 12px; border-radius: 8px; font-weight: 600;">
+            💡 Tip: ${escapeHtml(insight.recommendation)}
+          </div>
+        </div>
+      `;
+      resultArea.appendChild(row);
+    });
+
+  } catch (err) {
+    loading.style.display = "none";
+    resultArea.style.display = "block";
+    resultArea.innerHTML = `<p style="color:#dc2626;">Error loading pronunciation insights: ${escapeHtml(err.message)}</p>`;
+  } finally {
+    btn.disabled = false;
+  }
+}

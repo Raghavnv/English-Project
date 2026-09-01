@@ -1749,3 +1749,246 @@ function endLightningGame(reason) {
     <button onclick="closeLightningModal()" style="min-height: 56px; padding: 0 32px; border-radius: 999px; border: none; background: #713f12; color: #fef08a; font-size: 1.1rem; font-weight: 800; cursor: pointer;">Close & Return</button>
   `;
 }
+
+// ════════════════════════════════════════════════════════════════════
+//  CONVERSATIONAL ROLEPLAY SANDBOX
+// ════════════════════════════════════════════════════════════════════
+
+let roleplayHistory = [];
+let activeScenario = "";
+
+async function startRoleplay() {
+  const select = document.getElementById("roleplayScenario");
+  activeScenario = select.value;
+  roleplayHistory = [];
+  
+  const chatArea = document.getElementById("roleplayChatArea");
+  chatArea.innerHTML = "";
+  document.getElementById("roleplayInputContainer").style.display = "flex";
+  document.getElementById("roleplayInput").focus();
+  
+  appendRoleplayMsg("bot", `Great! We are now practicing: "${activeScenario}". I will start!`);
+  
+  // Trigger the AI's opening line by sending a hidden system prompt
+  const loadingId = appendRoleplayMsg("bot", `<div class="spinner blue" style="width:20px;height:20px;border-width:2px;"></div>`, true);
+  try {
+    const res = await apiFetch("/api/ai/roleplay-chat", {
+      method: "POST",
+      body: JSON.stringify({ scenario: activeScenario, messages: [{ role: "user", content: "(Start the scenario)" }] })
+    });
+    document.getElementById(loadingId).remove();
+    appendRoleplayMsg("bot", res.reply);
+    roleplayHistory.push({ role: "assistant", content: res.reply });
+    BuddyVoice.speak(res.reply, "English");
+  } catch(err) {
+    document.getElementById(loadingId).innerHTML = `<p style="color:#ef4444;margin:0;">Connection error.</p>`;
+  }
+}
+
+function appendRoleplayMsg(role, content, isLoading = false) {
+  const chatArea = document.getElementById("roleplayChatArea");
+  const msgDiv = document.createElement("div");
+  const msgId = "rp_msg_" + Date.now();
+  msgDiv.id = msgId;
+  msgDiv.style.cssText = `max-width: 80%; padding: 12px 18px; border-radius: 18px; font-size: 1.05rem; line-height: 1.5; animation: fadeViewIn 0.2s ease forwards; width: fit-content;`;
+  
+  if (role === "user") {
+    msgDiv.style.background = "var(--accent-deep)";
+    msgDiv.style.color = "white";
+    msgDiv.style.alignSelf = "flex-end";
+    msgDiv.style.borderBottomRightRadius = "4px";
+  } else {
+    msgDiv.style.background = "white";
+    msgDiv.style.color = "var(--text)";
+    msgDiv.style.alignSelf = "flex-start";
+    msgDiv.style.borderBottomLeftRadius = "4px";
+    msgDiv.style.boxShadow = "var(--shadow-soft)";
+    msgDiv.style.border = "1px solid rgba(80,58,40,0.1)";
+  }
+  
+  msgDiv.innerHTML = content;
+  chatArea.appendChild(msgDiv);
+  chatArea.scrollTop = chatArea.scrollHeight;
+  return msgId;
+}
+
+async function sendRoleplayMessage() {
+  const input = document.getElementById("roleplayInput");
+  const text = input.value.trim();
+  if (!text) return;
+  
+  input.value = "";
+  appendRoleplayMsg("user", text);
+  roleplayHistory.push({ role: "user", content: text });
+  
+  const loadingId = appendRoleplayMsg("bot", `<div class="spinner blue" style="width:20px;height:20px;border-width:2px;"></div>`, true);
+  
+  try {
+    const res = await apiFetch("/api/ai/roleplay-chat", {
+      method: "POST",
+      body: JSON.stringify({ scenario: activeScenario, messages: roleplayHistory })
+    });
+    document.getElementById(loadingId).remove();
+    appendRoleplayMsg("bot", res.reply);
+    roleplayHistory.push({ role: "assistant", content: res.reply });
+    BuddyVoice.speak(res.reply.replace(/'/g, "\\'"), "English");
+  } catch(err) {
+    document.getElementById(loadingId).innerHTML = `<p style="color:#ef4444;margin:0;">Oops, network error.</p>`;
+  }
+}
+
+function toggleRoleplayMic() {
+  const btn = document.getElementById("roleplayMicBtn");
+  const input = document.getElementById("roleplayInput");
+  
+  if (MicListener.isListening) {
+    MicListener.stop();
+    return;
+  }
+  
+  btn.style.background = "#22c55e"; // Green while listening
+  input.placeholder = "Listening...";
+  
+  MicListener.start(
+    (transcript) => {
+      input.value = transcript;
+      btn.style.background = "#dc2626";
+      input.placeholder = "Type or speak your reply...";
+      sendRoleplayMessage(); // Auto-send when speech completes
+    },
+    () => {
+      btn.style.background = "#dc2626";
+      input.placeholder = "Type or speak your reply...";
+    }
+  );
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+//  SPACED REPETITION MEMORY DECK (SM-2 ALGORITHM)
+// ════════════════════════════════════════════════════════════════════
+
+let srsQueue = [];
+let currentSrsWord = null;
+
+// Ensure all words in the Word Bank have SM-2 learning tracking data
+function upgradeWordBankToSRS() {
+  const studentId = studentProfile?.id || student?.id || "guest";
+  let words = JSON.parse(localStorage.getItem(`wordBank_${studentId}`) || "[]");
+  let updated = false;
+  
+  words = words.map(w => {
+    if (!w.srs) {
+      updated = true;
+      // repetition count, interval (days), ease factor, next review timestamp
+      w.srs = { repetition: 0, interval: 1, easeFactor: 2.5, nextReview: Date.now() };
+    }
+    return w;
+  });
+  
+  if (updated) localStorage.setItem(`wordBank_${studentId}`, JSON.stringify(words));
+  return words;
+}
+
+function saveWordBank(words) {
+  const studentId = studentProfile?.id || student?.id || "guest";
+  localStorage.setItem(`wordBank_${studentId}`, JSON.stringify(words));
+}
+
+function startSpacedRepetition() {
+  const words = upgradeWordBankToSRS();
+  const now = Date.now();
+  
+  // Filter for words due for review today
+  srsQueue = words.filter(w => w.srs.nextReview <= now);
+  
+  if (srsQueue.length === 0) {
+    document.getElementById("srsPlayArea").innerHTML = `
+      <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
+      <h2 style="font-family: 'Newsreader', serif; font-size: 2.2rem; color: #3d5220;">You're all caught up!</h2>
+      <p style="font-size: 1.1rem; color: var(--muted); margin-bottom: 32px;">There are no words due for review today. Add more words from the translator, or check back tomorrow.</p>
+    `;
+    return;
+  }
+  
+  renderSrsCard();
+}
+
+function renderSrsCard() {
+  if (srsQueue.length === 0) {
+    document.getElementById("srsPlayArea").innerHTML = `
+      <div style="font-size: 4rem; margin-bottom: 16px;">🏆</div>
+      <h2 style="font-family: 'Newsreader', serif; font-size: 2.2rem; color: #3d5220;">Daily Deck Complete!</h2>
+      <p style="font-size: 1.1rem; color: var(--muted); margin-bottom: 32px;">Excellent work. Your memory is growing stronger.</p>
+      <button onclick="switchAppView('view-dashboard')" class="primary-action">Return to Dashboard</button>
+    `;
+    return;
+  }
+  
+  currentSrsWord = srsQueue[0];
+  const playArea = document.getElementById("srsPlayArea");
+  
+  playArea.innerHTML = `
+    <p style="font-size: 0.9rem; font-weight: 800; color: #6d28d9; text-transform: uppercase; margin-bottom: 12px;">Cards remaining: ${srsQueue.length}</p>
+    <div id="srsFlashcard" style="width: 100%; height: 300px; perspective: 1000px; cursor: pointer; margin-bottom: 24px;" onclick="flipSrsCard()">
+      <div id="srsCardInner" style="position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d;">
+        
+        <!-- FRONT OF CARD -->
+        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; background: white; border: 2px solid rgba(139, 92, 246, 0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(109, 40, 217, 0.1);">
+          <h2 style="font-family: 'Newsreader', serif; font-size: 3rem; color: #4c1d95; margin: 0;">${escapeHtml(currentSrsWord.word)}</h2>
+          <p style="color: var(--muted); font-size: 0.9rem; margin-top: 16px;">Tap to flip</p>
+        </div>
+
+        <!-- BACK OF CARD -->
+        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; background: linear-gradient(135deg, #7c3aed, #5b21b6); color: white; transform: rotateY(180deg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; box-shadow: 0 10px 30px rgba(109, 40, 217, 0.3);">
+          <p style="font-size: 1.3rem; font-weight: 600; line-height: 1.5; margin: 0 0 16px;">${escapeHtml(currentSrsWord.definition)}</p>
+          <p style="font-size: 1.05rem; font-style: italic; opacity: 0.8; margin: 0;">"${escapeHtml(currentSrsWord.example)}"</p>
+        </div>
+      </div>
+    </div>
+    
+    <div id="srsControls" style="display: none; gap: 12px; justify-content: center;">
+      <button onclick="gradeSrsCard(1)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #fee2e2; color: #b91c1c; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Hard<br><span style="font-size:0.75rem; font-weight:600;">Again soon</span></button>
+      <button onclick="gradeSrsCard(4)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #fef9c3; color: #a16207; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Good<br><span style="font-size:0.75rem; font-weight:600;">Got it right</span></button>
+      <button onclick="gradeSrsCard(5)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #dcfce7; color: #15803d; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Easy<br><span style="font-size:0.75rem; font-weight:600;">Too simple</span></button>
+    </div>
+  `;
+}
+
+window.flipSrsCard = function() {
+  document.getElementById("srsCardInner").style.transform = "rotateY(180deg)";
+  document.getElementById("srsControls").style.display = "flex";
+  BuddyVoice.speak(`${currentSrsWord.word}. ${currentSrsWord.definition}`, "English");
+};
+
+window.gradeSrsCard = function(quality) {
+  let srs = currentSrsWord.srs;
+  
+  // SM-2 Algorithm Calculation
+  if (quality < 3) {
+    srs.repetition = 0;
+    srs.interval = 1;
+  } else {
+    if (srs.repetition === 0) srs.interval = 1;
+    else if (srs.repetition === 1) srs.interval = 6;
+    else srs.interval = Math.round(srs.interval * srs.easeFactor);
+    srs.repetition++;
+  }
+  
+  srs.easeFactor = srs.easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+  if (srs.easeFactor < 1.3) srs.easeFactor = 1.3;
+  
+  // Set next review timestamp (interval is converted to milliseconds)
+  srs.nextReview = Date.now() + (srs.interval * 24 * 60 * 60 * 1000);
+  
+  // Save updated word back to global Word Bank
+  const words = upgradeWordBankToSRS();
+  const index = words.findIndex(w => w.word === currentSrsWord.word);
+  if (index !== -1) {
+    words[index] = currentSrsWord;
+    saveWordBank(words);
+  }
+  
+  srsQueue.shift(); // Remove completed word from today's queue
+  renderSrsCard(); // Load next word
+};
