@@ -1516,7 +1516,7 @@ function evaluatePronunciation(spokenText) {
 
 
 // ════════════════════════════════════════════════════════════════════
-//  LIGHTNING ROUND GAME
+//  LIGHTNING ROUND GAME (WITH OFFLINE FALLBACK)
 // ════════════════════════════════════════════════════════════════════
 
 let lightningQuestions = [];
@@ -1525,70 +1525,110 @@ let lightningScore = 0;
 let lightningTime = 60;
 let lightningTimerInterval = null;
 
-function openLightningModal() {
+// Built-in pool so the game NEVER freezes if backend is offline or slow
+const FALLBACK_LIGHTNING_POOL = [
+  { question: "Which word is an adjective?", options: ["Quickly", "Beautiful", "Run", "Happiness"], answer: "Beautiful" },
+  { question: "Choose the correct past tense of 'Eat':", options: ["Eated", "Ate", "Eating", "Eaten"], answer: "Ate" },
+  { question: "Which sentence is punctuated correctly?", options: ["where are you going.", "Where are you going?", "Where are you going!", "where are you going?"], answer: "Where are you going?" },
+  { question: "What is the opposite of 'Ancient'?", options: ["Old", "Modern", "Heavy", "Broken"], answer: "Modern" },
+  { question: "Fill in the blank: She _____ to school every morning.", options: ["walk", "walks", "walking", "walked"], answer: "walks" },
+  { question: "Which is a noun?", options: ["Elephant", "Sing", "Loudly", "Bright"], answer: "Elephant" },
+  { question: "Choose the correct plural form of 'Child':", options: ["Childs", "Children", "Childrens", "Childes"], answer: "Children" }
+];
+
+window.openLightningModal = function() {
   const modal = document.getElementById("lightningModal");
+  if (!modal) return;
   modal.style.display = "flex";
-  // Force reflow
   void modal.offsetWidth;
   modal.style.opacity = "1";
   
-  document.getElementById("lightningHeader").style.display = "none";
-  document.getElementById("lightningPlayArea").innerHTML = `
-    <h2 style="font-family: 'Newsreader', serif; font-size: 2.8rem; color: #422006; margin-bottom: 10px;">Lightning Round</h2>
-    <p style="font-size: 1.1rem; color: #713f12; margin-bottom: 32px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
-    <div class="ai-loading-state" id="lightningLoading" style="display:none; padding: 20px;">
-      <div class="spinner" style="border-top-color: #713f12; border-right-color: rgba(113,63,18,0.2); border-bottom-color: rgba(113,63,18,0.2); border-left-color: rgba(113,63,18,0.2); margin: 0 auto;"></div>
-      <p style="color: #713f12; font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
-    </div>
-    <button id="lightningStartBtn" onclick="beginLightningGame()" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
-  `;
-}
+  const header = document.getElementById("lightningHeader");
+  if (header) header.style.display = "none";
+  
+  const playArea = document.getElementById("lightningPlayArea");
+  if (playArea) {
+    playArea.innerHTML = `
+      <h2 style="font-family: 'Newsreader', serif; font-size: 2.8rem; color: #422006; margin-bottom: 10px;">Lightning Round</h2>
+      <p style="font-size: 1.1rem; color: #713f12; margin-bottom: 32px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
+      <div class="ai-loading-state" id="lightningLoading" style="display:none; padding: 20px;">
+        <div class="spinner" style="border-top-color: #713f12; margin: 0 auto;"></div>
+        <p style="color: #713f12; font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
+      </div>
+      <button id="lightningStartBtn" onclick="beginLightningGame()" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
+    `;
+  }
+};
 
-function closeLightningModal() {
+window.closeLightningModal = function() {
   const modal = document.getElementById("lightningModal");
-  modal.style.opacity = "0";
-  setTimeout(() => { modal.style.display = "none"; }, 250);
-  clearInterval(lightningTimerInterval);
-}
+  if (modal) {
+    modal.style.opacity = "0";
+    setTimeout(() => { modal.style.display = "none"; }, 250);
+  }
+  if (lightningTimerInterval) clearInterval(lightningTimerInterval);
+};
 
-async function beginLightningGame() {
-  document.getElementById("lightningStartBtn").style.display = "none";
-  document.getElementById("lightningLoading").style.display = "block";
+window.beginLightningGame = async function() {
+  const startBtn = document.getElementById("lightningStartBtn");
+  const loading = document.getElementById("lightningLoading");
+  if (startBtn) startBtn.style.display = "none";
+  if (loading) loading.style.display = "block";
   
   try {
-    const res = await apiFetch("/api/ai/lightning-round", { method: "POST" });
-    if (!res.quiz || res.quiz.length === 0) throw new Error("No questions returned");
+    // Attempt backend fetch with fallback timeout
+    const fetchPromise = apiFetch("/api/ai/lightning-round", {
+      method: "POST",
+      body: JSON.stringify({})
+    });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Timeout")), 3500)
+    );
+
+    const res = await Promise.race([fetchPromise, timeoutPromise]);
     
-    lightningQuestions = res.quiz;
-    lightningIndex = 0;
-    lightningScore = 0;
-    lightningTime = 60;
-    
-    document.getElementById("lightningHeader").style.display = "flex";
-    updateLightningHeader();
-    
-    // Start Timer
-    lightningTimerInterval = setInterval(() => {
-      lightningTime--;
-      updateLightningHeader();
-      if (lightningTime <= 0) {
-        endLightningGame("timeout");
-      }
-    }, 1000);
-    
-    renderLightningQuestion();
-    
+    if (res && res.quiz && res.quiz.length >= 5) {
+      lightningQuestions = res.quiz.slice(0, 5);
+    } else {
+      throw new Error("Invalid response");
+    }
   } catch(err) {
-    document.getElementById("lightningPlayArea").innerHTML = `<p style="color:#dc2626;">Error: ${err.message}</p><button onclick="openLightningModal()" style="margin-top:20px; padding:10px 20px; border-radius:10px; border:none; background:#713f12; color:white;">Try Again</button>`;
+    console.warn("Using offline fallback quiz bank:", err);
+    // Shuffle and pick 5 fallback questions
+    lightningQuestions = [...FALLBACK_LIGHTNING_POOL]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 5);
   }
-}
+
+  lightningIndex = 0;
+  lightningScore = 0;
+  lightningTime = 60;
+  
+  const header = document.getElementById("lightningHeader");
+  if (header) header.style.display = "flex";
+  updateLightningHeader();
+  
+  if (lightningTimerInterval) clearInterval(lightningTimerInterval);
+  lightningTimerInterval = setInterval(() => {
+    lightningTime--;
+    updateLightningHeader();
+    if (lightningTime <= 0) {
+      endLightningGame("timeout");
+    }
+  }, 1000);
+  
+  renderLightningQuestion();
+};
 
 function updateLightningHeader() {
-  document.getElementById("lightningScore").textContent = lightningScore;
+  const scoreEl = document.getElementById("lightningScore");
   const timeEl = document.getElementById("lightningTimer");
-  timeEl.textContent = lightningTime;
-  if (lightningTime <= 10) timeEl.style.color = "#dc2626"; // Red when low
-  else timeEl.style.color = "inherit";
+  if (scoreEl) scoreEl.textContent = lightningScore;
+  if (timeEl) {
+    timeEl.textContent = lightningTime;
+    timeEl.style.color = lightningTime <= 10 ? "#dc2626" : "inherit";
+  }
 }
 
 function renderLightningQuestion() {
@@ -1599,8 +1639,8 @@ function renderLightningQuestion() {
   
   const q = lightningQuestions[lightningIndex];
   const playArea = document.getElementById("lightningPlayArea");
+  if (!playArea) return;
   
-  // Create the container first
   playArea.innerHTML = `
     <div style="animation: fadeViewIn 0.2s ease forwards;">
       <p style="font-size: 0.9rem; font-weight: 800; color: #a16207; text-transform: uppercase; margin-bottom: 12px;">Question ${lightningIndex + 1} of 5</p>
@@ -1609,28 +1649,24 @@ function renderLightningQuestion() {
     </div>
   `;
 
-  // Safely generate buttons using the DOM (Immune to apostrophe bugs)
   const optionsBox = document.getElementById("lightningOptionsBox");
-  
   q.options.forEach(opt => {
     const btn = document.createElement("button");
     btn.className = "lightning-opt-btn";
     btn.style.cssText = "width:100%; text-align:left; padding:16px 20px; border-radius:16px; border:2px solid rgba(113,63,18,0.2); background:rgba(255,255,255,0.6); color:#422006; font-size:1.1rem; font-weight:600; cursor:pointer; transition:all 0.2s; margin-bottom:10px;";
-    btn.textContent = opt; 
-    
-    // Attach the click event securely
+    btn.textContent = opt;
     btn.onclick = () => handleLightningAnswer(btn, opt, q.answer);
     optionsBox.appendChild(btn);
   });
 }
 
 function handleLightningAnswer(btnEl, selectedText, correctText) {
-  // Disable all buttons immediately to prevent double-clicking
   const buttons = document.querySelectorAll(".lightning-opt-btn");
   buttons.forEach(b => b.disabled = true);
   
-  // Use toLowerCase() for safer matching
-  if (selectedText.trim().toLowerCase() === correctText.trim().toLowerCase()) {
+  const isCorrect = selectedText.trim().toLowerCase() === correctText.trim().toLowerCase();
+  
+  if (isCorrect) {
     btnEl.style.background = "#22c55e";
     btnEl.style.borderColor = "#16a34a";
     btnEl.style.color = "white";
@@ -1639,29 +1675,29 @@ function handleLightningAnswer(btnEl, selectedText, correctText) {
     btnEl.style.background = "#ef4444";
     btnEl.style.borderColor = "#dc2626";
     btnEl.style.color = "white";
-    
-    // Highlight the correct answer
     buttons.forEach(b => {
-      if (b.innerText.trim().toLowerCase() === correctText.trim().toLowerCase()) {
+      if (b.textContent.trim().toLowerCase() === correctText.trim().toLowerCase()) {
         b.style.border = "2px solid #22c55e";
-        b.style.background = "rgba(34, 197, 94, 0.1)";
+        b.style.background = "rgba(34, 197, 94, 0.2)";
       }
     });
   }
   
   updateLightningHeader();
-  
-  // Wait 1 second before loading the next question
   setTimeout(() => {
     lightningIndex++;
     renderLightningQuestion();
-  }, 1000);
+  }, 900);
 }
 
 function endLightningGame(reason) {
-  clearInterval(lightningTimerInterval);
-  document.getElementById("lightningHeader").style.display = "none";
+  if (lightningTimerInterval) clearInterval(lightningTimerInterval);
+  
+  const header = document.getElementById("lightningHeader");
+  if (header) header.style.display = "none";
+  
   const playArea = document.getElementById("lightningPlayArea");
+  if (!playArea) return;
   
   let title = "";
   let msg = "";
@@ -1670,27 +1706,22 @@ function endLightningGame(reason) {
   if (reason === "timeout") {
     icon = "⏰";
     title = "Time's Up!";
-    msg = `You scored ${lightningScore} out of 5. Be a little faster next time!`;
+    msg = `You scored ${lightningScore} out of 5. Try again to beat the clock!`;
   } else {
     if (lightningScore >= 4) {
       icon = "⚡";
       title = "Lightning Fast!";
-      msg = `Amazing! You scored ${lightningScore}/5 and beat the clock! You earned the Lightning badge!`;
+      msg = `Incredible! You scored ${lightningScore}/5 and earned the Lightning Fast achievement!`;
       
-      // Save badge locally
       const studentId = studentProfile?.id || student?.id || "guest";
       localStorage.setItem(`lightningBadge_${studentId}`, "true");
       
-      // Force UI update on dashboard
-      setTimeout(() => {
-        const streak = studentProfile?.streak_days || student?.streak_days || 0;
-        evaluateAchievements(1, 10, streak); // Force evaluation
-      }, 500);
-
+      const streak = studentProfile?.streak_days || student?.streak_days || 0;
+      evaluateAchievements(1, 10, streak);
     } else {
       icon = "👍";
-      title = "Good Try!";
-      msg = `You scored ${lightningScore}/5. Keep practicing to earn the Lightning badge!`;
+      title = "Good Effort!";
+      msg = `You scored ${lightningScore}/5. Get 4 or 5 correct to unlock the badge!`;
     }
   }
   
@@ -1698,6 +1729,6 @@ function endLightningGame(reason) {
     <div style="font-size: 4rem; margin-bottom: 16px;">${icon}</div>
     <h2 style="font-family: 'Newsreader', serif; font-size: 2.5rem; color: #422006; margin-bottom: 12px;">${title}</h2>
     <p style="font-size: 1.15rem; color: #713f12; margin-bottom: 32px;">${msg}</p>
-    <button onclick="closeLightningModal()" style="min-height: 56px; padding: 0 32px; border-radius: 999px; border: none; background: #713f12; color: #fef08a; font-size: 1.1rem; font-weight: 800; cursor: pointer;">Close & Return to Dashboard</button>
+    <button onclick="closeLightningModal()" style="min-height: 56px; padding: 0 32px; border-radius: 999px; border: none; background: #713f12; color: #fef08a; font-size: 1.1rem; font-weight: 800; cursor: pointer;">Close & Return</button>
   `;
 }

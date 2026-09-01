@@ -706,15 +706,17 @@ def pronunciation_task(requester=Depends(require_authenticated_requester)):
 # ── DAILY LIGHTNING ROUND ──
 @router.post("/lightning-round")
 def lightning_round(requester=Depends(require_authenticated_requester)):
-    prompt = """Generate 5 multiple-choice questions for a fun, rapid-fire English lightning round. Mix vocabulary, basic grammar, and spelling. Make them kid-friendly.
+    prompt = """Generate 5 multiple-choice questions for a fun, rapid-fire English lightning round. Mix vocabulary, basic grammar, and spelling.
     Return ONLY a JSON object in this format (no markdown):
     {"quiz": [{"question": "...", "options": ["A", "B", "C", "D"], "answer": "The exact text of correct option"}]}"""
     try:
         raw = ask_groq(prompt, max_tokens=600, system="Output valid JSON only.")
         clean_json = raw.strip()
         match = re.search(r'\{.*\}', clean_json, re.DOTALL)
-        if match: clean_json = match.group(0)
+        if match: 
+            clean_json = match.group(0)
         return json.loads(clean_json)
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Failed to generate lightning round")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
