@@ -1600,27 +1600,37 @@ function renderLightningQuestion() {
   const q = lightningQuestions[lightningIndex];
   const playArea = document.getElementById("lightningPlayArea");
   
-  let optionsHtml = q.options.map(opt => `
-    <button class="lightning-opt-btn" onclick="handleLightningAnswer(this, '${escapeHtml(opt)}', '${escapeHtml(q.answer)}')" style="width:100%; text-align:left; padding:16px 20px; border-radius:16px; border:2px solid rgba(113,63,18,0.2); background:rgba(255,255,255,0.6); color:#422006; font-size:1.1rem; font-weight:600; cursor:pointer; transition:all 0.2s; margin-bottom:10px;">
-      ${escapeHtml(opt)}
-    </button>
-  `).join("");
-  
+  // Create the container first
   playArea.innerHTML = `
     <div style="animation: fadeViewIn 0.2s ease forwards;">
       <p style="font-size: 0.9rem; font-weight: 800; color: #a16207; text-transform: uppercase; margin-bottom: 12px;">Question ${lightningIndex + 1} of 5</p>
       <h3 style="font-size: 1.5rem; color: #422006; margin-bottom: 24px; line-height: 1.4;">${escapeHtml(q.question)}</h3>
-      <div>${optionsHtml}</div>
+      <div id="lightningOptionsBox"></div>
     </div>
   `;
+
+  // Safely generate buttons using the DOM (Immune to apostrophe bugs)
+  const optionsBox = document.getElementById("lightningOptionsBox");
+  
+  q.options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "lightning-opt-btn";
+    btn.style.cssText = "width:100%; text-align:left; padding:16px 20px; border-radius:16px; border:2px solid rgba(113,63,18,0.2); background:rgba(255,255,255,0.6); color:#422006; font-size:1.1rem; font-weight:600; cursor:pointer; transition:all 0.2s; margin-bottom:10px;";
+    btn.textContent = opt; 
+    
+    // Attach the click event securely
+    btn.onclick = () => handleLightningAnswer(btn, opt, q.answer);
+    optionsBox.appendChild(btn);
+  });
 }
 
 function handleLightningAnswer(btnEl, selectedText, correctText) {
-  // Disable all buttons immediately
+  // Disable all buttons immediately to prevent double-clicking
   const buttons = document.querySelectorAll(".lightning-opt-btn");
   buttons.forEach(b => b.disabled = true);
   
-  if (selectedText.trim() === correctText.trim()) {
+  // Use toLowerCase() for safer matching
+  if (selectedText.trim().toLowerCase() === correctText.trim().toLowerCase()) {
     btnEl.style.background = "#22c55e";
     btnEl.style.borderColor = "#16a34a";
     btnEl.style.color = "white";
@@ -1630,16 +1640,18 @@ function handleLightningAnswer(btnEl, selectedText, correctText) {
     btnEl.style.borderColor = "#dc2626";
     btnEl.style.color = "white";
     
-    // Highlight correct answer
+    // Highlight the correct answer
     buttons.forEach(b => {
-      if (b.innerText.trim() === correctText.trim()) {
+      if (b.innerText.trim().toLowerCase() === correctText.trim().toLowerCase()) {
         b.style.border = "2px solid #22c55e";
+        b.style.background = "rgba(34, 197, 94, 0.1)";
       }
     });
   }
   
   updateLightningHeader();
   
+  // Wait 1 second before loading the next question
   setTimeout(() => {
     lightningIndex++;
     renderLightningQuestion();
