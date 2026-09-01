@@ -25,31 +25,8 @@ function escHtml(str) {
   return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-// Add this line so escapeHtml works seamlessly:
 function escapeHtml(str) {
   return escHtml(str);
-}
-
-// ===== TAB SWITCH =====
-const ADMIN_TABS = ["lessons", "progress", "analytics", "broadcast", "resources"];
-
-function switchTab(tab) {
-  ADMIN_TABS.forEach(t => {
-    const isActive = t === tab;
-    const panel = document.getElementById("panel" + t.charAt(0).toUpperCase() + t.slice(1));
-    const btn   = document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1));
-    if (panel) panel.classList.toggle("active", isActive);
-    if (btn) btn.classList.toggle("active", isActive);
-  });
-
-  if (tab === "progress") loadProgressData();
-  if (tab === "analytics") {
-    loadClassAnalytics();
-    loadPredictiveAlerts();
-    loadClassroomHeatmap();
-  }
-  if (tab === "broadcast") { populateBroadcastClassOptions(); renderBroadcasts(); }
-  if (tab === "resources") { populateResourceClassOptions(); renderResources(); }
 }
 
 // ===== SHARED: pull known class names from saved lessons =====
@@ -186,7 +163,7 @@ function saveResource() {
       showPopup("Please choose a file to upload.");
       return;
     }
-    const MAX_BYTES = 4 * 1024 * 1024; // ~4MB, localStorage-safe
+    const MAX_BYTES = 4 * 1024 * 1024;
     if (file.size > MAX_BYTES) {
       showPopup("That file is too large (max ~4MB). Try a Link instead.");
       return;
@@ -348,7 +325,6 @@ function removeQuestion(row) {
   questionCount = container.querySelectorAll(".question-row").length;
 }
 
-// ── NEW FLASHCARD FUNCTIONS ──
 function addFlashcard(frontText = "", backText = "") {
   flashcardCount++;
   const hint = document.getElementById("noFlashcardsHint");
@@ -377,17 +353,14 @@ function addFlashcard(frontText = "", backText = "") {
   container.appendChild(row);
 }
 
-
 // ── EDIT MODE ──
 function startEditLesson(lesson) {
   editingLessonId = lesson.id;
 
-  // Fill form
   document.getElementById("title").value   = lesson.title;
   document.getElementById("class").value   = lesson.class_label;
   document.getElementById("content").value = lesson.description || "";
 
-  // Clear and repopulate questions
   const container = document.getElementById("questionsContainer");
   container.innerHTML = "";
   questionCount = 0;
@@ -424,7 +397,6 @@ function startEditLesson(lesson) {
     container.appendChild(row);
   });
 
-  // Repopulate Flashcards
   const fcContainer = document.getElementById("flashcardsContainer");
   fcContainer.innerHTML = "";
   flashcardCount = 0;
@@ -434,11 +406,9 @@ function startEditLesson(lesson) {
     fcContainer.innerHTML = '<p class="no-questions-hint" id="noFlashcardsHint">No flashcards yet — click "Add Flashcard" to add one.</p>';
   }
 
-  // Update button and heading
   document.getElementById("addBtn").textContent = "Update Lesson";
   document.querySelector(".admin-card h2").textContent = "Edit Lesson";
 
-  // Show cancel button
   let cancelBtn = document.getElementById("cancelEditBtn");
   if (!cancelBtn) {
     cancelBtn = document.createElement("button");
@@ -449,7 +419,6 @@ function startEditLesson(lesson) {
     document.getElementById("addBtn").parentNode.insertBefore(cancelBtn, document.getElementById("addBtn").nextSibling);
   }
 
-  // Scroll to form
   document.querySelector(".admin-card").scrollIntoView({ behavior: "smooth" });
 }
 
