@@ -1539,7 +1539,13 @@ const FALLBACK_LIGHTNING_POOL = [
 window.openLightningModal = function() {
   const modal = document.getElementById("lightningModal");
   if (!modal) return;
+  
   modal.style.display = "flex";
+  
+  // ── THE CRITICAL FIX: Make the modal clickable ──
+  modal.style.pointerEvents = "all"; 
+  
+  // Force browser to repaint before animating
   void modal.offsetWidth;
   modal.style.opacity = "1";
   
@@ -1555,8 +1561,14 @@ window.openLightningModal = function() {
         <div class="spinner" style="border-top-color: #713f12; margin: 0 auto;"></div>
         <p style="color: #713f12; font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
       </div>
-      <button id="lightningStartBtn" onclick="beginLightningGame()" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
+      <button id="lightningStartBtn" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
     `;
+    
+    // Bulletproof click listener attachment
+    const startBtn = document.getElementById("lightningStartBtn");
+    if (startBtn) {
+      startBtn.addEventListener("click", window.beginLightningGame);
+    }
   }
 };
 
@@ -1564,10 +1576,15 @@ window.closeLightningModal = function() {
   const modal = document.getElementById("lightningModal");
   if (modal) {
     modal.style.opacity = "0";
+    
+    // ── Turn off clicks so the invisible modal doesn't block the screen ──
+    modal.style.pointerEvents = "none"; 
+    
     setTimeout(() => { modal.style.display = "none"; }, 250);
   }
   if (lightningTimerInterval) clearInterval(lightningTimerInterval);
 };
+
 
 window.beginLightningGame = async function() {
   const startBtn = document.getElementById("lightningStartBtn");
