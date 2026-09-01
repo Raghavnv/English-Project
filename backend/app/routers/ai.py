@@ -655,3 +655,66 @@ def generate_story(body: StoryRequest, requester=Depends(require_authenticated_r
         return json.loads(clean_json)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Story generation failed: {str(e)}")
+
+# ── 1-CLICK PARENT REPORT ──
+class ParentReportRequest(BaseModel):
+    student_name: str
+    stats_summary: str
+    format: str = "friendly"
+
+@router.post("/parent-report")
+def generate_parent_report(body: ParentReportRequest, requester=Depends(require_authenticated_requester)):
+    prompt = f"""
+    Write a progress report for an English-learning student named {body.student_name}.
+    Here is their recent progress data: {body.stats_summary}
+    
+    Format requirement: {body.format}. 
+    - If 'whatsapp', use emojis, keep it punchy, warm, and highly encouraging (ready to be texted).
+    - If 'formal', write it as a professional 2-paragraph email from their English Teacher to the parents.
+    - If 'friendly', write a warm, standard 1-paragraph note.
+    
+    Return ONLY a JSON object in this format (no markdown, no other text):
+    {{
+        "report": "The actual text of the report here"
+    }}
+    """
+    try:
+        raw = ask_groq(prompt, max_tokens=400, system="You are an encouraging English teacher writing to parents. Output valid JSON only.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: 
+            clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ── PRONUNCIATION LAB ──
+@router.post("/pronunciation-task")
+def pronunciation_task(requester=Depends(require_authenticated_requester)):
+    prompt = """Generate a single, fun, moderately challenging English sentence for a student to practice pronouncing. (e.g., A tongue twister, an interesting fact, or a vivid description).
+    Return ONLY a JSON object in this format (no markdown):
+    {"sentence": "The sentence goes here."}"""
+    try:
+        raw = ask_groq(prompt, max_tokens=150, system="Output valid JSON only.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        return {"sentence": "The quick brown fox jumps over the lazy dog."}
+
+# ── DAILY LIGHTNING ROUND ──
+@router.post("/lightning-round")
+def lightning_round(requester=Depends(require_authenticated_requester)):
+    prompt = """Generate 5 multiple-choice questions for a fun, rapid-fire English lightning round. Mix vocabulary, basic grammar, and spelling. Make them kid-friendly.
+    Return ONLY a JSON object in this format (no markdown):
+    {"quiz": [{"question": "...", "options": ["A", "B", "C", "D"], "answer": "The exact text of correct option"}]}"""
+    try:
+        raw = ask_groq(prompt, max_tokens=600, system="Output valid JSON only.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to generate lightning round")
+

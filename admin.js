@@ -1159,3 +1159,82 @@ async function loadClassroomHeatmap() {
     container.innerHTML = `<p style="color: #ef4444; text-align: center;">Error loading heatmap: ${escapeHtml(err.message)}</p>`;
   }
 }
+
+// ════════════════════════════════════════════════════════════════════
+//  1-CLICK PARENT REPORTS
+// ════════════════════════════════════════════════════════════════════
+
+async function loadReportStudents() {
+  const select = document.getElementById("reportStudentSelect");
+  if (!select) return;
+  try {
+    const students = await Students.list();
+    select.innerHTML = '<option value="">Select a student...</option>';
+    students.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s.id;
+      opt.textContent = `${s.name} (${s.school})`;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    select.innerHTML = '<option value="">Error loading students</option>';
+  }
+}
+
+async function generateParentReport(format = "friendly") {
+  const selectEl = document.getElementById("reportStudentSelect");
+  const studentId = selectEl.value;
+  if (!studentId) { 
+    showPopup("Please select a student first."); 
+    return; 
+  }
+  
+  const studentName = selectEl.options[selectEl.selectedIndex].text.split(" (")[0];
+  
+  const btn = document.getElementById("generateReportBtn");
+  const loading = document.getElementById("reportLoadingState");
+  const resultArea = document.getElementById("reportResultArea");
+  const output = document.getElementById("reportOutput");
+
+  btn.disabled = true;
+  resultArea.style.display = "none";
+  loading.style.display = "block";
+
+  try {
+    // Compile stats to send to the backend
+    const progress = await Students.getProgress(studentId);
+    const profile = await Students.getProfile(studentId);
+    
+    let answered = 0;
+    let completedLessons = 0;
+    Object.values(progress || {}).forEach(p => {
+      answered += (p.answered_count || 0);
+      if (p.completed) completedLessons++;
+    });
+    
+    const streak = profile?.streak_days || 0;
+    const badges = profile?.badges?.length || 0;
+    
+    const statsSummary = `${answered} total questions answered, ${completedLessons} lessons fully completed, currently on a ${streak}-day learning streak, and has earned ${badges} achievement badges.`;
+
+    const res = await apiFetch("/api/ai/parent-report", {
+      method: "POST",
+      body: JSON.stringify({ student_name: studentName, stats_summary: statsSummary, format: format })
+    });
+    
+    output.value = res.report;
+    resultArea.style.display = "block";
+  } catch (err) {
+    showPopup("Could not generate report: " + err.message);
+  } finally {
+    btn.disabled = false;
+    loading.style.display = "none";
+  }
+}
+
+function copyReportToClipboard() {
+  const output = document.getElementById("reportOutput");
+  output.select();
+  document.execCommand("copy");
+  showPopup("Report copied to clipboard!");
+}

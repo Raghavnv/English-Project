@@ -18,10 +18,10 @@
       position: fixed; left: 0; top: 0; bottom: 0; width: 84px;
       background: linear-gradient(180deg, #1f1a16 0%, #3d2c20 100%);
       z-index: 9999; display: flex; flex-direction: column; align-items: center;
-      padding: 24px 0; gap: 16px; border-right: 1px solid rgba(255,255,255,0.1);
+      padding: 24px 0; gap: 14px; border-right: 1px solid rgba(255,255,255,0.1);
       box-shadow: 4px 0 24px rgba(0,0,0,0.2);
     }
-    .rail-logo { font-size: 1.8rem; margin-bottom: 12px; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); width: 50px; text-align: center; }
+    .rail-logo { font-size: 1.8rem; margin-bottom: 8px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); width: 50px; text-align: center; }
     .rail-btn {
       width: 50px; height: 50px; border-radius: 16px; border: none; background: transparent;
       font-size: 1.4rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -42,30 +42,15 @@
     .rail-btn:hover::after { opacity: 1; transform: translateX(0); }
 
     /* ── FULL-PAGE VIEW SWITCHING ── */
-    .app-view {
-      display: none;
-      animation: fadeViewIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-    .app-view.active-view {
-      display: block;
-    }
-    @keyframes fadeViewIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .app-view { display: none; animation: fadeViewIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .app-view.active-view { display: block; }
+    @keyframes fadeViewIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ── DEDICATED PAGE STYLING ── */
-    .page-container {
-      max-width: 1000px; margin: 0 auto; padding: 40px; width: 100%;
-    }
+    .page-container { max-width: 1000px; margin: 0 auto; padding: 40px; width: 100%; }
     .page-header { margin-bottom: 32px; }
-    .page-header h1 {
-      font-family: 'Newsreader', serif; font-size: 3rem; color: var(--text);
-      margin: 8px 0 16px; line-height: 1.1;
-    }
-    .page-header p {
-      color: var(--muted); font-size: 1.1rem; max-width: 60ch; line-height: 1.6;
-    }
+    .page-header h1 { font-family: 'Newsreader', serif; font-size: 3rem; color: var(--text); margin: 8px 0 16px; line-height: 1.1; }
+    .page-header p { color: var(--muted); font-size: 1.1rem; max-width: 60ch; line-height: 1.6; }
     
     .feature-input {
       width: 100%; border-radius: 18px; border: 1px solid rgba(80,58,40,0.15);
@@ -74,28 +59,36 @@
     }
     .feature-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(188,93,45,0.1); }
     
-    .word-card {
-      background: #fff; border: 1px solid rgba(80,58,40,0.1); border-radius: 18px; padding: 20px;
-      box-shadow: var(--shadow-soft); transition: transform 0.2s;
-    }
+    .word-card { background: #fff; border: 1px solid rgba(80,58,40,0.1); border-radius: 18px; padding: 20px; box-shadow: var(--shadow-soft); transition: transform 0.2s; }
     .word-card:hover { transform: translateY(-3px); border-color: rgba(188,93,45,0.3); }
 
-    /* ── STUDENT CHIP & OTHER EXISTING STYLES ── */
-    .student-chip {
-      display: flex; align-items: center; gap: 9px; padding: 6px 14px 6px 8px;
-      border-radius: 999px; background: rgba(255,255,255,0.55); border: 1px solid rgba(80,58,40,0.12); font-size: 0.86rem;
+    /* ── LIGHTNING ROUND WIDGET ── */
+    .lightning-widget {
+      flex: 1 1 240px; display: flex; align-items: center; justify-content: space-between; padding: 24px; border-radius: 24px; margin-bottom: 0;
+      background: linear-gradient(135deg, #fef08a, #eab308); border: 1px solid rgba(202,138,4,0.3); box-shadow: 0 8px 24px rgba(234, 179, 8, 0.25);
+      color: #713f12; cursor: pointer; transition: transform 0.2s ease;
     }
-    .student-avatar {
-      width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, rgba(188,93,45,0.18), rgba(111,124,74,0.22));
-      display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: var(--accent-deep); flex-shrink: 0;
+    .lightning-widget:hover { transform: translateY(-4px); }
+
+    /* ── PRONUNCIATION LAB ── */
+    .pronunciation-box {
+      padding: 40px; border-radius: 24px; background: linear-gradient(145deg, #ffffff, #fdfbfa);
+      border: 1px solid rgba(80,58,40,0.1); box-shadow: var(--shadow-soft); text-align: center;
     }
+    .mic-btn {
+      width: 80px; height: 80px; border-radius: 50%; border: none; background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3); transition: all 0.2s ease;
+    }
+    .mic-btn.listening { animation: pulseMic 1.5s infinite; background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4); }
+    @keyframes pulseMic { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(34,197,94,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0); } }
+
+    /* ── STUDENT CHIP & OTHER STYLES ── */
+    .student-chip { display: flex; align-items: center; gap: 9px; padding: 6px 14px 6px 8px; border-radius: 999px; background: rgba(255,255,255,0.55); border: 1px solid rgba(80,58,40,0.12); font-size: 0.86rem; }
+    .student-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, rgba(188,93,45,0.18), rgba(111,124,74,0.22)); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; color: var(--accent-deep); flex-shrink: 0; }
     .student-chip-info strong { display: block; font-size: 0.84rem; font-weight: 700; line-height: 1.1; }
     .student-chip-info span { font-size: 0.76rem; color: var(--muted); }
-    .logout-btn {
-      min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(188,93,45,0.2);
-      background: rgba(188,93,45,0.07); color: var(--accent-deep); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s ease;
-    }
-    .logout-btn:hover { background: rgba(188,93,45,0.14); }
+    .logout-btn { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(188,93,45,0.2); background: rgba(188,93,45,0.07); color: var(--accent-deep); font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.15s ease; }
 
     /* ── ACHIEVEMENTS (BADGES) ── */
     .badges-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
@@ -105,10 +98,7 @@
 
     @media (max-width: 768px) {
       body { padding-left: 0; padding-bottom: 80px; }
-      .app-rail {
-        top: auto; bottom: 0; width: 100%; height: 80px; flex-direction: row; justify-content: space-around;
-        padding: 0 16px; border-right: none; border-top: 1px solid rgba(255,255,255,0.1);
-      }
+      .app-rail { top: auto; bottom: 0; width: 100%; height: 80px; flex-direction: row; justify-content: space-around; padding: 0 16px; border-right: none; border-top: 1px solid rgba(255,255,255,0.1); }
       .rail-logo { display: none; }
       .rail-btn::after { display: none; }
       .platform-main { grid-template-columns: 1fr !important; }
@@ -127,6 +117,7 @@
     <button class="rail-btn" data-tooltip="Story Corner" onclick="switchAppView('view-story', this)">📖</button>
     <button class="rail-btn" data-tooltip="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️</button>
     <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('view-translator', this)">🌐</button>
+    <button class="rail-btn" data-tooltip="Pronunciation Lab" onclick="switchAppView('view-pronunciation', this)">🎙️</button>
     <button class="rail-btn" data-tooltip="Broadcasts" onclick="switchAppView('view-broadcast', this)" style="position:relative;">
       📣<span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
@@ -164,7 +155,7 @@
       </div>
     </header>
 
-        <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ════════════════════════════════════════════════════════════ -->
     <!-- ── VIEW 1: MAIN DASHBOARD ── -->
     <!-- ════════════════════════════════════════════════════════════ -->
     <div id="view-dashboard" class="app-view active-view">
@@ -178,9 +169,9 @@
           </p>
       </div>
 
-      <!-- DASHBOARD TOP WIDGETS ROW (Now spanning full width above the split layout) -->
+      <!-- DASHBOARD TOP WIDGETS ROW -->
       <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px;">
-        <section class="hero-band" style="flex: 1 1 450px; display: flex; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px; margin-bottom: 0;">
+        <section class="hero-band" style="flex: 1 1 350px; display: flex; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px; margin-bottom: 0;">
           <div style="display: flex; flex-direction: column; justify-content: center;">
             <p class="panel-label" style="margin-bottom: 6px;">Current Class Plan</p>
             <h2 id="classHeading" style="margin: 0; line-height: 1.1; font-size: 1.8rem; font-family: 'Newsreader', serif;">No class yet</h2>
@@ -193,7 +184,8 @@
           </div>
         </section>
 
-        <section class="workspace-panel" style="flex: 1 1 250px; display: flex; align-items: center; justify-content: space-between; padding: 28px 24px; border-radius: 24px; margin-bottom: 0; background: linear-gradient(145deg, #fffcf8, #fdf4e7); border: 1px solid rgba(188,93,45,0.15); box-shadow: var(--shadow-soft);">
+        <!-- DAILY GOAL WIDGET -->
+        <section class="workspace-panel" style="flex: 1 1 200px; display: flex; align-items: center; justify-content: space-between; padding: 28px 24px; border-radius: 24px; margin-bottom: 0; background: linear-gradient(145deg, #fffcf8, #fdf4e7); border: 1px solid rgba(188,93,45,0.15); box-shadow: var(--shadow-soft);">
           <div>
             <p class="panel-label" style="margin-bottom: 6px; color: var(--accent-deep);">Daily Goal</p>
             <h3 style="margin: 0 0 4px; font-size: 1.3rem; font-family: 'Newsreader', serif; color: var(--text);">Answer 5 Questions</h3>
@@ -207,14 +199,20 @@
             <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; color: var(--accent-deep);" id="dailyGoalText">0/5</div>
           </div>
         </section>
+
+        <!-- LIGHTNING ROUND WIDGET -->
+        <section class="lightning-widget" onclick="openLightningModal()">
+          <div>
+            <p class="panel-label" style="margin-bottom: 6px; color: #a16207;">Daily Challenge</p>
+            <h3 style="margin: 0 0 4px; font-size: 1.5rem; font-family: 'Newsreader', serif;">⚡ Lightning Round</h3>
+            <p style="margin: 0; font-size: 0.85rem; color: #854d0e;">60 seconds. 5 questions. Earn the badge!</p>
+          </div>
+          <div style="font-size: 2.5rem; opacity: 0.8;">⏱️</div>
+        </section>
       </div>
 
-      
-                  <!-- MAIN SPLIT GRID (Sidebar on left, Modules on right) -->
       <main class="platform-main" style="padding-top: 24px; display: grid;">
         <aside class="platform-sidebar" id="platformSidebar">
-          
-          <!-- Added margin-top: 14px here to align with the Lesson Flow header -->
           <div style="width: 100%; display: flex; margin-bottom: 20px; margin-top: 14px;" id="aiAnalysisSection">
             <button id="openAnalysisModalBtn" style="width: 100%; min-height: 48px; padding: 0 16px; border-radius: 18px; border: none; background: linear-gradient(135deg, var(--accent-deep), var(--accent)); color: #fffaf2; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-soft); transition: transform 0.2s;">
               ✨ View AI Progress Insights
@@ -316,8 +314,7 @@
           </section>
         </section>
       </main>
-    </div><!-- /view-dashboard -->
-
+    </div>
 
     <!-- ════════════════════════════════════════════════════════════ -->
     <!-- ── VIEW 2: SMART TRANSLATOR ── -->
@@ -390,7 +387,24 @@
     </section>
 
     <!-- ════════════════════════════════════════════════════════════ -->
-    <!-- ── VIEW 5: BROADCASTS ── -->
+    <!-- ── VIEW 5: PRONUNCIATION LAB ── -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <section id="view-pronunciation" class="app-view">
+      <div class="page-container">
+        <div class="page-header" style="text-align: center;">
+          <p class="panel-label" style="color: var(--accent-deep); font-size: 0.9rem;">🎙️ Speaking Practice</p>
+          <h1>The Pronunciation Lab</h1>
+          <p style="margin: 0 auto;">Listen to Buddy speak the sentence, then press the microphone to try it yourself!</p>
+        </div>
+        
+        <div class="pronunciation-box" id="pronunciationBox">
+          <button id="getPronunciationBtn" onclick="loadPronunciationTask()" style="min-height: 56px; padding: 0 32px; border-radius: 16px; border: none; background: var(--accent-deep); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: var(--shadow-soft);">Fetch a Challenge Sentence</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- ── VIEW 6: BROADCASTS ── -->
     <!-- ════════════════════════════════════════════════════════════ -->
     <section id="view-broadcast" class="app-view">
       <div class="page-container">
@@ -405,7 +419,7 @@
     </section>
 
     <!-- ════════════════════════════════════════════════════════════ -->
-    <!-- ── VIEW 6: RESOURCE LIBRARY ── -->
+    <!-- ── VIEW 7: RESOURCE LIBRARY ── -->
     <!-- ════════════════════════════════════════════════════════════ -->
     <section id="view-resources" class="app-view">
       <div class="page-container">
@@ -421,9 +435,30 @@
 
   </div>
 
-  <!-- Original AI Analysis Modal -->
+  <!-- ── LIGHTNING ROUND MODAL ── -->
+  <div class="modal-overlay" id="lightningModal" style="position:fixed; inset:0; z-index:10001; background:rgba(31,26,22,0.85); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.25s ease;">
+    <div style="width: min(calc(100% - 32px), 700px); max-height: 90vh; overflow-y: auto; padding: 40px; border-radius: 32px; background: linear-gradient(145deg, #fef08a, #eab308); border: 4px solid #ca8a04; box-shadow: 0 30px 70px rgba(202, 138, 4, 0.4); text-align: center; position: relative;">
+      <button onclick="closeLightningModal()" style="position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(113, 63, 18, 0.1); color: #713f12; font-size: 1.2rem; font-weight: bold; cursor: pointer;">✕</button>
+      
+      <div id="lightningHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid rgba(113, 63, 18, 0.2); font-size: 1.4rem; font-weight: 800; color: #713f12;">
+        <span>Score: <span id="lightningScore">0</span>/5</span>
+        <span style="font-variant-numeric: tabular-nums;">⏱️ <span id="lightningTimer">60</span>s</span>
+      </div>
+
+      <div id="lightningPlayArea">
+        <h2 style="font-family: 'Newsreader', serif; font-size: 2.8rem; color: #422006; margin-bottom: 10px;">Lightning Round</h2>
+        <p style="font-size: 1.1rem; color: #713f12; margin-bottom: 32px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
+        <div class="ai-loading-state" id="lightningLoading" style="display:none; padding: 20px;">
+          <div class="spinner" style="border-top-color: #713f12; margin: 0 auto;"></div>
+          <p style="color: #713f12; font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
+        </div>
+        <button id="lightningStartBtn" onclick="beginLightningGame()" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4);">⚡ Start Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Analysis Modal -->
   <div class="modal-overlay" id="aiAnalysisModal" style="position:fixed; inset:0; z-index:1001; background:rgba(31,26,22,0.6); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.25s ease;">
-    <!-- Same analysis modal code from earlier -->
     <div style="width:min(calc(100% - 32px), 640px); max-height: 85vh; overflow-y: auto; padding: 32px; border-radius: 26px; background: linear-gradient(145deg, #fffaf2, #fdf4e7); border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 30px 70px rgba(75,48,26,0.28); transform:translateY(16px); transition:transform 0.25s ease; position: relative;">
       <button id="closeAnalysisModalBtn" style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.15); background: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted);">✕</button>
       <p class="panel-label" style="margin-top: 0; color: var(--accent-deep); font-weight: 800; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;">AI Insights</p>
@@ -451,7 +486,6 @@
   <script src="platform.js"></script>
   
   <script>
-    // Handles switching between full-page views via the App Rail
     function switchAppView(viewId, btnElement) {
       document.querySelectorAll('.rail-btn').forEach(btn => btn.classList.remove('active'));
       if (btnElement) {
@@ -469,7 +503,6 @@
         targetView.classList.add('active-view');
       }
 
-      // Load Word Bank automatically if accessed
       if (viewId === 'view-wordbank' && typeof loadWordBank === 'function') {
         loadWordBank();
       }

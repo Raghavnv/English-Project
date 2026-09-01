@@ -56,6 +56,23 @@ const BuddyVoice = {
   }
 };
 
+// ── SPEECH RECOGNITION (MIC) HELPER ──
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+const MicListener = {
+  recognition: null,
+  isListening: false,
+  start(onResult, onEnd) {
+    if (!SpeechRec) return alert("Microphone is not supported on this browser. Try Chrome.");
+    this.recognition = new SpeechRec();
+    this.recognition.lang = 'en-IN';
+    this.recognition.interimResults = false;
+    this.recognition.onresult = (e) => onResult(e.results[0][0].transcript);
+    this.recognition.onend = () => { this.isListening = false; if(onEnd) onEnd(); };
+    this.isListening = true;
+    this.recognition.start();
+  },
+  stop() { if(this.recognition) this.recognition.stop(); }
+};
 
 // ===== LOGIN CHECK (DISABLED FOR DEMO — RESTORE BEFORE GOING LIVE) =====
 const student      = getStudentData();
@@ -439,11 +456,17 @@ function evaluateAchievements(totalCompleted, totalAnswers, streakDays) {
     earnedBadges.push({ icon: "🎯", name: "Sharp Shooter" });
   }
 
-   // Rule 4: Word Wizard (Saved 5+ words to the Word Bank)
+  // Rule 4: Word Wizard (Saved 5+ words to the Word Bank)
   const studentId = studentProfile?.id || student?.id || "guest";
   const wordBank = JSON.parse(localStorage.getItem(`wordBank_${studentId}`) || "[]");
   if (wordBank.length >= 5) {
     earnedBadges.push({ icon: "🗂️", name: "Word Wizard" });
+  }
+
+  // NEW: Rule 5: Lightning Fast
+  const hasLightning = localStorage.getItem(`lightningBadge_${studentId}`);
+  if (hasLightning) {
+    earnedBadges.push({ icon: "⚡", name: "Lightning Fast" });
   }
 
   // Update the UI
@@ -491,7 +514,7 @@ function renderProgress() {
   const completed = selectedClass.modules.filter(m => getModuleProgress(m.id).completed).length;
   const percent   = total ? Math.round((completed / total) * 100) : 0;
 
-  // NEW: Calculate the total number of answered questions in this class
+  // Calculate the total number of answered questions in this class
   const totalAnswers = selectedClass.modules.reduce((sum, m) => {
     return sum + (getModuleProgress(m.id).answeredCount || 0);
   }, 0);
@@ -685,17 +708,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if (openBtn && modal) {
     openBtn.addEventListener("click", () => {
       renderLocalAnalysisStats();
+      modal.style.display = "flex";
+      void modal.offsetWidth;
       modal.style.opacity = "1";
-      modal.style.pointerEvents = "all";
-      modal.querySelector("div").style.transform = "translateY(0) scale(1)";
     });
   }
 
   if (closeBtn && modal) {
     closeBtn.addEventListener("click", () => {
       modal.style.opacity = "0";
-      modal.style.pointerEvents = "none";
-      modal.querySelector("div").style.transform = "translateY(16px) scale(0.97)";
+      setTimeout(() => modal.style.display = "none", 250);
     });
   }
 
@@ -703,8 +725,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {
         modal.style.opacity = "0";
-        modal.style.pointerEvents = "none";
-        modal.querySelector("div").style.transform = "translateY(16px) scale(0.97)";
+        setTimeout(() => modal.style.display = "none", 250);
       }
     });
   }
@@ -729,7 +750,7 @@ async function getAiFeedbackAnalysis() {
     textEl.textContent = "Could not get AI feedback right now: " + err.message;
   } finally {
     btn.disabled = false;
-    btn.textContent = "✨ Get AI Feedback";
+    btn.textContent = "✨ Refresh AI Analysis";
   }
 }
 
@@ -741,11 +762,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ===== AI PANEL (TRANSFORMED INTO AI STUDY COMPANION) =====
 function renderAIPanel(module) {
-  // Find the parent container
   const aiPanel = document.querySelector(".workspace-panel.ai-panel");
   if (!aiPanel || !module) return;
 
-  // Build the dropdown options
   const allLessons = classes.flatMap(c => c.modules);
   let optionsHtml = '<option value="">Select a lesson...</option>';
   
@@ -754,7 +773,6 @@ function renderAIPanel(module) {
     optionsHtml += `<option value="${l.id}" data-title="${escapeHtml(l.title)}" data-desc="${escapeHtml(l.description || '')}" ${isSelected}>${escapeHtml(l.title)}</option>`;
   });
 
-  // Inject the new, highly professional widget design
   aiPanel.innerHTML = `
     <div class="section-head" style="margin-bottom: 20px;">
       <div>
@@ -777,7 +795,6 @@ function renderAIPanel(module) {
       </select>
 
       <div style="display: grid; gap: 14px;">
-        <!-- Re-Learn Card Button -->
         <button onclick="triggerStudyHub('relearn')" style="display: flex; align-items: flex-start; gap: 16px; width: 100%; text-align: left; padding: 20px; border-radius: 16px; border: 1px solid rgba(56,189,248,0.3); background: linear-gradient(135deg, rgba(56,189,248,0.05), rgba(2,132,199,0.02)); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(56,189,248,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
           <div style="font-size: 1.8rem; background: #fff; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 1px solid rgba(56,189,248,0.2); flex-shrink: 0;">📖</div>
           <div>
@@ -786,7 +803,6 @@ function renderAIPanel(module) {
           </div>
         </button>
 
-        <!-- Flashcards Card Button -->
         <button onclick="triggerStudyHub('flashcards')" style="display: flex; align-items: flex-start; gap: 16px; width: 100%; text-align: left; padding: 20px; border-radius: 16px; border: 1px solid rgba(139,92,246,0.3); background: linear-gradient(135deg, rgba(139,92,246,0.05), rgba(109,40,217,0.02)); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(139,92,246,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
           <div style="font-size: 1.8rem; background: #fff; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 1px solid rgba(139,92,246,0.2); flex-shrink: 0;">✨</div>
           <div>
@@ -804,7 +820,6 @@ function renderAIPanel(module) {
     </div>
   `;
 }
-
 
 // ===== INJECT AI MODALS DYNAMICALLY =====
 function injectStudyModals() {
@@ -939,7 +954,6 @@ async function openRelearn(lessonId, title, desc) {
   if (modal) modal.classList.add("show");
 
   try {
-    // STEP 1: Fetch the core learning summary first
     const res = await AI.getRelearn(lessonId, title, desc);
     if (!res || !res.content) throw new Error("Received empty response from AI");
 
@@ -988,7 +1002,6 @@ async function openRelearn(lessonId, title, desc) {
 
     if (!matchedAny && !summaryHtml) summaryHtml = `<div style="color:#cbd5e1; font-size:0.95rem; line-height:1.8;">${escapeHtml(res.content).replace(/\n/g, '<br>')}</div>`;
 
-    // Render the learning material alongside a call-to-action button to launch the quiz
     contentArea.innerHTML = `
       <div class="relearn-content">${summaryHtml}</div>
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(56,189,248,0.2); text-align: center;">
@@ -999,7 +1012,6 @@ async function openRelearn(lessonId, title, desc) {
       </div>
     `;
 
-    // STEP 2: When they click the quiz button, fetch a fresh, randomized set of questions
     document.getElementById("startQuizBtn").addEventListener("click", async () => {
       contentArea.innerHTML = `
         <div class="ai-loading-state">
@@ -1246,10 +1258,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ════════════════════════════════════════════════════════════════════
-//  NEW APP RAIL FEATURES (Translator, Word Bank, Story Corner)
+//  APP RAIL FEATURES (Translator, Word Bank, Story Corner)
 // ════════════════════════════════════════════════════════════════════
 
-// Global Word Bank Loader
 window.loadWordBank = function() {
   const wordGrid = document.getElementById("wordGrid");
   if (!wordGrid) return;
@@ -1262,7 +1273,6 @@ window.loadWordBank = function() {
   }
   
   words.reverse().forEach(item => {
-    // Added TTS Button
     wordGrid.innerHTML += `
       <div class="word-card" style="position: relative; padding-right: 50px;">
         <button onclick="BuddyVoice.speak('${escapeHtml(item.word).replace(/'/g, "\\'")}. ${escapeHtml(item.definition).replace(/'/g, "\\'")}. For example: ${escapeHtml(item.example).replace(/'/g, "\\'")}', 'English', this)" style="position: absolute; right: 16px; top: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.2); background: rgba(80,58,40,0.05); font-size: 1.1rem; cursor: pointer; display:flex; align-items:center; justify-content:center;">🔊</button>
@@ -1276,7 +1286,6 @@ window.loadWordBank = function() {
 
 document.addEventListener("DOMContentLoaded", () => {
   
-  // ── 1. SMART TRANSLATOR ──
   const runTranslateBtn = document.getElementById("runTranslateBtn");
   if (runTranslateBtn) {
     runTranslateBtn.addEventListener("click", async () => {
@@ -1297,7 +1306,6 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify({ text: text, target_language: lang })
         });
         
-        // Added TTS Buttons for translation and tip
         resultDiv.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
             <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">${escapeHtml(lang)} Translation:</p>
@@ -1320,7 +1328,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ── 2. ADD TO WORD BANK ──
   const addWordBtn = document.getElementById("addWordBtn");
   if (addWordBtn) {
     addWordBtn.addEventListener("click", async () => {
@@ -1352,7 +1359,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ── 3. SHORT STORY CORNER ──
   const generateStoryBtn = document.getElementById("generateStoryBtn");
   if (generateStoryBtn) {
     generateStoryBtn.addEventListener("click", async () => {
@@ -1380,7 +1386,6 @@ document.addEventListener("DOMContentLoaded", () => {
           paragraphsHtml += `<p style="font-size: 1.15rem; line-height: 1.8; color: var(--text); margin-bottom: 16px;">${escapeHtml(p)}</p>`;
         });
         
-        // Added TTS Button
         const fullStoryText = res.title + ". " + res.paragraphs.join(" ");
 
         resultDiv.innerHTML = `
@@ -1401,3 +1406,286 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+
+// ════════════════════════════════════════════════════════════════════
+//  PRONUNCIATION LAB
+// ════════════════════════════════════════════════════════════════════
+
+let currentPronunciationSentence = "";
+
+async function loadPronunciationTask() {
+  const box = document.getElementById("pronunciationBox");
+  box.innerHTML = `<div class="spinner blue" style="margin: 0 auto;"></div><p style="color:var(--muted); margin-top:16px;">Generating sentence...</p>`;
+  
+  try {
+    const res = await apiFetch("/api/ai/pronunciation-task", { method: "POST" });
+    currentPronunciationSentence = res.sentence;
+    renderPronunciationUI();
+  } catch (err) {
+    box.innerHTML = `<p style="color:red;">Error: ${err.message}</p><button onclick="loadPronunciationTask()" class="primary-action">Try Again</button>`;
+  }
+}
+
+function renderPronunciationUI() {
+  const box = document.getElementById("pronunciationBox");
+  box.innerHTML = `
+    <div style="margin-bottom: 32px;">
+      <p style="font-size: 0.85rem; font-weight: 800; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Your Target Sentence</p>
+      <h2 style="font-family: 'Newsreader', serif; font-size: 2.2rem; color: var(--text); line-height: 1.4; margin: 0 0 16px;">"${escapeHtml(currentPronunciationSentence)}"</h2>
+      <button onclick="BuddyVoice.speak('${escapeHtml(currentPronunciationSentence).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(111,124,74,0.3); background: rgba(111,124,74,0.1); color: #3d5220; font-weight: 700; cursor: pointer;">🔊 Hear Buddy Say It</button>
+    </div>
+    
+    <div style="padding-top: 32px; border-top: 1px solid rgba(80,58,40,0.1);">
+      <button id="pronunciationMicBtn" class="mic-btn" onclick="startPronunciationMic()">🎤</button>
+      <p id="pronunciationStatus" style="color: var(--muted); font-size: 1.05rem; font-weight: 600; margin: 0;">Click the mic and start speaking</p>
+    </div>
+    
+    <div id="pronunciationResultArea" style="margin-top: 32px; display: none;"></div>
+  `;
+}
+
+function startPronunciationMic() {
+  const btn = document.getElementById("pronunciationMicBtn");
+  const status = document.getElementById("pronunciationStatus");
+  const resultArea = document.getElementById("pronunciationResultArea");
+  
+  if (MicListener.isListening) {
+    MicListener.stop();
+    return;
+  }
+
+  btn.classList.add("listening");
+  status.textContent = "Listening... speak clearly!";
+  status.style.color = "#16a34a";
+  resultArea.style.display = "none";
+
+  MicListener.start(
+    (transcript) => {
+      // On Result
+      btn.classList.remove("listening");
+      status.textContent = "Click the mic to try again";
+      status.style.color = "var(--muted)";
+      evaluatePronunciation(transcript);
+    },
+    () => {
+      // On End
+      btn.classList.remove("listening");
+      if(status.textContent === "Listening... speak clearly!") {
+        status.textContent = "Didn't catch that. Try again.";
+        status.style.color = "#dc2626";
+      }
+    }
+  );
+}
+
+function evaluatePronunciation(spokenText) {
+  const targetWords = currentPronunciationSentence.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+  const spokenWords = spokenText.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+  
+  let correctCount = 0;
+  const resultHtmlArray = targetWords.map(word => {
+    if (spokenWords.includes(word)) {
+      correctCount++;
+      return `<span style="color: #16a34a; font-weight: 700;">${word}</span>`;
+    } else {
+      return `<span style="color: #dc2626; font-weight: 700; text-decoration: underline;">${word}</span>`;
+    }
+  });
+
+  const accuracy = Math.round((correctCount / targetWords.length) * 100);
+  const resultArea = document.getElementById("pronunciationResultArea");
+  
+  let feedbackText = accuracy >= 80 ? "Amazing job! 🌟" : accuracy >= 50 ? "Good effort, keep practicing! 👍" : "Let's try that one again. 💪";
+  
+  resultArea.style.display = "block";
+  resultArea.innerHTML = `
+    <div style="background: rgba(80,58,40,0.04); border-radius: 16px; padding: 24px; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-weight: 800; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-deep);">Accuracy Score</span>
+        <span style="font-size: 1.4rem; font-weight: 800; color: ${accuracy >= 80 ? '#16a34a' : '#dc2626'};">${accuracy}%</span>
+      </div>
+      <p style="font-size: 1.15rem; line-height: 1.6; margin-bottom: 16px;">${resultHtmlArray.join(" ")}</p>
+      <p style="font-size: 1rem; color: var(--text); font-weight: 600; margin-bottom: 20px;">${feedbackText}</p>
+      <div style="text-align: center;">
+        <button onclick="loadPronunciationTask()" style="min-height: 44px; padding: 0 24px; border-radius: 999px; border: none; background: var(--text); color: white; font-weight: 700; cursor: pointer;">Give me a new sentence</button>
+      </div>
+    </div>
+  `;
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+//  LIGHTNING ROUND GAME
+// ════════════════════════════════════════════════════════════════════
+
+let lightningQuestions = [];
+let lightningIndex = 0;
+let lightningScore = 0;
+let lightningTime = 60;
+let lightningTimerInterval = null;
+
+function openLightningModal() {
+  const modal = document.getElementById("lightningModal");
+  modal.style.display = "flex";
+  // Force reflow
+  void modal.offsetWidth;
+  modal.style.opacity = "1";
+  
+  document.getElementById("lightningHeader").style.display = "none";
+  document.getElementById("lightningPlayArea").innerHTML = `
+    <h2 style="font-family: 'Newsreader', serif; font-size: 2.8rem; color: #422006; margin-bottom: 10px;">Lightning Round</h2>
+    <p style="font-size: 1.1rem; color: #713f12; margin-bottom: 32px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
+    <div class="ai-loading-state" id="lightningLoading" style="display:none; padding: 20px;">
+      <div class="spinner" style="border-top-color: #713f12; border-right-color: rgba(113,63,18,0.2); border-bottom-color: rgba(113,63,18,0.2); border-left-color: rgba(113,63,18,0.2); margin: 0 auto;"></div>
+      <p style="color: #713f12; font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
+    </div>
+    <button id="lightningStartBtn" onclick="beginLightningGame()" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
+  `;
+}
+
+function closeLightningModal() {
+  const modal = document.getElementById("lightningModal");
+  modal.style.opacity = "0";
+  setTimeout(() => { modal.style.display = "none"; }, 250);
+  clearInterval(lightningTimerInterval);
+}
+
+async function beginLightningGame() {
+  document.getElementById("lightningStartBtn").style.display = "none";
+  document.getElementById("lightningLoading").style.display = "block";
+  
+  try {
+    const res = await apiFetch("/api/ai/lightning-round", { method: "POST" });
+    if (!res.quiz || res.quiz.length === 0) throw new Error("No questions returned");
+    
+    lightningQuestions = res.quiz;
+    lightningIndex = 0;
+    lightningScore = 0;
+    lightningTime = 60;
+    
+    document.getElementById("lightningHeader").style.display = "flex";
+    updateLightningHeader();
+    
+    // Start Timer
+    lightningTimerInterval = setInterval(() => {
+      lightningTime--;
+      updateLightningHeader();
+      if (lightningTime <= 0) {
+        endLightningGame("timeout");
+      }
+    }, 1000);
+    
+    renderLightningQuestion();
+    
+  } catch(err) {
+    document.getElementById("lightningPlayArea").innerHTML = `<p style="color:#dc2626;">Error: ${err.message}</p><button onclick="openLightningModal()" style="margin-top:20px; padding:10px 20px; border-radius:10px; border:none; background:#713f12; color:white;">Try Again</button>`;
+  }
+}
+
+function updateLightningHeader() {
+  document.getElementById("lightningScore").textContent = lightningScore;
+  const timeEl = document.getElementById("lightningTimer");
+  timeEl.textContent = lightningTime;
+  if (lightningTime <= 10) timeEl.style.color = "#dc2626"; // Red when low
+  else timeEl.style.color = "inherit";
+}
+
+function renderLightningQuestion() {
+  if (lightningIndex >= lightningQuestions.length) {
+    endLightningGame("complete");
+    return;
+  }
+  
+  const q = lightningQuestions[lightningIndex];
+  const playArea = document.getElementById("lightningPlayArea");
+  
+  let optionsHtml = q.options.map(opt => `
+    <button class="lightning-opt-btn" onclick="handleLightningAnswer(this, '${escapeHtml(opt)}', '${escapeHtml(q.answer)}')" style="width:100%; text-align:left; padding:16px 20px; border-radius:16px; border:2px solid rgba(113,63,18,0.2); background:rgba(255,255,255,0.6); color:#422006; font-size:1.1rem; font-weight:600; cursor:pointer; transition:all 0.2s; margin-bottom:10px;">
+      ${escapeHtml(opt)}
+    </button>
+  `).join("");
+  
+  playArea.innerHTML = `
+    <div style="animation: fadeViewIn 0.2s ease forwards;">
+      <p style="font-size: 0.9rem; font-weight: 800; color: #a16207; text-transform: uppercase; margin-bottom: 12px;">Question ${lightningIndex + 1} of 5</p>
+      <h3 style="font-size: 1.5rem; color: #422006; margin-bottom: 24px; line-height: 1.4;">${escapeHtml(q.question)}</h3>
+      <div>${optionsHtml}</div>
+    </div>
+  `;
+}
+
+function handleLightningAnswer(btnEl, selectedText, correctText) {
+  // Disable all buttons immediately
+  const buttons = document.querySelectorAll(".lightning-opt-btn");
+  buttons.forEach(b => b.disabled = true);
+  
+  if (selectedText.trim() === correctText.trim()) {
+    btnEl.style.background = "#22c55e";
+    btnEl.style.borderColor = "#16a34a";
+    btnEl.style.color = "white";
+    lightningScore++;
+  } else {
+    btnEl.style.background = "#ef4444";
+    btnEl.style.borderColor = "#dc2626";
+    btnEl.style.color = "white";
+    
+    // Highlight correct answer
+    buttons.forEach(b => {
+      if (b.innerText.trim() === correctText.trim()) {
+        b.style.border = "2px solid #22c55e";
+      }
+    });
+  }
+  
+  updateLightningHeader();
+  
+  setTimeout(() => {
+    lightningIndex++;
+    renderLightningQuestion();
+  }, 1000);
+}
+
+function endLightningGame(reason) {
+  clearInterval(lightningTimerInterval);
+  document.getElementById("lightningHeader").style.display = "none";
+  const playArea = document.getElementById("lightningPlayArea");
+  
+  let title = "";
+  let msg = "";
+  let icon = "";
+  
+  if (reason === "timeout") {
+    icon = "⏰";
+    title = "Time's Up!";
+    msg = `You scored ${lightningScore} out of 5. Be a little faster next time!`;
+  } else {
+    if (lightningScore >= 4) {
+      icon = "⚡";
+      title = "Lightning Fast!";
+      msg = `Amazing! You scored ${lightningScore}/5 and beat the clock! You earned the Lightning badge!`;
+      
+      // Save badge locally
+      const studentId = studentProfile?.id || student?.id || "guest";
+      localStorage.setItem(`lightningBadge_${studentId}`, "true");
+      
+      // Force UI update on dashboard
+      setTimeout(() => {
+        const streak = studentProfile?.streak_days || student?.streak_days || 0;
+        evaluateAchievements(1, 10, streak); // Force evaluation
+      }, 500);
+
+    } else {
+      icon = "👍";
+      title = "Good Try!";
+      msg = `You scored ${lightningScore}/5. Keep practicing to earn the Lightning badge!`;
+    }
+  }
+  
+  playArea.innerHTML = `
+    <div style="font-size: 4rem; margin-bottom: 16px;">${icon}</div>
+    <h2 style="font-family: 'Newsreader', serif; font-size: 2.5rem; color: #422006; margin-bottom: 12px;">${title}</h2>
+    <p style="font-size: 1.15rem; color: #713f12; margin-bottom: 32px;">${msg}</p>
+    <button onclick="closeLightningModal()" style="min-height: 56px; padding: 0 32px; border-radius: 999px; border: none; background: #713f12; color: #fef08a; font-size: 1.1rem; font-weight: 800; cursor: pointer;">Close & Return to Dashboard</button>
+  `;
+}
