@@ -1381,8 +1381,18 @@ async function loadPronunciationAnalytics() {
 // ══════════════════════════════════════════
 // 2. BULK CURRICULUM GENERATOR
 // ══════════════════════════════════════════
-function openBulkCurriculumModal() { document.getElementById("modalBulkCurriculum").classList.add("show"); }
-function closeBulkCurriculumModal() { document.getElementById("modalBulkCurriculum").classList.remove("show"); }
+function openBulkCurriculumModal() {
+  const modal = document.getElementById("modalBulkCurriculum");
+  modal.style.opacity = "1";
+  modal.style.pointerEvents = "all";
+  modal.querySelector("div").style.transform = "translateY(0) scale(1)";
+}
+function closeBulkCurriculumModal() {
+  const modal = document.getElementById("modalBulkCurriculum");
+  modal.style.opacity = "0";
+  modal.style.pointerEvents = "none";
+  modal.querySelector("div").style.transform = "translateY(12px) scale(0.97)";
+}
 
 async function runBulkCurriculum() {
   const topic = document.getElementById("bulkCurriculumTopic").value.trim();
