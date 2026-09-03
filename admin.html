@@ -43,14 +43,14 @@
     .app-rail:hover .rail-btn .label, body.rail-expanded .rail-btn .label { opacity: 1; transition-delay: 0.1s; }
     
     .powered-by-sidebar {
-      margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+       width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 6px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
       overflow: hidden;
     }
     .app-rail:hover .powered-by-sidebar, body.rail-expanded .powered-by-sidebar { opacity: 1; transition-delay: 0.15s; }
     .powered-by-sidebar span { color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
  
-    body:not(.rail-expanded) 
+    
 
     .app-view { display: none; animation: fadeViewIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     .app-view.active-view { display: block; }
@@ -256,7 +256,11 @@
       <span class="icon">👨‍👩‍👧</span><span class="label">Parent Reports</span>
     </button>
   
-        <div class="powered-by-sidebar">
+        
+    <button class="rail-btn" id="themeToggleBtn" onclick="toggleTheme()" style="">
+      <span class="icon" id="themeIcon">🌙</span><span class="label">Dark Mode</span>
+    </button>
+    <div class="powered-by-sidebar">
       <span>Powered By</span>
       <img src="sensesyslogo.png" alt="SenseSys Logo" style="height: 20px; object-fit: contain; margin-bottom: 2px;">
     </div>
@@ -410,9 +414,12 @@
           </div>
           <p style="font-size: 0.95rem; color: #166534; margin: 0 0 16px;">Buddy will analyze your students' recent quiz scores and completion rates to automatically suggest small focus groups for your next class.</p>
           
-          <div id="remedialGroupsLoading" style="display: none; padding: 20px; text-align: center;">
-            <div class="spinner" style="border-top-color: #16a34a; margin: 0 auto 10px;"></div>
-            <p style="color: #166534; font-weight: 600;">Analyzing class performance data...</p>
+          <div id="remedialGroupsLoading" style="display:none; flex-direction:column; gap:12px; padding: 24px;">
+            <div class="skeleton-pulse" style="height: 24px; width: 60%; border-radius: 6px;"></div>
+            <div class="skeleton-pulse" style="height: 16px; width: 100%; border-radius: 4px;"></div>
+            <div class="skeleton-pulse" style="height: 16px; width: 90%; border-radius: 4px;"></div>
+            <div class="skeleton-pulse" style="height: 16px; width: 95%; border-radius: 4px;"></div>
+            <p style="color: var(--accent); margin: 12px 0 0 0; font-weight: 600;">Analyzing class performance data...</p>
           </div>
           
           <div id="remedialGroupsResult" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;"></div>
@@ -603,10 +610,13 @@
           </div>
         </div>
         
-        <div id="reportLoadingState" style="display:none; padding: 40px; text-align: center;">
-          <div class="spinner blue" style="margin: 0 auto 16px;"></div>
-          <p style="color: var(--muted); font-weight: 600;">Buddy is analyzing progress and writing the report...</p>
-        </div>
+        <div id="reportLoadingState" style="display:none; flex-direction:column; gap:12px; padding: 24px;">
+            <div class="skeleton-pulse" style="height: 24px; width: 60%; border-radius: 6px;"></div>
+            <div class="skeleton-pulse" style="height: 16px; width: 100%; border-radius: 4px;"></div>
+            <div class="skeleton-pulse" style="height: 16px; width: 90%; border-radius: 4px;"></div>
+            <div class="skeleton-pulse" style="height: 16px; width: 95%; border-radius: 4px;"></div>
+            <p style="color: var(--accent); margin: 12px 0 0 0; font-weight: 600;">Buddy is analyzing progress and writing the report...</p>
+          </div>
       </div>
     </div>
 

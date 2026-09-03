@@ -1198,7 +1198,7 @@ async function generateParentReport(format = "friendly") {
 
   btn.disabled = true;
   resultArea.style.display = "none";
-  loading.style.display = "block";
+  loading.style.display = "flex";
 
   try {
     // Compile stats to send to the backend
@@ -1252,7 +1252,7 @@ async function generateRemedialGroups() {
   
   btn.disabled = true;
   resultArea.innerHTML = "";
-  loading.style.display = "block";
+  loading.style.display = "flex";
 
   try {
     // 1. Gather all student progress into a data string for the AI
@@ -1328,7 +1328,7 @@ async function loadPronunciationAnalytics() {
   
   btn.disabled = true;
   resultArea.style.display = "none";
-  loading.style.display = "block";
+  loading.style.display = "flex";
 
   try {
     const classFilter = document.getElementById("classFilter")?.options[document.getElementById("classFilter")?.selectedIndex]?.text || "Mixed ESL Class";
