@@ -731,6 +731,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+window.closeAnalysisModal = function() {
+  const modal = document.getElementById("aiAnalysisModal");
+  if (modal) {
+    modal.style.opacity = "0";
+    setTimeout(() => modal.style.display = "none", 250);
+  }
+};
+
 async function getAiFeedbackAnalysis() {
   const btn = document.getElementById("getAiFeedbackBtn");
   const textEl = document.getElementById("aiAnalysisText");
