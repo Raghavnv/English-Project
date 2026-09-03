@@ -818,13 +818,13 @@ body::after {
 }
 
 /* Glass Buttons Upgrade */
-button, .primary-action, .secondary-action {
+.primary-action, .secondary-action {
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-button::after, .primary-action::after, .secondary-action::after {
+.primary-action::after, .secondary-action::after {
   content: "";
   position: absolute;
   inset: 0;

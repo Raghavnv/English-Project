@@ -978,10 +978,15 @@ async function openRelearn(lessonId, title, desc) {
   if (titleEl) titleEl.textContent = title;
   if (contentArea) {
     contentArea.innerHTML = `
-      <div class="ai-loading-state">
-        <div class="spinner blue"></div>
-        <p style="color: #7dd3fc; margin: 0; font-weight: 600;">Buddy is preparing your lesson guide...</p>
+      
+      <div class="ai-loading-state" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="skeleton-pulse" style="height: 24px; width: 60%; border-radius: 6px;"></div>
+        <div class="skeleton-pulse" style="height: 16px; width: 100%; border-radius: 4px;"></div>
+        <div class="skeleton-pulse" style="height: 16px; width: 90%; border-radius: 4px;"></div>
+        <div class="skeleton-pulse" style="height: 16px; width: 95%; border-radius: 4px;"></div>
+        <p style="color: #7dd3fc; margin: 12px 0 0 0; font-weight: 600;">Buddy is preparing your lesson guide...</p>
       </div>
+
     `;
   }
   if (modal) modal.classList.add("show");
@@ -1737,6 +1742,7 @@ function handleLightningAnswer(btnEl, selectedText, correctText) {
     btnEl.style.borderColor = "#16a34a";
     btnEl.style.color = "white";
     lightningScore++;
+    if (typeof playChimeSound !== "undefined") playChimeSound();
   } else {
     btnEl.style.background = "#ef4444";
     btnEl.style.borderColor = "#dc2626";
@@ -1778,6 +1784,7 @@ function endLightningGame(reason) {
       icon = "⚡";
       title = "Lightning Fast!";
       msg = `Incredible! You scored ${lightningScore}/5 and earned the Lightning Fast achievement!`;
+      if (typeof fireConfetti !== "undefined") fireConfetti();
       
       const studentId = studentProfile?.id || student?.id || "guest";
       localStorage.setItem(`lightningBadge_${studentId}`, "true");

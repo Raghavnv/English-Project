@@ -193,6 +193,7 @@
     }
 
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
@@ -214,7 +215,12 @@
       📣 <span class="rail-btn-text">Broadcasts</span><span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
   
-        <div class="powered-by-sidebar">
+        
+    <button class="rail-btn" id="themeToggleBtn" data-tooltip="Theme" onclick="toggleTheme()" style="margin-top: 10px;">
+      <span id="themeIcon">🌙</span> <span class="rail-btn-text">Dark Mode</span>
+    </button>
+
+    <div class="powered-by-sidebar">
       <span>Powered By</span>
       <img src="sensesyslogo.png" alt="SenseSys Logo" style="height: 20px; object-fit: contain; margin-bottom: 2px;">
     </div>
@@ -654,6 +660,27 @@
       </div>
     </div>
   </div>
+
+
+  <!-- THEME LOGIC -->
+  <script>
+    function toggleTheme() {
+      const root = document.documentElement;
+      root.classList.toggle('dark-theme');
+      const isDark = root.classList.contains('dark-theme');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+      document.querySelector('#themeToggleBtn .rail-btn-text').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+      playPopSound();
+    }
+    
+    // On Load
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      document.getElementById('themeIcon').textContent = '☀️';
+      document.querySelector('#themeToggleBtn .rail-btn-text').textContent = 'Light Mode';
+    }
+  </script>
 
 </body>
 </html>
