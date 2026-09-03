@@ -269,11 +269,14 @@ h6 {
 .progress-grid,
 .module-grid,
 .question-stack {
-  max-height: 400px;
-  overflow-y: auto;
-  padding-right: 8px;
   display: grid;
   gap: 12px;
+}
+
+.question-stack {
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
 .class-list {
@@ -1209,13 +1212,13 @@ body::after {
 }
 
 /* Glass Buttons Upgrade */
-button, .primary-action, .secondary-action {
+.primary-action, .secondary-action {
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-button::after, .primary-action::after, .secondary-action::after {
+.primary-action::after, .secondary-action::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -1224,7 +1227,7 @@ button::after, .primary-action::after, .secondary-action::after {
   transition: transform 0.6s ease;
 }
 
-button:hover::after, .primary-action:hover::after, .secondary-action:hover::after {
+.primary-action:hover::after, .secondary-action:hover::after {
   transform: translateX(100%);
 }
 

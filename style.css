@@ -833,7 +833,7 @@ body::after {
   transition: transform 0.6s ease;
 }
 
-button:hover::after, .primary-action:hover::after, .secondary-action:hover::after {
+.primary-action:hover::after, .secondary-action:hover::after {
   transform: translateX(100%);
 }
 
