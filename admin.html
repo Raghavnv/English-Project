@@ -21,6 +21,7 @@
       overflow-x: hidden; white-space: nowrap;
     }
     .app-rail:hover, body.rail-expanded .app-rail { width: 240px; }
+    .app-rail:hover, body.rail-expanded .app-rail { width: 240px; }
 
     .rail-hamburger {
       width: 54px; height: 54px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);
@@ -243,22 +244,22 @@
   <!-- ── EXPANDABLE APP RAIL NAVIGATION ── -->
   <nav class="app-rail">
     <button class="rail-hamburger" onclick="toggleAdminRail()" title="Menu">☰</button>
-    <button class="rail-btn active" data-tooltip="Lesson Studio" onclick="switchView('view-lessons', this)">
+    <button class="rail-btn active" onclick="switchView('view-lessons', this)">
       <span class="icon">📝</span><span class="label">Lesson Studio</span>
     </button>
-    <button class="rail-btn" data-tooltip="Student Roster" onclick="switchView('view-progress', this)">
+    <button class="rail-btn" onclick="switchView('view-progress', this)">
       <span class="icon">🎯</span><span class="label">Student Roster</span>
     </button>
-    <button class="rail-btn" data-tooltip="Class Insights" onclick="switchView('view-analytics', this)">
+    <button class="rail-btn" onclick="switchView('view-analytics', this)">
       <span class="icon">📈</span><span class="label">Class Insights</span>
     </button>
-    <button class="rail-btn" data-tooltip="Broadcast Center" onclick="switchView('view-broadcast', this)">
+    <button class="rail-btn" onclick="switchView('view-broadcast', this)">
       <span class="icon">📣</span><span class="label">Broadcast Center</span>
     </button>
-    <button class="rail-btn" data-tooltip="Resource Library" onclick="switchView('view-resources', this)">
+    <button class="rail-btn" onclick="switchView('view-resources', this)">
       <span class="icon">📚</span><span class="label">Resource Library</span>
     </button>
-    <button class="rail-btn" data-tooltip="Parent Reports" onclick="switchView('view-reports', this)">
+    <button class="rail-btn" onclick="switchView('view-reports', this)">
       <span class="icon">👨‍👩‍👧</span><span class="label">Parent Reports</span>
     </button>
   
