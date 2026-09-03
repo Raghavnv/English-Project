@@ -829,12 +829,14 @@ def generate_bulk_curriculum(body: BulkCurriculumRequest, requester=Depends(requ
     }}
     """
     try:
-        raw = ask_groq(prompt, max_tokens=800, system="Output valid JSON only.")
+        raw = ask_groq(prompt, max_tokens=2500, system="Output valid JSON only.")
         clean_json = raw.strip()
         import re
         match = re.search(r'\{.*\}', clean_json, re.DOTALL)
-        if match: clean_json = match.group(0)
+        if match: 
+            clean_json = match.group(0)
         import json
         return json.loads(clean_json)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print("LLM JSON Parse Error. Raw Output:", raw if 'raw' in locals() else "N/A")
+        raise HTTPException(status_code=500, detail=f"LLM Error: {str(e)}")
