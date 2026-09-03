@@ -848,6 +848,7 @@ document.addEventListener("DOMContentLoaded", () => {
     openBtn.onclick = () => {
       renderLocalAnalysisStats();
       modal.style.display = "flex";
+      modal.style.pointerEvents = "all"; // Fix: Makes the modal clickable
       void modal.offsetWidth;
       modal.style.opacity = "1";
     };
@@ -855,6 +856,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (closeBtn && modal) {
     closeBtn.onclick = () => {
       modal.style.opacity = "0";
+      modal.style.pointerEvents = "none"; // Fix: Prevents invisible shield bug
       setTimeout(() => modal.style.display = "none", 250);
     };
   }
