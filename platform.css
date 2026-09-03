@@ -272,9 +272,8 @@ h6 {
   display: grid;
   gap: 12px;
 }
-
 .question-stack {
-  max-height: 380px;
+  max-height: 400px;
   overflow-y: auto;
   padding-right: 8px;
 }

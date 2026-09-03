@@ -25,7 +25,6 @@
     .app-rail:hover {
       width: 260px;
     }
-    
     .rail-logo {
       font-size: 1.8rem; margin-bottom: 8px; padding-bottom: 16px;
       border-bottom: 1px solid rgba(255,255,255,0.08); width: 100%;
@@ -36,14 +35,9 @@
     .rail-logo span {
       opacity: 0; transition: opacity 0.2s ease;
     }
-
     .app-rail:hover .rail-logo span {
       opacity: 1; transition-delay: 0.1s;
     }
-
-      opacity: 0; transition: opacity 0.2s ease;
-    }
-    
     .rail-btn {
       width: 100%; min-width: 52px; height: 52px; border-radius: 16px; border: 1px solid transparent; background: transparent;
       font-size: 1.4rem; cursor: pointer; transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -54,7 +48,6 @@
       font-size: 1.05rem; font-weight: 600; font-family: var(--font-family);
       opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
     }
-    
     .app-rail:hover .rail-btn-text {
       opacity: 1; transition-delay: 0.1s;
     }
@@ -69,20 +62,14 @@
     }
     .powered-by-sidebar {
       margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 4px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); 
+      gap: 6px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
       overflow: hidden;
     }
-    .powered-by-sidebar span { display: none; opacity: 0; }
-
-    .app-rail:hover .powered-by-sidebar span {
-      display: inline-block;
+    .app-rail:hover .powered-by-sidebar {
       opacity: 1; transition-delay: 0.15s;
     }
-
-    
     .powered-by-sidebar span { color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 
-    
     
 
     /* ── FULL-PAGE VIEW SWITCHING ── */
@@ -223,7 +210,7 @@
   
         
     <button class="rail-btn" id="themeToggleBtn" onclick="toggleTheme()" style="margin-top: 10px;">
-      <span id="themeIcon">🌙</span> <span class="rail-btn-text">Dark Mode</span> 
+      <span id="themeIcon">🌙</span> <span class="rail-btn-text">Dark Mode</span>
     </button>
 
     <div class="powered-by-sidebar">
