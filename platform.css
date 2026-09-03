@@ -269,6 +269,9 @@ h6 {
 .progress-grid,
 .module-grid,
 .question-stack {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
   display: grid;
   gap: 12px;
 }
@@ -278,7 +281,13 @@ h6 {
 }
 
 .class-button {
-  display: grid;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
   width: 100%;
   padding: 16px 18px;
@@ -435,6 +444,15 @@ h6 {
 }
 
 .module-card {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+
   padding: 22px 24px;
   border-radius: var(--radius-lg);
   background: linear-gradient(145deg, rgba(255, 252, 247, 0.94), rgba(248, 240, 229, 0.9));
@@ -462,6 +480,7 @@ h6 {
 }
 
 .module-card-top {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -477,6 +496,8 @@ h6 {
 }
 
 .module-card p {
+  text-align: left;
+  width: 100%;
   color: var(--muted);
   line-height: 1.65;
   font-size: 0.95rem;
@@ -1264,4 +1285,26 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 ::-moz-selection {
   background: var(--accent);
   color: #fff;
+}
+
+.question-stack::-webkit-scrollbar { width: 6px; }
+.question-stack::-webkit-scrollbar-track { background: rgba(80,58,40,0.04); border-radius: 4px; }
+.question-stack::-webkit-scrollbar-thumb { background: rgba(80,58,40,0.15); border-radius: 4px; }
+.question-stack::-webkit-scrollbar-thumb:hover { background: rgba(80,58,40,0.3); }
+
+/* Skeleton Loading State */
+.skeleton-pulse {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, rgba(80,58,40,0.06) 25%, rgba(80,58,40,0.12) 50%, rgba(80,58,40,0.06) 75%);
+  background-size: 400% 100%;
+  border-radius: 4px;
+}
+@keyframes skeletonPulse {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* Smooth Scrolling Globally */
+html {
+  scroll-behavior: smooth;
 }
