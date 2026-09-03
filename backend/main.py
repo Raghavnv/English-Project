@@ -32,7 +32,7 @@ app = FastAPI(
 # ── CORS — FIXED & READY ──────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=["*"],
     allow_credentials=False,  # Must be False when using wildcard origins (browser CORS rule)
     allow_methods=["*"],      # Allows GET, POST, DELETE, etc.
     allow_headers=["*"],      # Allows Authorization and Content-Type headers
