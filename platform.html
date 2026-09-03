@@ -198,7 +198,7 @@
 
   <!-- ── APP RAIL NAVIGATION ── -->
   <nav class="app-rail">
-    <div class="rail-logo">📚 <span>Bridge</span></div>
+    <div class="rail-logo">☰ <span>Menu</span></div>
     <button class="rail-btn active" data-tooltip="Dashboard" onclick="switchAppView('view-dashboard', this)">🏠 <span class="rail-btn-text">Dashboard</span></button>
     <button class="rail-btn" data-tooltip="Pronunciation Lab" onclick="switchAppView('view-pronunciation', this)">🎙️ <span class="rail-btn-text">Pronunciation Lab</span></button>
     <button class="rail-btn" data-tooltip="Roleplay Sandbox" onclick="switchAppView('view-roleplay', this)">🎭 <span class="rail-btn-text">Roleplay Sandbox</span></button>
@@ -214,9 +214,11 @@
       📣 <span class="rail-btn-text">Broadcasts</span><span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
   
-    <div class="powered-by-sidebar">
+        <div class="powered-by-sidebar">
       <span>Powered By</span>
-      </div>
+      <img src="sensesyslogo.png" alt="SenseSys Logo" style="height: 20px; object-fit: contain; margin-bottom: 2px;">
+      <strong style="color: rgba(255,255,255,0.9); font-size: 0.85rem; letter-spacing: 0.02em;">SenseSys</strong>
+    </div>
 </nav>
 
   <div class="platform-shell">
@@ -365,7 +367,7 @@
               </div>
               <button class="text-button" type="button" id="resetClassButton">Reset Class Progress</button>
             </div>
-            <div class="module-grid" id="moduleGrid"></div>
+            <div class="module-grid stagger-in" id="moduleGrid"></div>
           </section>
 
           <section class="workspace-grid">
