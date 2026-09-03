@@ -206,6 +206,33 @@ function renderWelcomeBanner() {
   if (cEl) cEl.textContent = completed;
 }
 
+function renderBadges() {
+  const badgesGrid = document.getElementById("badgesGrid");
+  const badgeCountPill = document.getElementById("badgeCountPill");
+  if (!badgesGrid) return;
+  
+  if (isAdminViewing || !studentProfile || !studentProfile.badges || studentProfile.badges.length === 0) {
+    if (badgeCountPill) badgeCountPill.textContent = "0";
+    badgesGrid.innerHTML = `<p class="empty-state" style="grid-column: 1 / -1; padding: 12px; margin-top: 10px;">No badges yet. Start learning to earn some!</p>`;
+    return;
+  }
+
+  const badges = studentProfile.badges;
+  if (badgeCountPill) badgeCountPill.textContent = badges.length;
+  badgesGrid.innerHTML = "";
+  
+  badges.forEach(b => {
+    const card = document.createElement("div");
+    card.className = "badge-card";
+    card.title = b.description;
+    card.innerHTML = \`
+      <div class="badge-icon">\${b.icon}</div>
+      <div class="badge-name">\${b.name}</div>
+    \`;
+    badgesGrid.appendChild(card);
+  });
+}
+
 // ===== TEACHER BROADCASTS =====
 const BROADCAST_ICONS = { announcement: "📣", goal: "🎯", reminder: "⏰" };
 
