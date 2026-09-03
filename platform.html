@@ -141,7 +141,29 @@
       .platform-sidebar.mobile-open { display: flex; }
       .mobile-sidebar-toggle { display: inline-flex !important; }
     }
-  </style>
+  
+    .text-gradient {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+    
+    .glow-effect {
+      position: relative;
+    }
+    .glow-effect::after {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      background: radial-gradient(circle at center, rgba(188, 93, 45, 0.15) 0%, transparent 70%);
+      z-index: -1;
+      border-radius: 50%;
+    }
+
+</style>
 </head>
 <body>
 
@@ -201,7 +223,7 @@
       <!-- EXPANDED FULL-WIDTH LEARNER WIDGET (Hero Banner) -->
       <div class="workspace-panel" style="margin-top: 24px; padding: 36px 42px; border-radius: 24px; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(145deg, rgba(255, 251, 246, 0.98), rgba(249, 240, 227, 0.92)); border: 1px solid rgba(255,255,255,0.8);">
           <p class="panel-label" style="margin-bottom: 8px; font-size: 0.85rem; color: var(--accent-deep);">Learner Portal</p>
-          <h1 id="sidebarWelcome" style="font-family: var(--font-family); font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 10px; color: var(--text); line-height: 1.15;">Welcome back!</h1>
+          <h1 id="sidebarWelcome" class="text-gradient glow-effect" style="font-family: var(--font-family); font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 10px; color: var(--text); line-height: 1.15;">Welcome back!</h1>
           <p style="color: var(--muted); font-size: 1.05rem; margin: 0; line-height: 1.6; max-width: 65ch;">
             Choose the class you are attending from the sidebar. The platform will automatically load your learning plan, dynamic AI flashcards, and saved progress below.
           </p>

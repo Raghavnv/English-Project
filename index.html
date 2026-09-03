@@ -410,7 +410,29 @@
       .welcome-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
 
-  </style>
+  
+    .text-gradient {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+    
+    .glow-effect {
+      position: relative;
+    }
+    .glow-effect::after {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      background: radial-gradient(circle at center, rgba(188, 93, 45, 0.15) 0%, transparent 70%);
+      z-index: -1;
+      border-radius: 50%;
+    }
+
+</style>
 </head>
 <body>
 
@@ -440,7 +462,12 @@
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:4px;">
         <img src="https://api.logo.com/api/v2/images?design=lg_hwt2cBy6LwvoVHvFsi&u=1777398156000&width=1200&height=1200&margins=200&fit=contain&format=webp&quality=60&tightBounds=true" alt="EnglishBridge logo" style="width:72px;height:72px;object-fit:contain;padding:6px;">
       </div>
-      <h1 class="welcome-title">English learning built on trust and real practice.</h1>
+      
+      <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(188,93,45,0.08); border: 1px solid rgba(188,93,45,0.2); margin-bottom: 24px; animation: pageEntrance 0.8s ease backwards;">
+        <span style="font-size: 1.1rem;">✨</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-deep); letter-spacing: 0.05em; text-transform: uppercase;">Powered by AI</span>
+      </div>
+      <h1 class="welcome-title" style="font-size: 3.8rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;">English learning built on <span class="text-gradient">trust</span> and <span class="text-gradient">real practice.</span></h1>
       <p class="welcome-subtitle">
         A classroom-first platform for underserved children in Bangalore. Teachers lead, students practise, and progress is tracked — all in one place.
       </p>
