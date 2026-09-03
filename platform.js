@@ -178,6 +178,34 @@ function getModuleProgress(moduleId) {
   };
 }
 
+function renderWelcomeBanner() {
+  const banner = document.getElementById("welcomeBanner");
+  if (!banner || isAdminViewing) return;
+  if (classes.length === 0) { banner.style.display = "none"; return; }
+
+  banner.style.display = "";
+  const selectedClass = getSelectedClass();
+  const total     = selectedClass?.modules.length || 0;
+  const completed = selectedClass
+    ? selectedClass.modules.filter(m => getModuleProgress(m.id).completed).length
+    : 0;
+
+  const titleEl = document.getElementById("welcomeBannerTitle");
+  const subEl   = document.getElementById("welcomeBannerSub");
+  const lEl     = document.getElementById("bannerLessonCount");
+  const cEl     = document.getElementById("bannerCompletedCount");
+
+  if (titleEl) titleEl.textContent = "Welcome back, " + activeUser.name + "!";
+  if (subEl) {
+    if (total === 0)          subEl.textContent = "No lessons yet — your teacher will add them soon.";
+    else if (completed === 0) subEl.textContent = "You haven't started yet — pick a lesson below.";
+    else if (completed === total) subEl.textContent = "You've completed all lessons. Great work!";
+    else                      subEl.textContent = `${completed} of ${total} lessons completed. Keep going!`;
+  }
+  if (lEl) lEl.textContent = total;
+  if (cEl) cEl.textContent = completed;
+}
+
 // ===== TEACHER BROADCASTS =====
 const BROADCAST_ICONS = { announcement: "📣", goal: "🎯", reminder: "⏰" };
 
