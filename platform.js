@@ -1140,7 +1140,6 @@ async function openFlashcards(title, desc) {
   const contentArea = document.getElementById("flashcardContentArea");
   const regenBtn = document.getElementById("regenerateFlashcardsBtn");
 
-<<<<<<< HEAD
   if (openBtn && modal) {
     openBtn.onclick = () => {
       renderLocalAnalysisStats();
@@ -1156,12 +1155,11 @@ async function openFlashcards(title, desc) {
       modal.style.pointerEvents = "none"; // Fix: Prevents invisible shield bug
       setTimeout(() => modal.style.display = "none", 250);
     };
-=======
+  }
   if (titleEl) titleEl.textContent = title + " Deck";
   if (regenBtn) {
     regenBtn.style.display = "none"; 
     regenBtn.onclick = () => openFlashcards(title, desc); 
->>>>>>> d2c4b7a4b5a56b8d6ba8d1f2eb39ac92e07865d5
   }
   
   if (contentArea) {
