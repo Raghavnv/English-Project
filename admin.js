@@ -721,6 +721,7 @@ async function saveNewStudent() {
     closeAddStudent();
     showPopup("✓ Student added");
     loadProgressData();
+  if(typeof initLiveFeed === "function") initLiveFeed();
   } catch (err) {
     showPopup("Error: " + err.message);
   }
@@ -731,6 +732,7 @@ async function deleteStudent(studentId) {
     await Students.delete(studentId);
     showPopup("Student removed");
     loadProgressData();
+  if(typeof initLiveFeed === "function") initLiveFeed();
   } catch (err) {
     showPopup("Error: " + err.message);
   }
