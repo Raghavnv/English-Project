@@ -25,34 +25,39 @@
     }
 
     .auth-card {
-      padding: 36px 32px;
+      padding: 42px 38px;
       border-radius: 28px;
-      background: linear-gradient(145deg, rgba(255,251,246,0.97), rgba(249,240,227,0.93));
-      border: 1px solid rgba(255,255,255,0.72);
-      box-shadow: var(--shadow);
+      background: linear-gradient(145deg, rgba(255,252,248,0.96), rgba(248,240,228,0.9));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 24px 60px -12px rgba(75,48,26,0.18), inset 0 1px 0 rgba(255,255,255,1);
       position: relative;
     }
 
     .auth-card::before {
       content: "";
       position: absolute;
-      inset: 10px;
-      border: 1px solid rgba(80,58,40,0.07);
-      border-radius: 20px;
+      inset: 8px;
+      border: 1px solid rgba(80,58,40,0.05);
+      border-radius: 22px;
       pointer-events: none;
     }
 
     .auth-card h2 {
-      font-family: "Newsreader", serif;
-      font-size: 1.9rem;
+      font-family: var(--font-family);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-size: 2rem;
       margin-bottom: 6px;
+      color: var(--text);
     }
 
     .auth-subtitle {
       color: var(--muted);
-      font-size: 0.93rem;
+      font-size: 0.94rem;
       line-height: 1.6;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .form-label {
@@ -71,17 +76,29 @@
       min-height: 50px;
       border-radius: 999px;
       border: none;
-      background: var(--accent-deep);
+      background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent) 100%);
       color: #fffaf2;
+      font-family: var(--font-family);
       font-weight: 800;
       font-size: 1rem;
+      letter-spacing: -0.01em;
       cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: var(--shadow-soft);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .auth-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-soft);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .auth-btn:active {
+      transform: translateY(0);
+    }
+
+    .auth-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3.5px rgba(188, 93, 45, 0.3), var(--shadow-soft);
     }
 
     .auth-toggle {

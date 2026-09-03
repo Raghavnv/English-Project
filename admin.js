@@ -511,7 +511,7 @@ async function renderSavedLessons() {
       
       classSection.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(80,58,40,0.08); padding-bottom: 8px;">
-          <h4 style="margin: 0; font-size: 1.15rem; color: var(--accent-deep); font-family: 'Newsreader', serif;">📂 ${escHtml(cls.label)}</h4>
+          <h4 style="margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent-deep); font-family: var(--font-family);">📂 ${escHtml(cls.label)}</h4>
           <button class="delete-class-btn" data-id="${cls.id}" style="min-height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(188,93,45,0.3); background: rgba(188,93,45,0.1); color: var(--accent-deep); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.2s;">Delete Class</button>
         </div>
         <div class="class-lessons-container"></div>
