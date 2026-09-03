@@ -669,22 +669,17 @@ function renderLessonPanel(selectedClass, module) {
 function renderLocalAnalysisStats() {
   const section = document.getElementById("aiAnalysisSection");
   if (!section) return;
-  if (isAdminViewing || !student?.id) { 
-    section.style.display = "none"; 
-    return; 
-  }
+  if (isAdminViewing || !student?.id) { section.style.display = "none"; return; }
   section.style.display = "";
 
   let scored = 0, correct = 0, scoreSum = 0;
-  
   Object.values(allProgress || {}).forEach(p => {
     if (!p.answers) return;
     Object.values(p.answers).forEach(a => {
       const text = typeof a === "string" ? a : a?.text;
       const score = typeof a === "object" ? (a.ai_score || 0) : 0;
       if (text && text.trim() && score > 0) {
-        scored++;
-        scoreSum += score;
+        scored++; scoreSum += score;
         if (score >= 3) correct++;
       }
     });
@@ -692,12 +687,42 @@ function renderLocalAnalysisStats() {
 
   const accuracy = scored > 0 ? Math.round((correct / scored) * 100) : 0;
   const avgScore = scored > 0 ? (scoreSum / scored).toFixed(1) : "0";
-
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set("statScored", scored);
-  set("statCorrect", correct);
-  set("statAccuracy", accuracy + "%");
-  set("statAvgScore", avgScore + "/5");
+  set("statScored", scored); set("statCorrect", correct); set("statAccuracy", accuracy + "%"); set("statAvgScore", avgScore + "/5");
+}
+
+async function getAiFeedbackAnalysis() {
+  const btn = document.getElementById("getAiFeedbackBtn");
+  const textEl = document.getElementById("aiAnalysisText");
+  
+  if (!btn || !textEl) return;
+  
+  // Prevent silent crashes during Admin Preview mode
+  if (isAdminViewing || !student?.id) {
+    textEl.textContent = "You are currently in Admin Preview mode. Please log in as a real student to generate an AI evaluation.";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Thinking…";
+  textEl.textContent = "Analysing your progress…";
+  
+  try {
+    const data = await AI.getAnalysis(student.id);
+    textEl.textContent = data.ai_summary || "No summary available yet.";
+    
+    // Sync the widget stats with the server data as a backup
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    if (data.scored_count !== undefined) set("statScored", data.scored_count);
+    if (data.correct_count !== undefined) set("statCorrect", data.correct_count);
+    if (data.accuracy_percentage !== undefined) set("statAccuracy", data.accuracy_percentage + "%");
+    if (data.average_score !== undefined) set("statAvgScore", data.average_score + "/5");
+  } catch (err) {
+    textEl.textContent = "Could not fetch AI feedback right now: " + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "✨ Refresh AI Analysis";
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -709,27 +734,27 @@ document.addEventListener("DOMContentLoaded", () => {
     openBtn.addEventListener("click", () => {
       renderLocalAnalysisStats();
       modal.style.display = "flex";
+      // CRITICAL FIX: "auto" is the valid property for HTML elements. "all" is for SVGs.
+      modal.style.pointerEvents = "auto"; 
       void modal.offsetWidth;
       modal.style.opacity = "1";
     });
   }
-
+  
   if (closeBtn && modal) {
     closeBtn.addEventListener("click", () => {
       modal.style.opacity = "0";
-      setTimeout(() => modal.style.display = "none", 250);
+      modal.style.pointerEvents = "none";
+      setTimeout(() => { modal.style.display = "none"; }, 250);
     });
   }
-
-  if (modal) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.style.opacity = "0";
-        setTimeout(() => modal.style.display = "none", 250);
-      }
-    });
+  
+  const feedbackBtn = document.getElementById("getAiFeedbackBtn");
+  if (feedbackBtn) {
+    feedbackBtn.addEventListener("click", getAiFeedbackAnalysis);
   }
 });
+
 
 window.closeAnalysisModal = function() {
   const modal = document.getElementById("aiAnalysisModal");
