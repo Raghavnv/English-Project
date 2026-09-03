@@ -272,13 +272,24 @@ h6 {
   display: grid;
   gap: 12px;
 }
+.question-stack {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
 
 .class-list {
   margin-top: 16px;
 }
 
 .class-button {
-  display: grid;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
   width: 100%;
   padding: 16px 18px;
@@ -435,6 +446,15 @@ h6 {
 }
 
 .module-card {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+
   padding: 22px 24px;
   border-radius: var(--radius-lg);
   background: linear-gradient(145deg, rgba(255, 252, 247, 0.94), rgba(248, 240, 229, 0.9));
@@ -462,6 +482,7 @@ h6 {
 }
 
 .module-card-top {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -477,6 +498,8 @@ h6 {
 }
 
 .module-card p {
+  text-align: left;
+  width: 100%;
   color: var(--muted);
   line-height: 1.65;
   font-size: 0.95rem;
@@ -1119,4 +1142,248 @@ textarea {
   font-size: 0.84rem;
   font-weight: 700;
   cursor: pointer;
+}
+/* ── PRO MAX UI/UX UPGRADES ── */
+body {
+  background: var(--bg);
+}
+
+/* Animated Mesh Orbs */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  width: 70vw;
+  height: 70vw;
+  border-radius: 50%;
+  filter: blur(90px);
+  z-index: -1;
+  opacity: 0.6;
+  pointer-events: none;
+  animation: orbFloat 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body::before {
+  top: -20vw;
+  left: -20vw;
+  background: radial-gradient(circle, rgba(188, 93, 45, 0.18) 0%, rgba(188, 93, 45, 0) 70%);
+}
+
+body::after {
+  bottom: -20vw;
+  right: -20vw;
+  background: radial-gradient(circle, rgba(96, 114, 61, 0.16) 0%, rgba(96, 114, 61, 0) 70%);
+  animation-duration: 30s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes orbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(5vw, 8vw) scale(1.1); }
+  66% { transform: translate(-3vw, 12vw) scale(0.9); }
+  100% { transform: translate(8vw, -5vw) scale(1.05); }
+}
+
+/* Page Load Animation */
+.page-container, .welcome-shell, .app-view, .lesson-shell, .admin-shell {
+  animation: pageEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pageEntrance {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* Enhanced 3D Hover on Cards */
+.portal-card, .admin-card, .module-card, .stat-card {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow;
+}
+
+.portal-card:hover, .admin-card:hover, .module-card:hover, .stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 32px 72px -12px rgba(60, 36, 18, 0.2), 0 16px 32px -8px rgba(60, 36, 18, 0.1);
+  border-color: rgba(255, 255, 255, 1);
+}
+
+.portal-card:active, .admin-card:active, .module-card:active {
+  transform: translateY(-2px) scale(0.99);
+}
+
+/* Glass Buttons Upgrade */
+.primary-action, .secondary-action {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primary-action::after, .secondary-action::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.primary-action:hover::after, .secondary-action:hover::after {
+  transform: translateX(100%);
+}
+
+.primary-action:hover {
+  box-shadow: 0 12px 28px rgba(188, 93, 45, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Custom Scrollbar for modern feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(80, 58, 40, 0.15);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(80, 58, 40, 0.25);
+}
+
+/* ── PRO MAX EXTRA POLISH ── */
+/* Modern Focus States */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(188, 93, 45, 0.2);
+  border-radius: 4px;
+}
+button:focus-visible, input:focus-visible, select:focus-visible {
+  border-radius: inherit;
+}
+
+/* Staggered Item Animations */
+.stagger-in > * {
+  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.stagger-in > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-in > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-in > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-in > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-in > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-in > *:nth-child(n+6) { animation-delay: 0.3s; }
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Elegant Text Selection */
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+::-moz-selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+.question-stack::-webkit-scrollbar { width: 6px; }
+.question-stack::-webkit-scrollbar-track { background: rgba(80,58,40,0.04); border-radius: 4px; }
+.question-stack::-webkit-scrollbar-thumb { background: rgba(80,58,40,0.15); border-radius: 4px; }
+.question-stack::-webkit-scrollbar-thumb:hover { background: rgba(80,58,40,0.3); }
+
+/* Skeleton Loading State */
+.skeleton-pulse {
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, rgba(80,58,40,0.06) 25%, rgba(80,58,40,0.12) 50%, rgba(80,58,40,0.06) 75%);
+  background-size: 400% 100%;
+  border-radius: 4px;
+}
+@keyframes skeletonPulse {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* Smooth Scrolling Globally */
+html {
+  scroll-behavior: smooth;
+}
+
+
+/* ── DARK MODE THEME ── */
+:root.dark-theme {
+  --background: #121212;
+  --text: #e0e0e0;
+  --muted: #a0a0a0;
+  --accent: #d97706;
+  --accent-deep: #fbbf24;
+  --surface: #1e1e1e;
+  --shadow-glass: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+:root.dark-theme body {
+  background: var(--background);
+}
+
+:root.dark-theme .page-container::before,
+:root.dark-theme .page-container::after {
+  opacity: 0.05;
+}
+
+:root.dark-theme .sidebar-panel,
+:root.dark-theme .hero-band,
+:root.dark-theme .workspace-panel,
+:root.dark-theme .module-card,
+:root.dark-theme .class-button {
+  background: linear-gradient(145deg, rgba(30, 30, 30, 0.94), rgba(20, 20, 20, 0.9));
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+:root.dark-theme .module-card h4,
+:root.dark-theme .class-button strong {
+  color: #fff;
+}
+
+:root.dark-theme .module-card p,
+:root.dark-theme .class-button span {
+  color: #bbb;
+}
+
+:root.dark-theme .app-rail {
+  background: linear-gradient(185deg, #0f0f0f 0%, #1a1a1a 100%);
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+:root.dark-theme .rail-btn {
+  color: rgba(255,255,255,0.4);
+}
+:root.dark-theme .rail-btn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+
+:root.dark-theme .question-card {
+  background: rgba(30, 30, 30, 0.7);
+  border-color: rgba(255,255,255,0.05);
+  color: #e0e0e0;
+}
+
+:root.dark-theme .choice-button {
+  background: rgba(40, 40, 40, 0.8);
+  border-color: rgba(255,255,255,0.1);
+  color: #e0e0e0;
+}
+:root.dark-theme .choice-button:hover {
+  background: rgba(60, 60, 60, 0.9);
+}
+
+.class-list,
+.progress-grid,
+.module-grid,
+.workspace-grid {
+  padding-top: 16px;
+  margin-top: -16px;
 }

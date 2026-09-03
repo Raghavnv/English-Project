@@ -13,6 +13,7 @@ if (!currentLesson) {
 }
 
 let module = null;
+let lessonCompletedSoundPlayed = false;
 let progressId = null;
 let answers = {};
 let lessonTitle = "";
@@ -184,6 +185,13 @@ function renderQuestions(lesson, savedProgress) {
     document.getElementById("progressText").textContent = `${answered} of ${total} answered`;
     document.getElementById("progressPct").textContent = pct + "%";
     document.getElementById("progressFill").style.width = pct + "%";
+    
+    if (pct === 100 && !lessonCompletedSoundPlayed) {
+      lessonCompletedSoundPlayed = true;
+      if (typeof playChimeSound !== 'undefined') playChimeSound();
+      if (typeof fireConfetti !== 'undefined') fireConfetti();
+    }
+    
     return answered;
   }
 

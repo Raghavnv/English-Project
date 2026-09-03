@@ -13,23 +13,43 @@
   <style>
     /* ── LAYOUT & APP RAIL ── */
     body { padding-left: 88px; }
-    
     .app-rail {
       position: fixed; left: 0; top: 0; bottom: 0; width: 88px;
       background: linear-gradient(185deg, #18130f 0%, #291d15 50%, #1f1610 100%);
-      z-index: 9999; display: flex; flex-direction: column; align-items: center;
-      padding: 24px 0; gap: 14px; border-right: 1px solid rgba(255,255,255,0.08);
+      z-index: 9999; display: flex; flex-direction: column; align-items: flex-start;
+      padding: 24px 18px; gap: 14px; border-right: 1px solid rgba(255,255,255,0.08);
       box-shadow: 4px 0 28px rgba(0,0,0,0.25);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-x: hidden;
+    }
+    .app-rail:hover {
+      width: 260px;
     }
     .rail-logo {
       font-size: 1.8rem; margin-bottom: 8px; padding-bottom: 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.08); width: 56px;
-      text-align: center; filter: drop-shadow(0 2px 8px rgba(188,93,45,0.3));
+      border-bottom: 1px solid rgba(255,255,255,0.08); width: 100%;
+      display: flex; align-items: center; justify-content: flex-start; gap: 16px; padding-left: 10px;
+      text-align: left; filter: drop-shadow(0 2px 8px rgba(188,93,45,0.3));
+      white-space: nowrap; color: white; font-weight: 800; font-family: var(--font-family);
+    }
+    .rail-logo span {
+      opacity: 0; transition: opacity 0.2s ease;
+    }
+    .app-rail:hover .rail-logo span {
+      opacity: 1; transition-delay: 0.1s;
     }
     .rail-btn {
-      width: 52px; height: 52px; border-radius: 16px; border: 1px solid transparent; background: transparent;
+      width: 100%; min-width: 52px; height: 52px; border-radius: 16px; border: 1px solid transparent; background: transparent;
       font-size: 1.4rem; cursor: pointer; transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-      color: rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; position: relative;
+      color: rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: flex-start; position: relative;
+      padding-left: 10px; gap: 16px; flex-shrink: 0;
+    }
+    .rail-btn-text {
+      font-size: 1.05rem; font-weight: 600; font-family: var(--font-family);
+      opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
+    }
+    .app-rail:hover .rail-btn-text {
+      opacity: 1; transition-delay: 0.1s;
     }
     .rail-btn:hover {
       background: rgba(255,255,255,0.1); color: #fff;
@@ -38,17 +58,19 @@
     }
     .rail-btn.active {
       background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%); color: #fff;
-      box-shadow: 0 8px 20px -4px rgba(188,93,45,0.55), inset 0 1px 0 rgba(255,255,255,0.3);
-      border-color: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.2); box-shadow: 0 8px 24px rgba(188,93,45,0.35);
     }
-    .rail-btn::after {
-      content: attr(data-tooltip); position: absolute; left: 68px;
-      background: #18130f; color: #fffaf2; padding: 7px 14px; border-radius: 10px;
-      font-size: 0.82rem; font-weight: 700; font-family: var(--font-family); white-space: nowrap; opacity: 0; pointer-events: none;
-      transform: translateX(-10px); transition: all 0.2s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.12); z-index: 10000;
+    .powered-by-sidebar {
+      margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
+      overflow: hidden;
     }
-    .rail-btn:hover::after { opacity: 1; transform: translateX(0); }
+    .app-rail:hover .powered-by-sidebar {
+      opacity: 1; transition-delay: 0.15s;
+    }
+    .powered-by-sidebar span { color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    
 
     /* ── FULL-PAGE VIEW SWITCHING ── */
     .app-view { display: none; animation: fadeViewIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
@@ -135,34 +157,67 @@
       body { padding-left: 0; padding-bottom: 80px; }
       .app-rail { top: auto; bottom: 0; width: 100%; height: 80px; flex-direction: row; justify-content: space-around; padding: 0 16px; border-right: none; border-top: 1px solid rgba(255,255,255,0.1); }
       .rail-logo { display: none; }
-      .rail-btn::after { display: none; }
+      
       .platform-main { grid-template-columns: 1fr !important; }
       .platform-sidebar { display: none; }
       .platform-sidebar.mobile-open { display: flex; }
       .mobile-sidebar-toggle { display: inline-flex !important; }
     }
-  </style>
+  
+    .text-gradient {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+    
+    .glow-effect {
+      position: relative;
+    }
+    .glow-effect::after {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      background: radial-gradient(circle at center, rgba(188, 93, 45, 0.15) 0%, transparent 70%);
+      z-index: -1;
+      border-radius: 50%;
+    }
+
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
   <!-- ── APP RAIL NAVIGATION ── -->
   <nav class="app-rail">
-    <div class="rail-logo">📚</div>
-    <button class="rail-btn active" data-tooltip="Dashboard" onclick="switchAppView('view-dashboard', this)">🏠</button>
-    <button class="rail-btn" data-tooltip="Pronunciation Lab" onclick="switchAppView('view-pronunciation', this)">🎙️</button>
-    <button class="rail-btn" data-tooltip="Roleplay Sandbox" onclick="switchAppView('view-roleplay', this)">🎭</button>
-    <button class="rail-btn" data-tooltip="Story Corner" onclick="switchAppView('view-story', this)">📖</button>
-    <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('view-translator', this)">🌐</button>
-    <button class="rail-btn" data-tooltip="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️</button>
-    <button class="rail-btn" data-tooltip="Memory Deck" onclick="switchAppView('view-memory-deck', this)">🧠</button>
+    <div class="rail-logo">☰ <span>Menu</span></div>
+    <button class="rail-btn active" onclick="switchAppView('view-dashboard', this)">🏠 <span class="rail-btn-text">Dashboard</span></button>
+    <button class="rail-btn" onclick="switchAppView('view-pronunciation', this)">🎙️ <span class="rail-btn-text">Pronunciation Lab</span></button>
+    <button class="rail-btn" onclick="switchAppView('view-roleplay', this)">🎭 <span class="rail-btn-text">Roleplay Sandbox</span></button>
+    <button class="rail-btn" onclick="switchAppView('view-story', this)">📖 <span class="rail-btn-text">Story Corner</span></button>
+    <button class="rail-btn" onclick="switchAppView('view-translator', this)">🌐 <span class="rail-btn-text">Smart Translator</span></button>
+    <button class="rail-btn" onclick="switchAppView('view-wordbank', this)">🗂️ <span class="rail-btn-text">Personal Word Bank</span></button>
+    <button class="rail-btn" onclick="switchAppView('view-memory-deck', this)">🧠 <span class="rail-btn-text">Memory Deck</span></button>
 
-    <button class="rail-btn" data-tooltip="Resources" onclick="switchAppView('view-resources', this)" style="position:relative;">
-      📚<span id="resourceRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
+    <button class="rail-btn" onclick="switchAppView('view-resources', this)" style="position:relative;">
+      📚 <span class="rail-btn-text">Resources</span><span id="resourceRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
-    <button class="rail-btn" data-tooltip="Broadcasts" onclick="switchAppView('view-broadcast', this)" style="position:relative;">
-      📣<span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
+    <button class="rail-btn" onclick="switchAppView('view-broadcast', this)" style="position:relative;">
+      📣 <span class="rail-btn-text">Broadcasts</span><span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
-  </nav>
+  
+        
+    <button class="rail-btn" id="themeToggleBtn" onclick="toggleTheme()" style="margin-top: 10px;">
+      <span id="themeIcon">🌙</span> <span class="rail-btn-text">Dark Mode</span>
+    </button>
+
+    <div class="powered-by-sidebar">
+      <span>Powered By</span>
+      <img src="sensesyslogo.png" alt="SenseSys Logo" style="height: 20px; object-fit: contain; margin-bottom: 2px;">
+    </div>
+</nav>
 
   <div class="platform-shell">
     <header class="platform-header">
@@ -176,9 +231,7 @@
             <span>Learning Platform</span>
           </div>
         </div>
-        <div style="width: 1.5px; height: 32px; background: rgba(80,58,40,0.15); border-radius: 2px;"></div>
-        <img src="sensesyslogo.png" alt="SenseSys Logo" style="height: 24px; object-fit: contain; margin-top: 2px;">
-      </div>
+        </div>
 
       <div class="platform-header-actions">
         <button class="mobile-sidebar-toggle" id="mobileSidebarToggle">☰ Classes</button>
@@ -201,7 +254,7 @@
       <!-- EXPANDED FULL-WIDTH LEARNER WIDGET (Hero Banner) -->
       <div class="workspace-panel" style="margin-top: 24px; padding: 36px 42px; border-radius: 24px; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(145deg, rgba(255, 251, 246, 0.98), rgba(249, 240, 227, 0.92)); border: 1px solid rgba(255,255,255,0.8);">
           <p class="panel-label" style="margin-bottom: 8px; font-size: 0.85rem; color: var(--accent-deep);">Learner Portal</p>
-          <h1 id="sidebarWelcome" style="font-family: var(--font-family); font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 10px; color: var(--text); line-height: 1.15;">Welcome back!</h1>
+          <h1 id="sidebarWelcome" class="text-gradient glow-effect" style="font-family: var(--font-family); font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 10px; color: var(--text); line-height: 1.15;">Welcome back!</h1>
           <p style="color: var(--muted); font-size: 1.05rem; margin: 0; line-height: 1.6; max-width: 65ch;">
             Choose the class you are attending from the sidebar. The platform will automatically load your learning plan, dynamic AI flashcards, and saved progress below.
           </p>
@@ -312,7 +365,7 @@
               </div>
               <button class="text-button" type="button" id="resetClassButton">Reset Class Progress</button>
             </div>
-            <div class="module-grid" id="moduleGrid"></div>
+            <div class="module-grid stagger-in" id="moduleGrid"></div>
           </section>
 
           <section class="workspace-grid">
@@ -565,7 +618,7 @@
       if (btnElement) {
         btnElement.classList.add('active');
       } else {
-        document.querySelector('.rail-btn[data-tooltip="Dashboard"]').classList.add('active');
+        document.querySelector('.rail-btn[onclick*="view-dashboard"]').classList.add('active');
       }
 
       document.querySelectorAll('.app-view').forEach(view => {
@@ -600,6 +653,27 @@
       </div>
     </div>
   </div>
+
+
+  <!-- THEME LOGIC -->
+  <script>
+    function toggleTheme() {
+      const root = document.documentElement;
+      root.classList.toggle('dark-theme');
+      const isDark = root.classList.contains('dark-theme');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+      document.querySelector('#themeToggleBtn .rail-btn-text').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+      playPopSound();
+    }
+    
+    // On Load
+    if (localStorage.getItem('theme') === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      document.getElementById('themeIcon').textContent = '☀️';
+      document.querySelector('#themeToggleBtn .rail-btn-text').textContent = 'Light Mode';
+    }
+  </script>
 
 </body>
 </html>
