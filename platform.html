@@ -22,9 +22,7 @@
       transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow-x: hidden;
     }
-    .app-rail:hover {
-      width: 260px;
-    }
+    
     .rail-logo {
       font-size: 1.8rem; margin-bottom: 8px; padding-bottom: 16px;
       border-bottom: 1px solid rgba(255,255,255,0.08); width: 100%;
@@ -35,9 +33,7 @@
     .rail-logo span {
       opacity: 0; transition: opacity 0.2s ease;
     }
-    .app-rail:hover .rail-logo span {
-      opacity: 1; transition-delay: 0.1s;
-    }
+    
     .rail-btn {
       width: 100%; min-width: 52px; height: 52px; border-radius: 16px; border: 1px solid transparent; background: transparent;
       font-size: 1.4rem; cursor: pointer; transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -48,9 +44,7 @@
       font-size: 1.05rem; font-weight: 600; font-family: var(--font-family);
       opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
     }
-    .app-rail:hover .rail-btn-text {
-      opacity: 1; transition-delay: 0.1s;
-    }
+    
     .rail-btn:hover {
       background: rgba(255,255,255,0.1); color: #fff;
       transform: translateY(-2px);
@@ -62,22 +56,15 @@
     }
     .powered-by-sidebar {
       margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 6px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
+      gap: 4px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); 
       overflow: hidden;
     }
-    .app-rail:hover .powered-by-sidebar {
-      opacity: 1; transition-delay: 0.15s;
-    }
+    .powered-by-sidebar span { display: none; }
+    
     .powered-by-sidebar span { color: rgba(255,255,255,0.5); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 
-    .rail-btn::after {
-      content: attr(data-tooltip); position: absolute; left: 68px;
-      background: #18130f; color: #fffaf2; padding: 7px 14px; border-radius: 10px;
-      font-size: 0.82rem; font-weight: 700; font-family: var(--font-family); white-space: nowrap; opacity: 0; pointer-events: none;
-      transform: translateX(-10px); transition: all 0.2s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.12); z-index: 10000;
-    }
-    .rail-btn:hover::after { opacity: 1; transform: translateX(0); }
+    
+    
 
     /* ── FULL-PAGE VIEW SWITCHING ── */
     .app-view { display: none; animation: fadeViewIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
@@ -164,7 +151,7 @@
       body { padding-left: 0; padding-bottom: 80px; }
       .app-rail { top: auto; bottom: 0; width: 100%; height: 80px; flex-direction: row; justify-content: space-around; padding: 0 16px; border-right: none; border-top: 1px solid rgba(255,255,255,0.1); }
       .rail-logo { display: none; }
-      .rail-btn::after { display: none; }
+      
       .platform-main { grid-template-columns: 1fr !important; }
       .platform-sidebar { display: none; }
       .platform-sidebar.mobile-open { display: flex; }
@@ -200,24 +187,24 @@
   <!-- ── APP RAIL NAVIGATION ── -->
   <nav class="app-rail">
     <div class="rail-logo">☰ <span>Menu</span></div>
-    <button class="rail-btn active" data-tooltip="Dashboard" onclick="switchAppView('view-dashboard', this)">🏠 <span class="rail-btn-text">Dashboard</span></button>
-    <button class="rail-btn" data-tooltip="Pronunciation Lab" onclick="switchAppView('view-pronunciation', this)">🎙️ <span class="rail-btn-text">Pronunciation Lab</span></button>
-    <button class="rail-btn" data-tooltip="Roleplay Sandbox" onclick="switchAppView('view-roleplay', this)">🎭 <span class="rail-btn-text">Roleplay Sandbox</span></button>
-    <button class="rail-btn" data-tooltip="Story Corner" onclick="switchAppView('view-story', this)">📖 <span class="rail-btn-text">Story Corner</span></button>
-    <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('view-translator', this)">🌐 <span class="rail-btn-text">Smart Translator</span></button>
-    <button class="rail-btn" data-tooltip="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️ <span class="rail-btn-text">Personal Word Bank</span></button>
-    <button class="rail-btn" data-tooltip="Memory Deck" onclick="switchAppView('view-memory-deck', this)">🧠 <span class="rail-btn-text">Memory Deck</span></button>
+    <button class="rail-btn active" data-tooltip="Dashboard" onclick="switchAppView('view-dashboard', this)">🏠 </button>
+    <button class="rail-btn" data-tooltip="Pronunciation Lab" onclick="switchAppView('view-pronunciation', this)">🎙️ </button>
+    <button class="rail-btn" data-tooltip="Roleplay Sandbox" onclick="switchAppView('view-roleplay', this)">🎭 </button>
+    <button class="rail-btn" data-tooltip="Story Corner" onclick="switchAppView('view-story', this)">📖 </button>
+    <button class="rail-btn" data-tooltip="Smart Translator" onclick="switchAppView('view-translator', this)">🌐 </button>
+    <button class="rail-btn" data-tooltip="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️ </button>
+    <button class="rail-btn" data-tooltip="Memory Deck" onclick="switchAppView('view-memory-deck', this)">🧠 </button>
 
     <button class="rail-btn" data-tooltip="Resources" onclick="switchAppView('view-resources', this)" style="position:relative;">
-      📚 <span class="rail-btn-text">Resources</span><span id="resourceRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
+      📚 <span id="resourceRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
     <button class="rail-btn" data-tooltip="Broadcasts" onclick="switchAppView('view-broadcast', this)" style="position:relative;">
-      📣 <span class="rail-btn-text">Broadcasts</span><span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
+      📣 <span id="broadcastRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
     </button>
   
         
     <button class="rail-btn" id="themeToggleBtn" data-tooltip="Theme" onclick="toggleTheme()" style="margin-top: 10px;">
-      <span id="themeIcon">🌙</span> <span class="rail-btn-text">Dark Mode</span>
+      <span id="themeIcon">🌙</span> 
     </button>
 
     <div class="powered-by-sidebar">

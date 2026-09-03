@@ -1380,3 +1380,11 @@ html {
 :root.dark-theme .choice-button:hover {
   background: rgba(60, 60, 60, 0.9);
 }
+
+.class-list,
+.progress-grid,
+.module-grid,
+.workspace-grid {
+  padding-top: 16px;
+  margin-top: -16px;
+}
