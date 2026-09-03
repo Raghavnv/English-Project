@@ -310,7 +310,7 @@ function renderBroadcastFullPage() {
     <div class="workspace-panel" style="padding:24px; border-radius:20px;">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
         <span style="font-size:1.4rem;">${BROADCAST_ICONS[b.type] || "📣"}</span>
-        <h3 style="margin:0; font-family:'Newsreader', serif; font-size:1.25rem;">${escapeHtml(b.title)}</h3>
+        <h3 style="margin:0; font-family:var(--font-family); font-weight:700; letter-spacing:-0.02em; font-size:1.25rem;">${escapeHtml(b.title)}</h3>
       </div>
       <p style="margin:0 0 10px; color: var(--text); line-height:1.7;">${escapeHtml(b.message)}</p>
       <span style="font-size:0.78rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; font-weight:700;">
@@ -371,7 +371,7 @@ function renderResourceFullPage() {
     <a href="${escapeHtml(r.url)}" ${r.fileName ? `download="${escapeHtml(r.fileName)}"` : `target="_blank" rel="noopener"`} class="workspace-panel" style="display:block; padding:22px; border-radius:20px; text-decoration:none; color:inherit; transition: transform 0.15s ease;">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
         <span style="font-size:1.4rem;">${RESOURCE_ICONS[r.type] || "📄"}</span>
-        <h3 style="margin:0; font-family:'Newsreader', serif; font-size:1.1rem;">${escapeHtml(r.title)}</h3>
+        <h3 style="margin:0; font-family:var(--font-family); font-weight:700; letter-spacing:-0.02em; font-size:1.15rem;">${escapeHtml(r.title)}</h3>
       </div>
       ${r.notes ? `<p style="margin:0 0 10px; color: var(--muted); line-height:1.6; font-size:0.92rem;">${escapeHtml(r.notes)}</p>` : ""}
       <span style="font-size:0.78rem; color: var(--accent-deep); font-weight:800;">${r.fileName ? `⬇️ Download (${r.fileName})` : "Open resource →"}</span>
@@ -777,7 +777,7 @@ function renderAIPanel(module) {
     <div class="section-head" style="margin-bottom: 20px;">
       <div>
         <p class="panel-label" style="color: var(--accent-deep);">AI Study Companion</p>
-        <h3 style="font-family: 'Newsreader', serif; font-size: 1.8rem; color: var(--text);">Learn with Buddy</h3>
+        <h3 style="font-family: var(--font-family); font-weight: 700; letter-spacing: -0.025em; font-size: 1.8rem; color: var(--text);">Learn with Buddy</h3>
       </div>
       <div style="display: flex; align-items: center; gap: 6px; background: rgba(34, 197, 94, 0.1); padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(34, 197, 94, 0.2);">
         <div style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: ai-pulse 2s infinite;"></div>
@@ -1276,7 +1276,7 @@ window.loadWordBank = function() {
     wordGrid.innerHTML += `
       <div class="word-card" style="position: relative; padding-right: 50px;">
         <button onclick="BuddyVoice.speak('${escapeHtml(item.word).replace(/'/g, "\\'")}. ${escapeHtml(item.definition).replace(/'/g, "\\'")}. For example: ${escapeHtml(item.example).replace(/'/g, "\\'")}', 'English', this)" style="position: absolute; right: 16px; top: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.2); background: rgba(80,58,40,0.05); font-size: 1.1rem; cursor: pointer; display:flex; align-items:center; justify-content:center;">🔊</button>
-        <h4 style="font-size: 1.4rem; font-family: 'Newsreader', serif; margin-bottom: 6px; color: var(--accent-deep);">${escapeHtml(item.word)}</h4>
+        <h4 style="font-size: 1.4rem; font-family: var(--font-family); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--accent-deep);">${escapeHtml(item.word)}</h4>
         <p style="font-size: 0.95rem; color: var(--text); font-weight: 600; margin-bottom: 8px;">${escapeHtml(item.definition)}</p>
         <p style="font-size: 0.9rem; color: var(--muted); font-style: italic;">"${escapeHtml(item.example)}"</p>
       </div>
@@ -1391,7 +1391,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resultDiv.innerHTML = `
           <div style="padding: 40px; border-radius: 24px; background: #fff; border: 1px solid rgba(80,58,40,0.1); box-shadow: var(--shadow-soft); animation: popIn 0.3s ease;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px;">
-              <h4 style="font-family: 'Newsreader', serif; font-size: 2.2rem; color: var(--accent-deep); margin: 0;">${escapeHtml(res.title)}</h4>
+              <h4 style="font-family: var(--font-family); font-size: 2.1rem; font-weight: 800; letter-spacing: -0.025em; color: var(--accent-deep); margin: 0;">${escapeHtml(res.title)}</h4>
               <button onclick="BuddyVoice.speak('${escapeHtml(fullStoryText).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(111,124,74,0.3); background: rgba(111,124,74,0.1); color: #3d5220; font-weight: 700; cursor: pointer; display:flex; align-items:center; gap: 8px; flex-shrink: 0;">🔊 Read to me</button>
             </div>
             ${paragraphsHtml}
@@ -1432,7 +1432,7 @@ function renderPronunciationUI() {
   box.innerHTML = `
     <div style="margin-bottom: 32px;">
       <p style="font-size: 0.85rem; font-weight: 800; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Your Target Sentence</p>
-      <h2 style="font-family: 'Newsreader', serif; font-size: 2.2rem; color: var(--text); line-height: 1.4; margin: 0 0 16px;">"${escapeHtml(currentPronunciationSentence)}"</h2>
+      <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: var(--text); line-height: 1.35; margin: 0 0 16px;">"${escapeHtml(currentPronunciationSentence)}"</h2>
       <button onclick="BuddyVoice.speak('${escapeHtml(currentPronunciationSentence).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(111,124,74,0.3); background: rgba(111,124,74,0.1); color: #3d5220; font-weight: 700; cursor: pointer;">🔊 Hear Buddy Say It</button>
     </div>
     
@@ -1555,13 +1555,13 @@ window.openLightningModal = function() {
   const playArea = document.getElementById("lightningPlayArea");
   if (playArea) {
     playArea.innerHTML = `
-      <h2 style="font-family: 'Newsreader', serif; font-size: 2.8rem; color: #422006; margin-bottom: 10px;">Lightning Round</h2>
+      <h2 style="font-family: var(--font-family); font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: #422006; margin-bottom: 10px;">Lightning Round</h2>
       <p style="font-size: 1.1rem; color: #713f12; margin-bottom: 32px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
       <div class="ai-loading-state" id="lightningLoading" style="display:none; padding: 20px;">
         <div class="spinner" style="border-top-color: #713f12; margin: 0 auto;"></div>
         <p style="color: #713f12; font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
       </div>
-      <button id="lightningStartBtn" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-size: 1.3rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
+      <button id="lightningStartBtn" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-family: var(--font-family); font-size: 1.25rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
     `;
     
     // Bulletproof click listener attachment
@@ -1744,9 +1744,9 @@ function endLightningGame(reason) {
   
   playArea.innerHTML = `
     <div style="font-size: 4rem; margin-bottom: 16px;">${icon}</div>
-    <h2 style="font-family: 'Newsreader', serif; font-size: 2.5rem; color: #422006; margin-bottom: 12px;">${title}</h2>
+    <h2 style="font-family: var(--font-family); font-size: 2.4rem; font-weight: 800; letter-spacing: -0.025em; color: #422006; margin-bottom: 12px;">${title}</h2>
     <p style="font-size: 1.15rem; color: #713f12; margin-bottom: 32px;">${msg}</p>
-    <button onclick="closeLightningModal()" style="min-height: 56px; padding: 0 32px; border-radius: 999px; border: none; background: #713f12; color: #fef08a; font-size: 1.1rem; font-weight: 800; cursor: pointer;">Close & Return</button>
+    <button onclick="closeLightningModal()" style="min-height: 56px; padding: 0 32px; border-radius: 999px; border: none; background: #713f12; color: #fef08a; font-family: var(--font-family); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: transform 0.2s;">Close & Return</button>
   `;
 }
 
@@ -1905,7 +1905,7 @@ function startSpacedRepetition() {
   if (srsQueue.length === 0) {
     document.getElementById("srsPlayArea").innerHTML = `
       <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
-      <h2 style="font-family: 'Newsreader', serif; font-size: 2.2rem; color: #3d5220;">You're all caught up!</h2>
+      <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: #3d5220;">You're all caught up!</h2>
       <p style="font-size: 1.1rem; color: var(--muted); margin-bottom: 32px;">There are no words due for review today. Add more words from the translator, or check back tomorrow.</p>
     `;
     return;
@@ -1918,7 +1918,7 @@ function renderSrsCard() {
   if (srsQueue.length === 0) {
     document.getElementById("srsPlayArea").innerHTML = `
       <div style="font-size: 4rem; margin-bottom: 16px;">🏆</div>
-      <h2 style="font-family: 'Newsreader', serif; font-size: 2.2rem; color: #3d5220;">Daily Deck Complete!</h2>
+      <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: #3d5220;">Daily Deck Complete!</h2>
       <p style="font-size: 1.1rem; color: var(--muted); margin-bottom: 32px;">Excellent work. Your memory is growing stronger.</p>
       <button onclick="switchAppView('view-dashboard')" class="primary-action">Return to Dashboard</button>
     `;
@@ -1935,7 +1935,7 @@ function renderSrsCard() {
         
         <!-- FRONT OF CARD -->
         <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; background: white; border: 2px solid rgba(139, 92, 246, 0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(109, 40, 217, 0.1);">
-          <h2 style="font-family: 'Newsreader', serif; font-size: 3rem; color: #4c1d95; margin: 0;">${escapeHtml(currentSrsWord.word)}</h2>
+          <h2 style="font-family: var(--font-family); font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; color: #4c1d95; margin: 0;">${escapeHtml(currentSrsWord.word)}</h2>
           <p style="color: var(--muted); font-size: 0.9rem; margin-top: 16px;">Tap to flip</p>
         </div>
 
