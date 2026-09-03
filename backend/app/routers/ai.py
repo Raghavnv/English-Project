@@ -340,8 +340,6 @@ Do NOT write any text before or after the array."""
         )
         
         clean_json = raw.strip()
-        
-        # Hunt for the brackets just in case the AI added conversational text
         match = re.search(r'\[.*\]', clean_json, re.DOTALL)
         if match:
             clean_json = match.group(0)
@@ -350,11 +348,9 @@ Do NOT write any text before or after the array."""
             cards = json.loads(clean_json)
             return {"flashcards": cards[:body.count]}
         except json.JSONDecodeError:
-            # If the AI completely messes up the format, give a friendly message instead of a crash
             raise ValueError("The AI did not format the cards correctly. Please try again.")
             
     except Exception as e:
-        # We clean up the error message so the UI alert looks nicer
         error_msg = str(e).replace("AI service error: ", "")
         raise HTTPException(status_code=500, detail=error_msg)
 
@@ -370,7 +366,6 @@ def get_student_analysis(student_id: str, db: Session = Depends(get_db), request
     lessons_total = len(progresses)
     lessons_completed = sum(1 for p in progresses if p.completed)
 
-    # Auto-grade unchecked answers
     AUTO_GRADE_LIMIT = 15
     auto_graded = 0
     for p in progresses:
@@ -490,7 +485,6 @@ Write a short, professional summary (2-3 sentences) for the teacher about the cl
 @router.get("/predictive-flags")
 def get_predictive_flags(db: Session = Depends(get_db), current_admin=Depends(get_current_admin)):
     from app.models.models import Student as StudentModel
-    import json
     
     students = db.query(StudentModel).all()
     class_data = []
@@ -537,7 +531,6 @@ Format:
     try:
         raw = ask_groq(prompt, max_tokens=500, system="You are a strict JSON data classifier.")
         
-        # Clean up any potential markdown formatting from the AI
         clean_json = raw.strip()
         match = re.search(r'\[.*\]', clean_json, re.DOTALL)
         if match:
@@ -730,7 +723,6 @@ class RoleplayRequest(BaseModel):
 
 @router.post("/roleplay-chat")
 def roleplay_chat(request: RoleplayRequest, requester=Depends(require_authenticated_requester)):
-    # Inject the scenario and strict instructions into the system prompt
     system_prompt = f"""
     You are Buddy, acting out a roleplay scenario with an English learner. 
     Current Scenario: {request.scenario}.
@@ -742,7 +734,6 @@ def roleplay_chat(request: RoleplayRequest, requester=Depends(require_authentica
     """
     
     try:
-        # Format history for the LLM
         formatted_history = [{"role": m.role, "content": m.content} for m in request.messages]
         reply = ask_groq(system_prompt, history=formatted_history, max_tokens=150)
         return {"reply": reply}
@@ -786,4 +777,3 @@ def pronunciation_analytics(req: PronunciationRequest, requester=Depends(require
         return json.loads(clean_json)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
