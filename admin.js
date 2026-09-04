@@ -1406,7 +1406,7 @@ async function runBulkCurriculum() {
   loading.style.display = "flex";
   
   try {
-    const response = await window.apiFetch('/api/ai/bulk-curriculum', {
+    const response = await apiFetch('/api/ai/bulk-curriculum', {
       method: 'POST',
       body: JSON.stringify({ topic, count })
     });
