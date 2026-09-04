@@ -879,3 +879,46 @@ html::after {
 .tilt-card:hover {
   z-index: 10;
 }
+
+/* ── UIUX PRO MAX MICRO-INTERACTIONS ── */
+.portal-card, .stat-card, .feature-card {
+  box-shadow: 0 12px 32px -8px rgba(188, 93, 45, 0.12), 0 4px 12px -4px rgba(188, 93, 45, 0.08) !important;
+  border: 1px solid rgba(255,255,255,0.7) !important;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.portal-card:hover, .stat-card:hover, .feature-card:hover {
+  box-shadow: 0 24px 56px -12px rgba(188, 93, 45, 0.25), 0 12px 24px -8px rgba(188, 93, 45, 0.15) !important;
+  transform: translateY(-6px) scale(1.02) !important;
+  z-index: 10;
+}
+
+.portal-card:active, .stat-card:active {
+  transform: translateY(-2px) scale(0.98) !important;
+  transition: transform 0.1s !important;
+}
+
+.nav-link {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.nav-link:hover {
+  transform: translateY(-2px);
+  opacity: 1 !important;
+}
+
+.primary-button {
+  box-shadow: 0 8px 24px -4px rgba(188, 93, 45, 0.4) !important;
+}
+.primary-button:hover {
+  box-shadow: 0 16px 32px -6px rgba(188, 93, 45, 0.5) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+.primary-button:active {
+  transform: translateY(0) scale(0.96) !important;
+}
+
+.welcome-header {
+  box-shadow: 0 12px 36px -8px rgba(188, 93, 45, 0.15) !important;
+  border: 1px solid rgba(255,255,255,0.8) !important;
+}
+

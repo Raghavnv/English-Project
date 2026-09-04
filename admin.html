@@ -230,6 +230,43 @@
       border-radius: 50%;
     }
 
+/* ── UIUX PRO MAX MICRO-INTERACTIONS ── */
+.admin-card, .stat-card, .glass-panel {
+  box-shadow: 0 12px 36px -8px rgba(188, 93, 45, 0.12), 0 4px 12px -4px rgba(188, 93, 45, 0.08) !important;
+  border: 1px solid rgba(255,255,255,0.7) !important;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+body.dark-theme .admin-card, body.dark-theme .stat-card, body.dark-theme .glass-panel {
+  box-shadow: 0 12px 36px -8px rgba(0,0,0,0.4), 0 4px 12px -4px rgba(0,0,0,0.2) !important;
+  border-color: rgba(255,255,255,0.05) !important;
+}
+
+.admin-card:hover, .stat-card:hover {
+  box-shadow: 0 24px 56px -12px rgba(188, 93, 45, 0.25), 0 12px 24px -8px rgba(188, 93, 45, 0.15) !important;
+  transform: translateY(-4px) scale(1.02) !important;
+}
+body.dark-theme .admin-card:hover, body.dark-theme .stat-card:hover {
+  box-shadow: 0 24px 56px -12px rgba(0,0,0,0.6), 0 12px 24px -8px rgba(0,0,0,0.4) !important;
+}
+
+.admin-card:active, .stat-card:active {
+  transform: translateY(-2px) scale(0.98) !important;
+  transition: transform 0.1s !important;
+}
+
+button:active, .rail-btn:active, .action-btn:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.1s !important;
+}
+
+.action-btn.primary {
+  box-shadow: 0 8px 24px -4px rgba(188, 93, 45, 0.4) !important;
+}
+.action-btn.primary:hover {
+  box-shadow: 0 12px 32px -4px rgba(188, 93, 45, 0.6) !important;
+  transform: translateY(-2px) !important;
+}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>

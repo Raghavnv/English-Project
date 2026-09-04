@@ -1426,15 +1426,72 @@ html::after {
 :root.dark-theme .module-carousel::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
 :root.dark-theme .module-carousel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
 
-/* Glass Sidebar */
-.app-rail {
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(24px) saturate(180%);
-  border-right: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 4px 0 24px rgba(188, 93, 45, 0.05);
+
+/* ── UIUX PRO MAX MICRO-INTERACTIONS ── */
+.workspace-panel, .sidebar-panel {
+  box-shadow: 0 12px 36px -8px rgba(188, 93, 45, 0.12), 0 4px 12px -4px rgba(188, 93, 45, 0.08) !important;
+  border: 1px solid rgba(255,255,255,0.7) !important;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-:root.dark-theme .app-rail {
-  background: rgba(20, 20, 20, 0.4) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+:root.dark-theme .workspace-panel, :root.dark-theme .sidebar-panel {
+  box-shadow: 0 12px 36px -8px rgba(0,0,0,0.4), 0 4px 12px -4px rgba(0,0,0,0.2) !important;
+  border-color: rgba(255,255,255,0.05) !important;
 }
+
+.workspace-panel:hover, .sidebar-panel:hover {
+  box-shadow: 0 20px 48px -12px rgba(188, 93, 45, 0.18), 0 8px 16px -6px rgba(188, 93, 45, 0.1) !important;
+}
+:root.dark-theme .workspace-panel:hover, :root.dark-theme .sidebar-panel:hover {
+  box-shadow: 0 20px 48px -12px rgba(0,0,0,0.6), 0 8px 16px -6px rgba(0,0,0,0.4) !important;
+}
+
+button:active, .rail-btn:active, .module-card:active {
+  transform: scale(0.97) !important;
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.primary-action {
+  box-shadow: 0 8px 24px -4px rgba(188, 93, 45, 0.4) !important;
+}
+.primary-action:hover {
+  box-shadow: 0 12px 32px -4px rgba(188, 93, 45, 0.6) !important;
+  transform: translateY(-2px) !important;
+}
+
+.status-badge {
+  box-shadow: 0 4px 12px rgba(188, 93, 45, 0.15) !important;
+  border: 1px solid rgba(255,255,255,0.8) !important;
+}
+
+/* Make class buttons pop more */
+.class-button {
+  box-shadow: 0 4px 12px -2px rgba(188, 93, 45, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+.class-button:hover {
+  box-shadow: 0 8px 20px -4px rgba(188, 93, 45, 0.15) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+.class-button.is-active {
+  box-shadow: 0 12px 28px -6px rgba(188, 93, 45, 0.25) !important;
+  transform: translateY(-3px) scale(1.03) !important;
+}
+
+:root.dark-theme .class-button { border-color: rgba(255,255,255,0.08) !important; }
+:root.dark-theme .status-badge { border-color: rgba(255,255,255,0.1) !important; }
+
+/* Enhancing module cards */
+.module-card {
+  box-shadow: 0 6px 16px -4px rgba(188, 93, 45, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+.module-card:hover {
+  box-shadow: 0 16px 32px -8px rgba(188, 93, 45, 0.2) !important;
+}
+.module-card.is-active {
+  box-shadow: 0 16px 32px -8px rgba(188, 93, 45, 0.3) !important;
+  border: 2px solid var(--accent) !important;
+}
+:root.dark-theme .module-card { border-color: rgba(255,255,255,0.08) !important; }
+
