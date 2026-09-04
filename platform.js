@@ -573,15 +573,23 @@ function renderBadges() {
 // ===== MODULE GRID =====
 function renderModules() {
   const selectedClass = getSelectedClass();
-  const moduleGridEl  = document.getElementById("moduleGrid");
-  moduleGridEl.innerHTML = "";
+  const upcomingGrid = document.getElementById("moduleGridUpcoming");
+  const completedGrid = document.getElementById("moduleGridCompleted");
+  
+  if (!upcomingGrid || !completedGrid) return; // fail-safe if layout changed
+  
+  upcomingGrid.innerHTML = "";
+  completedGrid.innerHTML = "";
 
   if (!selectedClass || selectedClass.modules.length === 0) {
-    moduleGridEl.innerHTML = `<p class="empty-state">No lessons in this class yet.</p>`;
+    upcomingGrid.innerHTML = `<p class="empty-state">No lessons in this class yet.</p>`;
+    completedGrid.innerHTML = `<p class="empty-state">No lessons completed yet.</p>`;
     return;
   }
 
   const sortedModules = [...selectedClass.modules].sort((a, b) => (a.order || 0) - (b.order || 0));
+  let hasUpcoming = false;
+  let hasCompleted = false;
 
   sortedModules.forEach((module, idx) => {
     const prevModule   = idx > 0 ? sortedModules[idx - 1] : null;
@@ -612,8 +620,22 @@ function renderModules() {
       renderLessonPanel(selectedClass, module);
       renderAIPanel(module);
     };
-    moduleGridEl.appendChild(button);
+    
+    if (isComplete) {
+      completedGrid.appendChild(button);
+      hasCompleted = true;
+    } else {
+      upcomingGrid.appendChild(button);
+      hasUpcoming = true;
+    }
   });
+  
+  if (!hasUpcoming) {
+    upcomingGrid.innerHTML = `<p class="empty-state">You've completed all lessons!</p>`;
+  }
+  if (!hasCompleted) {
+    completedGrid.innerHTML = `<p class="empty-state" style="opacity:0.6;font-size:0.9rem;">No lessons completed yet.</p>`;
+  }
 }
 
 // ===== LESSON PANEL =====

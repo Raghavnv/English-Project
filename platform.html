@@ -357,15 +357,23 @@
         </aside>
 
         <section class="platform-content">
-          <section class="content-section">
+          <section class="content-section" id="moduleContainer">
             <div class="section-head">
               <div>
                 <p class="panel-label">Lesson Flow</p>
-                <h3>Class modules</h3>
+                <h3>Upcoming Lessons</h3>
               </div>
               <button class="text-button" type="button" id="resetClassButton">Reset Class Progress</button>
             </div>
-            <div class="module-grid stagger-in" id="moduleGrid"></div>
+            <div class="module-carousel stagger-in" id="moduleGridUpcoming"></div>
+            
+            <div class="section-head" style="margin-top: 32px;">
+              <div>
+                <p class="panel-label">History</p>
+                <h3>Completed Lessons</h3>
+              </div>
+            </div>
+            <div class="module-carousel stagger-in" id="moduleGridCompleted"></div>
           </section>
 
           <section class="workspace-grid">
