@@ -471,21 +471,21 @@
     </div>
 
     <div class="hero-right">
-      <div class="stat-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;">
+      <div class="stat-card tilt-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;">
         <div class="stat-icon stat-icon-orange">📚</div>
         <div class="stat-text">
           <strong>Lesson-based learning</strong>
           <span>Admins create structured lessons with questions that students work through at their own pace.</span>
         </div>
       </div>
-      <div class="stat-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s backwards;">
+      <div class="stat-card tilt-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s backwards;">
         <div class="stat-icon stat-icon-green">📈</div>
         <div class="stat-text">
           <strong>Progress you can see</strong>
           <span>Every answer saved, every lesson tracked. Students and teachers know exactly where they stand.</span>
         </div>
       </div>
-      <div class="stat-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;">
+      <div class="stat-card tilt-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;">
         <div class="stat-icon stat-icon-warm">🤝</div>
         <div class="stat-text">
           <strong>Human connection first</strong>
@@ -521,7 +521,7 @@
 
     <div class="portal-cards stagger-in">
 
-      <div class="portal-card" onclick="window.location.href='login.html'">
+      <div class="portal-card tilt-card" onclick="window.location.href='login.html'">
         <span class="portal-badge portal-badge-student">🎓 Student</span>
         <h3>I'm here to learn</h3>
         <p>Enter your name and school to access your class, open your lessons, and track your answers and progress.</p>
@@ -531,7 +531,7 @@
         <div class="portal-deco portal-deco-student"></div>
       </div>
 
-      <div class="portal-card" onclick="window.location.href='admin-login.html'">
+      <div class="portal-card tilt-card" onclick="window.location.href='admin-login.html'">
         <span class="portal-badge portal-badge-admin">🛠 Admin</span>
         <h3>I'm here to teach</h3>
         <p>Create and manage classes, write lessons with questions, and keep content updated for your students.</p>
@@ -560,6 +560,26 @@
 </div>
 
 <script>
+  // ── 3D TILT EFFECT ──
+  document.addEventListener("DOMContentLoaded", () => {
+    const cards = document.querySelectorAll(".tilt-card");
+    cards.forEach(card => {
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -5;
+        const rotateY = ((x - centerX) / centerX) * 5;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+  });
+
   document.addEventListener("DOMContentLoaded", () => {
     // Check if the user is already signed in by looking for a token
     const token = localStorage.getItem("token"); 
