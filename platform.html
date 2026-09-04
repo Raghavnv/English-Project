@@ -65,9 +65,9 @@
       border-color: rgba(255,255,255,0.2); box-shadow: 0 8px 24px rgba(188,93,45,0.35);
     }
     .powered-by-sidebar {
-      margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin-top: 32px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 6px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
-      overflow: hidden;
+      overflow: hidden; flex-shrink: 0; padding-bottom: 24px;
     }
     .app-rail:hover .powered-by-sidebar {
       opacity: 1; transition-delay: 0.15s;
@@ -168,7 +168,7 @@
         gap: 16px; align-items: center;
       }
       .app-rail > * { flex-shrink: 0; }
-      .rail-logo { display: none; }
+      .rail-logo { display: none; } .powered-by-sidebar { display: none !important; }
       
       .platform-main { grid-template-columns: 1fr !important; }
       .platform-sidebar { display: none; }

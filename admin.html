@@ -45,7 +45,7 @@
     .app-rail:hover .rail-btn .label, body.rail-expanded .rail-btn .label { opacity: 1; transition-delay: 0.1s; }
     
     .powered-by-sidebar {
-       width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin-top: 32px; flex-shrink: 0; padding-bottom: 24px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 6px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); opacity: 0; white-space: nowrap; transition: opacity 0.2s ease;
       overflow: hidden;
     }
@@ -206,7 +206,7 @@
         overflow-x: auto; overflow-y: hidden; gap: 16px;
       }
       .app-rail > * { flex-shrink: 0; }
-      .rail-hamburger { display: none; }
+      .rail-hamburger { display: none; } .powered-by-sidebar { display: none !important; }
       .rail-btn { width: 50px; height: 50px; padding: 0; justify-content: center; }
       .rail-btn .label { display: none !important; }
       .rail-btn .icon { width: auto; }
