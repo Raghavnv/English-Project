@@ -395,7 +395,7 @@ function renderClassList() {
     button.innerHTML = `<strong>${courseClass.label}</strong>`;
     button.onclick = () => {
       state.selectedClassId  = courseClass.id;
-      state.selectedModuleId = courseClass.modules[0]?.id || "";
+      state.selectedModuleId = "";
       platformSidebar?.classList.remove("mobile-open");
       render();
     };
@@ -656,7 +656,15 @@ function renderLessonPanel(selectedClass, module) {
   const stack = document.getElementById("questionStack");
   stack.innerHTML = "";
 
-  if (total > 0) {
+  if (total === 0) {
+    stack.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 48px 24px; text-align:center; opacity: 0.6; animation: pageEntrance 1s ease backwards;">
+        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(188,93,45,0.4)); animation: orbFloat 6s ease-in-out infinite alternate;">📝</div>
+        <h4 style="font-size: 1.25rem; margin: 0 0 8px; color: var(--text);">No Questions Yet</h4>
+        <p style="font-size: 0.95rem; color: var(--muted); max-width: 280px; margin: 0;">Your teacher hasn't added any questions to this lesson yet.</p>
+      </div>
+    `;
+  } else {
     const progressRow = document.createElement("div");
     progressRow.className = "lesson-progress-row";
     progressRow.innerHTML = `
@@ -667,11 +675,6 @@ function renderLessonPanel(selectedClass, module) {
       <div class="lesson-mini-bar"><div class="lesson-mini-fill" style="width:${percent}%"></div></div>
     `;
     stack.appendChild(progressRow);
-  } else {
-    const noQ = document.createElement("p");
-    noQ.className = "empty-state";
-    noQ.textContent = "This lesson has no questions yet.";
-    stack.appendChild(noQ);
   }
 
   const goBtn = document.createElement("button");
@@ -1307,9 +1310,6 @@ window.addEventListener("focus", async () => {
 // ===== MAIN RENDER =====
 function render() {
   const selectedClass = getSelectedClass();
-  if (!state.selectedModuleId && selectedClass?.modules.length > 0) {
-    state.selectedModuleId = selectedClass.modules[0].id;
-  }
   renderStudentChip();
   renderWelcomeBanner();
   renderClassList();
@@ -1325,6 +1325,23 @@ function render() {
   if (sc && m) {
     renderLessonPanel(sc, m);
     renderAIPanel(m);
+  } else {
+    // Reset to empty state
+    document.getElementById("lessonTitle").textContent = "Choose a lesson";
+    document.getElementById("lessonDescription").textContent = "Select a lesson above to view the learning goal and start practising.";
+    document.getElementById("lessonStatus").textContent = "Waiting";
+    document.getElementById("lessonStatus").className = "status-badge";
+    document.getElementById("questionStack").innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 48px 24px; text-align:center; opacity: 0.6; animation: pageEntrance 1s ease backwards;">
+        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(188,93,45,0.4)); animation: orbFloat 6s ease-in-out infinite alternate;">🚀</div>
+        <h4 style="font-size: 1.25rem; margin: 0 0 8px; color: var(--text);">Ready to begin?</h4>
+        <p style="font-size: 0.95rem; color: var(--muted); max-width: 280px; margin: 0;">Click on any upcoming lesson in the carousel above to start your practice session.</p>
+      </div>
+    `;
+    
+    // Clear AI panel
+    const analysisArea = document.getElementById("aiAnalysisContent");
+    if(analysisArea) analysisArea.innerHTML = `<p class="empty-state">Select a lesson to view AI feedback.</p>`;
   }
 }
 
