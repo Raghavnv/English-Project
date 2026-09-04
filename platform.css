@@ -44,13 +44,24 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: 
-    radial-gradient(circle at 15% 50%, rgba(253, 188, 180, 0.3), transparent 45%),
-    radial-gradient(circle at 85% 30%, rgba(173, 216, 230, 0.35), transparent 40%),
-    radial-gradient(circle at 50% 90%, rgba(152, 255, 152, 0.25), transparent 50%),
-    radial-gradient(circle at 70% 80%, rgba(230, 230, 250, 0.4), transparent 45%),
-    linear-gradient(135deg, #f0f4ff 0%, #fef8f4 50%, #effff6 100%);
+  background-color: #f8f9fa;
+  background-image: 
+    radial-gradient(at 40% 20%, hsla(28,100%,74%,0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(189,100%,56%,0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(355,100%,93%,0.2) 0px, transparent 50%),
+    radial-gradient(at 80% 50%, hsla(340,100%,76%,0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(22,100%,77%,0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 100%, hsla(242,100%,70%,0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, hsla(343,100%,76%,0.1) 0px, transparent 50%);
   background-attachment: fixed;
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
 }
 
 button,
@@ -61,9 +72,6 @@ textarea {
   font-size: inherit;
 }
 
-button {
-  cursor: pointer;
-}
 
 h1,
 h2,
