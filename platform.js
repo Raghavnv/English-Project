@@ -2087,3 +2087,51 @@ window.gradeSrsCard = function(quality) {
   srsQueue.shift(); // Remove completed word from today's queue
   renderSrsCard(); // Load next word
 };
+
+// --- New Features Logic ---
+function completeDailyChallenge(btn) {
+  btn.innerHTML = '✅ Completed';
+  btn.style.background = 'linear-gradient(135deg, #cbd5e1, #94a3b8)';
+  btn.disabled = true;
+  const streakEl = document.getElementById('streakCount');
+  let currentStreak = parseInt(streakEl.textContent);
+  streakEl.textContent = currentStreak + 1;
+  playPopSound();
+  alert("Challenge Completed! Your streak increased.");
+}
+
+function generateInfiniteReading() {
+  const input = document.getElementById('interestInput').value;
+  const output = document.getElementById('infiniteReadingOutput');
+  if (!input.trim()) {
+    alert('Please enter a topic first!');
+    return;
+  }
+  
+  output.style.display = 'block';
+  output.innerHTML = `
+    <div style="text-align: center; padding: 40px;">
+      <span style="font-size: 2rem; display: inline-block; animation: pulse 1s infinite;">✨</span>
+      <p style="color: var(--muted); margin-top: 10px;">AI is writing a custom passage about <strong>${input}</strong>...</p>
+    </div>
+  `;
+  
+  setTimeout(() => {
+    output.innerHTML = `
+      <h3 style="color: var(--accent-deep); font-size: 1.5rem; margin-bottom: 16px; font-weight: 800;">The Fascinating World of ${input}</h3>
+      <p style="font-size: 1.1rem; line-height: 1.7; color: var(--text); margin-bottom: 24px;">
+        ${input} has shaped modern culture in unexpected ways. From its humble beginnings to becoming a global phenomenon, the evolution of this topic is truly remarkable. As you delve deeper, you'll discover complex techniques, rich history, and a passionate community dedicated to exploring every nuance.
+      </p>
+      
+      <div style="background: rgba(188, 93, 45, 0.05); border-left: 4px solid var(--accent); padding: 16px 20px; border-radius: 0 12px 12px 0;">
+        <h4 style="margin: 0 0 12px; color: var(--accent-deep); font-size: 1rem; font-weight: 800;">Vocabulary from this passage:</h4>
+        <ul style="margin: 0; padding-left: 20px; color: var(--text); line-height: 1.6;">
+          <li><strong>Phenomenon:</strong> A fact or situation that is observed to exist or happen.</li>
+          <li><strong>Nuance:</strong> A subtle difference in or shade of meaning, expression, or sound.</li>
+          <li><strong>Evolution:</strong> The gradual development of something, especially from a simple to a more complex form.</li>
+        </ul>
+      </div>
+    `;
+    playPopSound();
+  }, 1500);
+}

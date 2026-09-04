@@ -205,9 +205,11 @@
   <!-- ── APP RAIL NAVIGATION ── -->
   <nav class="app-rail">
     <div class="rail-logo">☰ <span>Menu</span></div>
-    <button class="rail-btn" title="Dashboard active onclick="switchAppView('view-dashboard', this)">🏠 <span class="rail-btn-text">Dashboard</span></button>
+    <button class="rail-btn active" title="Dashboard" onclick="switchAppView('view-dashboard', this)">🏠 <span class="rail-btn-text">Dashboard</span></button>
+    <button class="rail-btn" title="AI Call Tutor" onclick="switchAppView('view-voice-tutor', this)">📞 <span class="rail-btn-text">AI Call Tutor</span></button>
     <button class="rail-btn" title="Pronunciation Lab" onclick="switchAppView('view-pronunciation', this)">🎙️ <span class="rail-btn-text">Pronunciation Lab</span></button>
     <button class="rail-btn" title="Roleplay Sandbox" onclick="switchAppView('view-roleplay', this)">🎭 <span class="rail-btn-text">Roleplay Sandbox</span></button>
+    <button class="rail-btn" title="Infinite Reader" onclick="switchAppView('view-infinite-reading', this)">📰 <span class="rail-btn-text">Infinite Reader</span></button>
     <button class="rail-btn" title="Story Corner" onclick="switchAppView('view-story', this)">📖 <span class="rail-btn-text">Story Corner</span></button>
     <button class="rail-btn" title="Smart Translator" onclick="switchAppView('view-translator', this)">🌐 <span class="rail-btn-text">Smart Translator</span></button>
     <button class="rail-btn" title="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️ <span class="rail-btn-text">Personal Word Bank</span></button>
@@ -247,6 +249,9 @@
 
       <div class="platform-header-actions">
         <button class="mobile-sidebar-toggle" id="mobileSidebarToggle">☰ Classes</button>
+        <div class="streak-indicator" title="Daily Streak" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255, 107, 0, 0.1); border: 2px solid #ffffff; border-radius: 99px; box-shadow: inset -1px -1px 4px rgba(0,0,0,0.02), 2px 4px 8px rgba(0,0,0,0.04), inset 1px 1px 4px rgba(255,255,255,1); font-weight: 700; color: #ea580c; cursor: default;">
+          <span style="font-size: 1.1rem;">🔥</span> <span id="streakCount">3</span> <span style="font-size: 0.85rem;">Days</span>
+        </div>
         <div class="student-chip" id="studentChip">
           <div class="student-avatar" id="studentAvatar">?</div>
           <div class="student-chip-info">
@@ -272,6 +277,18 @@
           </p>
       </div>
 
+      <!-- DAILY MICRO-CHALLENGE -->
+      <div class="workspace-panel daily-challenge-card" style="margin-top: 24px; padding: 24px 32px; border-radius: 24px; background: linear-gradient(145deg, rgba(230, 255, 240, 0.9), rgba(245, 255, 250, 0.8)); border: 3px solid #ffffff; box-shadow: inset -4px -4px 12px rgba(0,0,0,0.03), 8px 12px 24px rgba(0,0,0,0.05), inset 4px 4px 12px rgba(255,255,255,0.9); display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between;">
+        <div>
+          <h3 style="margin: 0 0 6px; font-size: 1.25rem; font-weight: 800; color: #166534; display: flex; align-items: center; gap: 8px;">
+            <span>🎯</span> Daily Micro-Challenge
+          </h3>
+          <p style="margin: 0; color: #15803d; font-size: 0.95rem;">Record yourself using the word <strong style="color: #14532d;">"Ubiquitous"</strong> in a sentence.</p>
+        </div>
+        <button class="primary-action" id="dailyChallengeBtn" onclick="completeDailyChallenge(this)" style="padding: 10px 24px; border-radius: 99px; min-width: 140px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); font-weight: 700;">
+          Start Challenge
+        </button>
+      </div>
       <!-- DASHBOARD TOP WIDGETS ROW -->
       <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 24px;">
         <section class="hero-band" style="flex: 1 1 350px; display: flex; align-items: center; justify-content: space-between; padding: 28px 32px; border-radius: 24px; margin-bottom: 0;">
@@ -583,6 +600,57 @@
         </div>
 
         <div id="resourceFullList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px;"></div>
+      </div>
+    </section>
+
+    <!-- ── AI CALL TUTOR VIEW ── -->
+    <section id="view-voice-tutor" class="app-view">
+      <div class="workspace-panel" style="padding: 40px; border-radius: 24px; text-align: center; min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(240, 245, 255, 0.9));">
+        <h2 style="font-size: 2.2rem; margin-bottom: 8px; color: var(--accent-deep);">AI Call Tutor</h2>
+        <p style="color: var(--muted); margin-bottom: 40px; font-size: 1.1rem;">Have a real-time conversational phone call with your AI English Tutor.</p>
+        
+        <!-- Animated Call Avatar -->
+        <div style="position: relative; width: 140px; height: 140px; margin-bottom: 40px;">
+          <div style="position: absolute; inset: 0; border-radius: 50%; background: var(--accent); opacity: 0.2; animation: pulse 2s infinite;"></div>
+          <div style="position: absolute; inset: 10px; border-radius: 50%; background: var(--accent); opacity: 0.4; animation: pulse 2s infinite 0.5s;"></div>
+          <div style="position: absolute; inset: 20px; border-radius: 50%; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #fff; box-shadow: 0 10px 20px rgba(188,93,45,0.3);">
+            🤖
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 20px; justify-content: center;">
+          <button class="primary-action" onclick="alert('Starting AI Voice Call! (Simulated)')" style="padding: 16px 40px; border-radius: 99px; font-size: 1.2rem; background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 8px 24px rgba(22, 163, 74, 0.4);">
+            📞 Start Call
+          </button>
+          <button class="secondary-action" onclick="alert('Ending Call...')" style="padding: 16px 40px; border-radius: 99px; font-size: 1.2rem; background: #fff; color: #ef4444; border-color: #fca5a5;">
+            End Call
+          </button>
+        </div>
+        <p style="margin-top: 30px; font-size: 0.9rem; color: #64748b; background: rgba(255,255,255,0.6); padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05);">
+          <strong>Live Transcript:</strong> Waiting for call to start...
+        </p>
+      </div>
+    </section>
+
+    <!-- ── INFINITE READER VIEW ── -->
+    <section id="view-infinite-reading" class="app-view">
+      <div class="workspace-panel" style="padding: 40px;">
+        <h2 style="font-size: 2.2rem; margin-bottom: 8px; color: var(--accent-deep);">Infinite Topic Reader</h2>
+        <p style="color: var(--muted); margin-bottom: 30px; font-size: 1.1rem;">Generate custom reading passages tailored to your personal interests!</p>
+        
+        <div style="background: rgba(255,255,255,0.7); padding: 24px; border-radius: 16px; border: 2px solid #ffffff; box-shadow: inset 0 2px 8px rgba(0,0,0,0.02); display: flex; gap: 16px; align-items: flex-end; margin-bottom: 30px;">
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: var(--muted);">What do you want to read about today?</label>
+            <input type="text" id="interestInput" placeholder="e.g. Football, Cooking, Technology, Ancient History..." style="width: 100%; padding: 14px 20px; border-radius: 12px; border: 2px solid rgba(80,58,40,0.1); font-size: 1.05rem; font-family: inherit;">
+          </div>
+          <button class="primary-action" onclick="generateInfiniteReading()" style="padding: 14px 30px; border-radius: 12px; font-size: 1.05rem; white-space: nowrap;">
+            ✨ Generate Passage
+          </button>
+        </div>
+
+        <div id="infiniteReadingOutput" style="display: none; background: #ffffff; padding: 32px; border-radius: 20px; border: 2px solid #f1f5f9; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+          <!-- Content goes here -->
+        </div>
       </div>
     </section>
 
