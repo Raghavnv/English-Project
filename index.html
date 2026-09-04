@@ -22,11 +22,11 @@
       align-items: center;
       justify-content: space-between;
       padding: 18px 24px;
-      border-radius: 22px;
-      background: rgba(255, 248, 239, 0.82);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 248, 255, 0.8));
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.68);
-      box-shadow: var(--shadow);
+      border: 3px solid #ffffff;
+      box-shadow: inset -2px -2px 6px rgba(0,0,0,0.02), 8px 12px 24px rgba(0,0,0,0.05), inset 2px 2px 6px rgba(255,255,255,0.8);
       position: sticky;
       top: 16px;
       z-index: 20;
@@ -42,23 +42,24 @@
 
     .hero-left {
       padding: 52px 48px;
-      border-radius: 28px;
-      background: linear-gradient(145deg, rgba(255,251,246,0.97), rgba(249,240,227,0.92));
-      border: 1px solid rgba(255,255,255,0.72);
-      box-shadow: var(--shadow);
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 247, 255, 0.7));
+      border: 3px solid #ffffff;
+      box-shadow: inset -4px -4px 12px rgba(0, 0, 0, 0.04), 8px 8px 24px rgba(0, 0, 0, 0.06), inset 4px 4px 12px rgba(255, 255, 255, 0.8);
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: center;
       gap: 20px;
+      backdrop-filter: blur(20px);
     }
 
     .hero-left::before {
       content: "";
       position: absolute;
-      inset: 12px;
-      border: 1px solid rgba(80,58,40,0.07);
-      border-radius: 18px;
+      inset: -3px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 32px;
       pointer-events: none;
     }
 
@@ -106,16 +107,16 @@
 
     .stat-card {
       padding: 26px 28px;
-      border-radius: 22px;
-      background: linear-gradient(145deg, rgba(255,252,248,0.92), rgba(249,241,230,0.85));
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(245,248,255,0.7));
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.85);
-      box-shadow: 0 10px 24px -6px rgba(75,48,26,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+      border: 2px solid #ffffff;
+      box-shadow: inset -2px -2px 8px rgba(0,0,0,0.03), 4px 8px 16px rgba(0,0,0,0.05), inset 2px 2px 8px rgba(255,255,255,0.9);
       display: flex;
       align-items: center;
       gap: 20px;
-      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .stat-card:hover {
@@ -163,13 +164,13 @@
 
     .about-card {
       padding: 28px 26px;
-      border-radius: 22px;
-      background: linear-gradient(145deg, rgba(255,252,248,0.92), rgba(249,241,230,0.85));
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(245,248,255,0.7));
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.85);
-      box-shadow: 0 10px 24px -6px rgba(75,48,26,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
-      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid #ffffff;
+      box-shadow: inset -2px -2px 8px rgba(0,0,0,0.03), 4px 8px 16px rgba(0,0,0,0.05), inset 2px 2px 8px rgba(255,255,255,0.9);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .about-card:hover {
@@ -237,26 +238,26 @@
 
     .portal-card {
       padding: 38px 34px;
-      border-radius: 28px;
-      background: linear-gradient(145deg, rgba(255,252,248,0.95), rgba(248,240,228,0.88));
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(245,248,255,0.85));
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.9);
-      box-shadow: 0 16px 40px -10px rgba(75,48,26,0.1), inset 0 1px 0 rgba(255,255,255,0.95);
+      border: 3px solid #ffffff;
+      box-shadow: inset -4px -4px 12px rgba(0,0,0,0.03), 8px 12px 24px rgba(0,0,0,0.06), inset 4px 4px 12px rgba(255,255,255,0.9);
       display: flex;
       flex-direction: column;
       gap: 16px;
       position: relative;
       overflow: hidden;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       text-align: left;
     }
 
     .portal-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 30px 60px -12px rgba(75,48,26,0.2), inset 0 1px 0 rgba(255,255,255,1);
-      border-color: rgba(188,93,45,0.3);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: inset -4px -4px 12px rgba(0,0,0,0.02), 12px 20px 32px rgba(0,0,0,0.1), inset 4px 4px 12px rgba(255,255,255,1);
+      border-color: #ffffff;
     }
 
     .portal-card::before {
@@ -368,10 +369,10 @@
     /* ── FOOTER ── */
     .welcome-footer {
       padding: 24px 32px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, rgba(31,27,23,0.96), rgba(93,53,36,0.95));
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: var(--shadow);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(40,40,50,0.96), rgba(20,20,30,0.95));
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4), 8px 12px 24px rgba(0,0,0,0.1), inset 2px 2px 6px rgba(255,255,255,0.1);
       display: flex;
       align-items: center;
       justify-content: space-between;
