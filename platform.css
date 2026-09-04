@@ -1143,21 +1143,24 @@ textarea {
   font-weight: 700;
   cursor: pointer;
 }
-/* ── PRO MAX UI/UX UPGRADES ── */
+
+
 body {
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: radial-gradient(rgba(188, 93, 45, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 /* Animated Mesh Orbs */
 body::before, body::after {
   content: "";
   position: fixed;
-  width: 70vw;
-  height: 70vw;
+  width: 80vw;
+  height: 80vw;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(100px);
   z-index: -1;
-  opacity: 0.6;
+  opacity: 0.85;
   pointer-events: none;
   animation: orbFloat 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1165,13 +1168,13 @@ body::before, body::after {
 body::before {
   top: -20vw;
   left: -20vw;
-  background: radial-gradient(circle, rgba(188, 93, 45, 0.18) 0%, rgba(188, 93, 45, 0) 70%);
+  background: radial-gradient(circle, rgba(188, 93, 45, 0.25) 0%, rgba(188, 93, 45, 0) 65%);
 }
 
 body::after {
   bottom: -20vw;
   right: -20vw;
-  background: radial-gradient(circle, rgba(96, 114, 61, 0.16) 0%, rgba(96, 114, 61, 0) 70%);
+  background: radial-gradient(circle, rgba(96, 114, 61, 0.22) 0%, rgba(96, 114, 61, 0) 65%);
   animation-duration: 30s;
   animation-direction: alternate-reverse;
 }
