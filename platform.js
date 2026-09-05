@@ -2094,8 +2094,8 @@ function completeDailyChallenge(btn) {
   btn.style.background = 'linear-gradient(135deg, #cbd5e1, #94a3b8)';
   btn.disabled = true;
   const streakEl = document.getElementById('streakCount');
-  let currentStreak = parseInt(streakEl.textContent);
-  streakEl.textContent = currentStreak + 1;
+  let currentStreak = parseInt(streakEl.textContent.replace(/[^0-9]/g, '')) || 0;
+  streakEl.textContent = '🔥 ' + (currentStreak + 1);
   playPopSound();
   alert("Challenge Completed! Your streak increased.");
 }
