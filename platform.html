@@ -214,6 +214,8 @@
     <button class="rail-btn" title="Smart Translator" onclick="switchAppView('view-translator', this)">🌐 <span class="rail-btn-text">Smart Translator</span></button>
     <button class="rail-btn" title="Personal Word Bank" onclick="switchAppView('view-wordbank', this)">🗂️ <span class="rail-btn-text">Personal Word Bank</span></button>
     <button class="rail-btn" title="Memory Deck" onclick="switchAppView('view-memory-deck', this)">🧠 <span class="rail-btn-text">Memory Deck</span></button>
+    <button class="rail-btn" title="Leaderboard" onclick="switchAppView('view-leaderboard', this)">🏆 <span class="rail-btn-text">Leaderboards</span></button>
+    <button class="rail-btn" title="Live Sessions" onclick="switchAppView('view-live-sessions', this)">🧑‍🏫 <span class="rail-btn-text">Live Sessions</span></button>
 
     <button class="rail-btn" title="Resources" onclick="switchAppView('view-resources', this)" style="position:relative;">
       📚 <span class="rail-btn-text">Resources</span><span id="resourceRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
@@ -648,6 +650,43 @@
 
         <div id="infiniteReadingOutput" style="display: none; background: #ffffff; padding: 32px; border-radius: 20px; border: 2px solid #f1f5f9; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
           <!-- Content goes here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── LEADERBOARD VIEW ── -->
+    <section id="view-leaderboard" class="app-view">
+      <div class="workspace-panel" style="padding: 40px; border-radius: 24px;">
+        <h2 style="font-size: 2.2rem; margin-bottom: 8px; color: var(--accent-deep);">Global Leaderboards & Tournaments</h2>
+        <p style="color: var(--muted); margin-bottom: 30px; font-size: 1.1rem;">Check your rank in the latest Spring Vocab Challenge!</p>
+        
+        <div style="display: grid; gap: 16px;">
+          <div style="display: flex; justify-content: space-between; padding: 20px 24px; background: rgba(255, 215, 0, 0.15); border: 2px solid #fbbf24; border-radius: 16px; align-items: center;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #b45309;">1st - Team Alpha</div>
+            <div style="font-weight: 700; color: #b45309;">1,250 pts</div>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 20px 24px; background: rgba(192, 192, 192, 0.15); border: 2px solid #cbd5e1; border-radius: 16px; align-items: center;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #475569;">2nd - The Grammarians</div>
+            <div style="font-weight: 700; color: #475569;">980 pts</div>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 20px 24px; background: rgba(205, 127, 50, 0.1); border: 2px solid #f87171; border-radius: 16px; align-items: center;">
+            <div style="font-size: 1.2rem; font-weight: 800; color: #b91c1c;">3rd - Syntax Squad</div>
+            <div style="font-weight: 700; color: #b91c1c;">845 pts</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── LIVE SESSIONS VIEW ── -->
+    <section id="view-live-sessions" class="app-view">
+      <div class="workspace-panel" style="padding: 40px; border-radius: 24px; text-align: center; min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(245, 248, 255, 0.9));">
+        <div style="font-size: 4rem; margin-bottom: 20px;">🧑‍🏫</div>
+        <h2 style="font-size: 2.2rem; margin-bottom: 8px; color: var(--accent-deep);">Virtual Office Hours</h2>
+        <p style="color: var(--muted); margin-bottom: 30px; font-size: 1.1rem; max-width: 50ch;">Join live sessions, participate in real-time polls, and view live AI-transcribed whiteboards.</p>
+        
+        <div style="padding: 24px; background: rgba(59, 130, 246, 0.1); border: 2px solid #60a5fa; border-radius: 16px; display: inline-block;">
+          <h3 style="color: #1e3a8a; margin: 0 0 10px; font-weight: 800;">No Active Sessions</h3>
+          <p style="color: #1e40af; margin: 0; font-size: 0.95rem;">Your teacher hasn't started a live session yet. We'll notify you when one begins!</p>
         </div>
       </div>
     </section>

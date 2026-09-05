@@ -292,10 +292,19 @@ button:active, .rail-btn:active, .action-btn:active {
       <span class="icon">📣</span><span class="label">Broadcast Center</span>
     </button>
     <button class="rail-btn" title="Resources" onclick="switchView('view-resources', this)">
-      <span class="icon">📚</span><span class="label">Resource Library</span>
+      <span class="icon">📚</span><span class="label">Resources</span>
     </button>
     <button class="rail-btn" title="Reports" onclick="switchView('view-reports', this)">
-      <span class="icon">👨‍👩‍👧</span><span class="label">Parent Reports</span>
+      <span class="icon">📊</span><span class="label">Reports</span>
+    </button>
+    <button class="rail-btn" title="AI Content Studio" onclick="switchView('view-ai-studio', this)">
+      <span class="icon">🚀</span><span class="label">AI Content Studio</span>
+    </button>
+    <button class="rail-btn" title="Tournaments" onclick="switchView('view-tournaments', this)">
+      <span class="icon">🏆</span><span class="label">Tournaments</span>
+    </button>
+    <button class="rail-btn" title="Live Sessions" onclick="switchView('view-live-sessions', this)">
+      <span class="icon">🧑‍🏫</span><span class="label">Live Sessions</span>
     </button>
   
         
@@ -699,6 +708,42 @@ button:active, .rail-btn:active, .action-btn:active {
             <div class="skeleton-pulse" style="height: 16px; width: 95%; border-radius: 4px;"></div>
             <p style="color: var(--accent); margin: 12px 0 0 0; font-weight: 600;">Buddy is analyzing progress and writing the report...</p>
           </div>
+      </div>
+    </div>
+
+    <!-- VIEW 7 — AI CONTENT STUDIO -->
+    <div class="app-view" id="view-ai-studio">
+      <div class="admin-card" style="min-height: 50vh; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h2 style="font-size: 2rem;">🚀 AI Content Studio</h2>
+        <p class="admin-card-subtitle" style="max-width: 500px; margin: 10px auto 30px;">Paste a YouTube link or text, and our AI will automatically generate a full lesson plan, vocabulary list, and 10-question quiz in seconds.</p>
+        
+        <div style="width: 100%; max-width: 600px; display: flex; gap: 12px; margin-bottom: 24px;">
+          <input type="text" class="form-input" placeholder="Paste URL or topic here..." style="flex: 1;">
+          <button class="action-btn" onclick="alert('AI Generation Started!')" style="background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%); color: white; border: none;">Generate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 8 — TOURNAMENTS -->
+    <div class="app-view" id="view-tournaments">
+      <div class="admin-card">
+        <h2>🏆 Global Tournaments</h2>
+        <p class="admin-card-subtitle">Launch weekly challenges and manage the global leaderboard.</p>
+        
+        <div style="background: rgba(255, 215, 0, 0.15); border: 2px solid #fbbf24; border-radius: 16px; padding: 24px; margin-top: 24px;">
+          <h3 style="color: #b45309; margin: 0 0 10px;">Active Tournament: Spring Vocab Challenge</h3>
+          <p style="margin: 0 0 20px; color: #b45309;">Ends in 3 days. 145 students participating.</p>
+          <button class="action-btn" onclick="alert('Ending Tournament...')" style="background: #ef4444; color: white; border: none;">End Tournament Early</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 9 — LIVE SESSIONS -->
+    <div class="app-view" id="view-live-sessions">
+      <div class="admin-card" style="text-align: center; padding: 60px 20px;">
+        <h2 style="font-size: 2.2rem; color: var(--accent-deep); margin-bottom: 10px;">🧑‍🏫 Virtual Office Hours</h2>
+        <p class="admin-card-subtitle" style="margin-bottom: 40px;">Launch a live session with collaborative whiteboards and AI transcription.</p>
+        <button class="action-btn" onclick="alert('Starting Live Session...')" style="padding: 16px 40px; font-size: 1.2rem; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 99px; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);">Start Live Session</button>
       </div>
     </div>
 
