@@ -736,3 +736,34 @@ function askForGrammarCheck() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+// ===== ADD TO WORD BANK FROM LESSON =====
+async function promptAddWord() {
+  const word = prompt("Enter a new English word to add to your Word Bank:");
+  if (!word || !word.trim()) return;
+  
+  try {
+    const studentToken = localStorage.getItem("studentToken") || "";
+    const res = await fetch("/api/ai/word-bank/define", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + studentToken
+      },
+      body: JSON.stringify({ word: word.trim() })
+    });
+    
+    if (!res.ok) throw new Error("Failed to define word");
+    const data = await res.json();
+    
+    const student = JSON.parse(localStorage.getItem("student") || "{}");
+    let words = JSON.parse(localStorage.getItem(`wordBank_${student.id}`) || "[]");
+    words = words.filter(w => w.word.toLowerCase() !== data.word.toLowerCase());
+    words.push(data);
+    localStorage.setItem(`wordBank_${student.id}`, JSON.stringify(words));
+    
+    alert(`✨ "${data.word}" added to your Word Bank successfully!`);
+  } catch(e) {
+    alert("Failed to add word. Please try again later.");
+  }
+}

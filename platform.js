@@ -1032,8 +1032,9 @@ async function openRelearn(lessonId, title, desc) {
       summaryHtml += `<div class="rl-section"><div class="rl-header">${icon} ${currentSection}</div>`;
       if (currentSection === "HELPFUL EXAMPLES") {
         buffer.forEach(line => {
-          const clean = line.replace(/^[-•*]\s*/, "").replace(/^[""'](.+)[""']$/, "$1");
-          summaryHtml += `<div class="rl-example">"${escapeHtml(clean.replace(/^"|"$/g, ""))}"</div>`;
+          let clean = line.replace(/^[-•*]\s*/, "").trim();
+          clean = clean.replace(/^["']|["']$/g, "").trim(); // strip leading/trailing quotes
+          summaryHtml += `<div class="rl-example" style="font-weight: 500;">${escapeHtml(clean)}</div>`;
         });
       } else {
         summaryHtml += `<ul>`;

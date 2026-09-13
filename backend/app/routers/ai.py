@@ -257,7 +257,8 @@ KEY CONCEPTS
 HELPFUL EXAMPLES
 QUICK TIPS
 
-Each section: 2-4 bullet points. Simple English. Be warm and encouraging."""
+Each section: 2-4 bullet points. Simple English. Be warm and encouraging.
+IMPORTANT: Under HELPFUL EXAMPLES, just write the clean sentence directly (no extra quotation marks, no conversational filler like 'Here is an example:')."""
     
     try:
         content = ask_groq(
