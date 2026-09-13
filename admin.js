@@ -1527,3 +1527,123 @@ function initLiveFeed() {
 const style = document.createElement('style');
 style.textContent = `@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }`;
 document.head.appendChild(style);
+
+
+
+// ── QUIZZES ──
+function openQuizModal() {
+  document.getElementById('quizTitle').value = '';
+  document.getElementById('quizDesc').value = '';
+  document.getElementById('quizQuestionsContainer').innerHTML = '';
+  addQuizQuestionRow();
+  document.getElementById('modalManualQuiz').style.opacity = '1';
+  document.getElementById('modalManualQuiz').style.pointerEvents = 'auto';
+}
+function closeQuizModal() {
+  document.getElementById('modalManualQuiz').style.opacity = '0';
+  document.getElementById('modalManualQuiz').style.pointerEvents = 'none';
+}
+function addQuizQuestionRow() {
+  const container = document.getElementById('quizQuestionsContainer');
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex; gap:8px; margin-bottom:8px;';
+  row.innerHTML = `
+    <textarea class="admin-input q-prompt" placeholder="Question prompt..." style="flex:1; height:60px;"></textarea>
+    <button onclick="this.parentElement.remove()" style="background:#ffe6e6; color:#d00; border:none; border-radius:8px; padding:0 12px; cursor:pointer;">X</button>
+  `;
+  container.appendChild(row);
+}
+async function saveManualQuiz() {
+  const title = document.getElementById('quizTitle').value.trim();
+  const description = document.getElementById('quizDesc').value.trim();
+  const start_time = document.getElementById('quizStart').value || null;
+  const end_time = document.getElementById('quizEnd').value || null;
+  const time_limit_minutes = parseInt(document.getElementById('quizTimeLimit').value) || 30;
+  
+  const prompts = Array.from(document.querySelectorAll('#quizQuestionsContainer .q-prompt')).map(el => el.value.trim()).filter(v => v);
+  if(!title || prompts.length === 0) {
+    showPopup("Title and at least one question required."); return;
+  }
+  
+  const questions = prompts.map((p, i) => ({ prompt: p, type: 'text', order: i }));
+  
+  try {
+    await apiFetch('/api/quizzes/', {
+      method: 'POST',
+      body: JSON.stringify({ title, description, start_time: start_time ? new Date(start_time).toISOString() : null, end_time: end_time ? new Date(end_time).toISOString() : null, time_limit_minutes, questions })
+    });
+    showPopup("Quiz saved!");
+    closeQuizModal();
+    loadQuizzes();
+  } catch(e) { showPopup("Error: " + e.message); }
+}
+
+function openAIQuizModal() {
+  document.getElementById('modalAIQuiz').style.opacity = '1';
+  document.getElementById('modalAIQuiz').style.pointerEvents = 'auto';
+}
+function closeAIQuizModal() {
+  document.getElementById('modalAIQuiz').style.opacity = '0';
+  document.getElementById('modalAIQuiz').style.pointerEvents = 'none';
+}
+async function generateAIQuiz() {
+  const prompt = document.getElementById('aiQuizPrompt').value.trim();
+  const num_questions = parseInt(document.getElementById('aiQuizCount').value) || 5;
+  const start_time = document.getElementById('aiQuizStart').value || null;
+  const end_time = document.getElementById('aiQuizEnd').value || null;
+  const time_limit_minutes = parseInt(document.getElementById('aiQuizTimeLimit').value) || 15;
+  const btn = document.getElementById('aiQuizGenBtn');
+  
+  if(!prompt) { showPopup("Enter a prompt"); return; }
+  
+  btn.innerText = "Generating..."; btn.disabled = true;
+  try {
+    const aiData = await apiFetch('/api/ai/generate-quiz', {
+      method: 'POST', body: JSON.stringify({ prompt, num_questions })
+    });
+    
+    await apiFetch('/api/quizzes/', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        title: aiData.title || "AI Generated Quiz",
+        description: aiData.description || "",
+        start_time: start_time ? new Date(start_time).toISOString() : null, 
+        end_time: end_time ? new Date(end_time).toISOString() : null, 
+        time_limit_minutes, 
+        questions: (aiData.questions || []).map((q,i) => ({prompt: q.prompt, order:i})) 
+      })
+    });
+    showPopup("AI Quiz Created!");
+    closeAIQuizModal();
+    loadQuizzes();
+  } catch(e) { showPopup("Error: "+e.message); }
+  finally { btn.innerText = "Generate & Save"; btn.disabled = false; }
+}
+
+async function loadQuizzes() {
+  try {
+    const quizzes = await apiFetch('/api/quizzes/');
+    const c = document.getElementById('adminQuizzesContainer');
+    c.innerHTML = quizzes.length === 0 ? '<p>No quizzes yet.</p>' : quizzes.map(q => `
+      <div style="background:#fff; border-radius:12px; padding:16px; border:1px solid #ddd; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h4 style="margin:0; font-size:1.1rem;">${q.title}</h4>
+          <div style="font-size:0.85rem; color:#666; margin-top:4px;">
+            ${q.questions.length} questions | ${q.time_limit_minutes} min limit<br>
+            Start: ${q.start_time ? new Date(q.start_time).toLocaleString() : 'Anytime'} | 
+            End: ${q.end_time ? new Date(q.end_time).toLocaleString() : 'Never'}
+          </div>
+        </div>
+        <button onclick="deleteQuiz('${q.id}')" style="background:#ffe6e6; color:#d00; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:bold;">Delete</button>
+      </div>
+    `).join('');
+  } catch(e) { console.error(e); }
+}
+
+async function deleteQuiz(id) {
+  if(!confirm("Delete this quiz?")) return;
+  try {
+    await apiFetch('/api/quizzes/'+id, { method: 'DELETE' });
+    loadQuizzes();
+  } catch(e) { showPopup(e.message); }
+}

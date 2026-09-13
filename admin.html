@@ -306,6 +306,9 @@ button:active, .rail-btn:active, .action-btn:active {
     <button class="rail-btn" title="Live Sessions" onclick="switchView('view-live-sessions', this)">
       <span class="icon">🧑‍🏫</span><span class="label">Live Sessions</span>
     </button>
+    <button class="rail-btn" title="Quizzes" onclick="switchView('view-quizzes', this)">
+      <span class="icon">📝</span><span class="label">Quizzes</span>
+    </button>
   
         
     <button class="rail-btn" title="Toggle Theme" id="themeToggleBtn" onclick="toggleTheme()" style="">
@@ -739,6 +742,20 @@ button:active, .rail-btn:active, .action-btn:active {
     </div>
 
     <!-- VIEW 9 — LIVE SESSIONS -->
+    
+    <!-- ── QUIZZES VIEW ── -->
+    <div class="app-view" id="view-quizzes">
+      <div class="view-header">
+        <h2 style="font-size: 1.8rem; font-family: var(--font-family); font-weight: 800; letter-spacing: -0.02em; color: var(--text);">Quiz Manager</h2>
+        <div style="display: flex; gap: 10px;">
+          <button class="primary-action" onclick="openQuizModal()" style="padding: 0 20px; font-weight: 700;">+ Create Quiz</button>
+          <button class="primary-action" onclick="openAIQuizModal()" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border-color: rgba(255,255,255,0.2);">🪄 AI Generate Quiz</button>
+        </div>
+      </div>
+      <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 24px;">Manage timed quizzes for your students.</p>
+      <div id="adminQuizzesContainer" style="display: grid; gap: 16px;"></div>
+    </div>
+
     <div class="app-view" id="view-live-sessions">
       <div class="admin-card" style="text-align: center; padding: 60px 20px;">
         <h2 style="font-size: 2.2rem; color: var(--accent-deep); margin-bottom: 10px;">🧑‍🏫 Virtual Office Hours</h2>
@@ -800,6 +817,7 @@ button:active, .rail-btn:active, .action-btn:active {
     if (target) target.classList.add('active-view');
 
     if (viewId === 'view-progress') loadProgressData();
+    if (viewId === 'view-quizzes') { loadQuizzes(); }
     if (viewId === 'view-analytics') {
       loadClassAnalytics();
       loadPredictiveAlerts();
@@ -848,7 +866,109 @@ button:active, .rail-btn:active, .action-btn:active {
     </div>
   </div>
 </div>
-\n<!-- ADMIN BUDDY FLOATING WIDGET -->\n
+\n
+<!-- MANUAL QUIZ MODAL -->
+<div id="modalManualQuiz" style="position:fixed;inset:0;z-index:1000;background:rgba(31,26,22,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s ease;">
+  <div style="background:#fff;border-radius:24px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 24px 48px -12px rgba(80,58,40,0.25);position:relative;">
+    <button onclick="closeQuizModal()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;">×</button>
+    <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 16px;">Create Quiz</h3>
+    <input type="text" id="quizTitle" class="admin-input" placeholder="Quiz Title" style="width:100%;margin-bottom:12px;">
+    <textarea id="quizDesc" class="admin-input" placeholder="Description" style="width:100%;margin-bottom:12px;"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div><label class="form-label">Start Time</label><input type="datetime-local" id="quizStart" class="admin-input" style="width:100%;"></div>
+      <div><label class="form-label">End Time</label><input type="datetime-local" id="quizEnd" class="admin-input" style="width:100%;"></div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label class="form-label">Time Limit (minutes)</label>
+      <input type="number" id="quizTimeLimit" class="admin-input" value="30" style="width:100%;">
+    </div>
+    <div id="quizQuestionsContainer" style="margin-bottom: 16px;"></div>
+    <button onclick="addQuizQuestionRow()" style="padding: 8px 16px; border-radius: 8px; border: 1px dashed #ccc; background: none; cursor: pointer; width: 100%; margin-bottom: 24px;">+ Add Question</button>
+    
+    <div style="display:flex; justify-content:flex-end; gap:12px;">
+      <button onclick="closeQuizModal()" style="padding:10px 20px; border-radius:12px; border:1px solid #ddd; background:#eee; cursor:pointer;">Cancel</button>
+      <button onclick="saveManualQuiz()" style="padding:10px 20px; border-radius:12px; border:none; background:var(--accent-deep); color:#fff; font-weight:bold; cursor:pointer;">Save Quiz</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI QUIZ MODAL -->
+<div id="modalAIQuiz" style="position:fixed;inset:0;z-index:1000;background:rgba(31,26,22,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s ease;">
+  <div style="background:#fff;border-radius:24px;width:90%;max-width:500px;padding:32px;box-shadow:0 24px 48px -12px rgba(80,58,40,0.25);position:relative;">
+    <button onclick="closeAIQuizModal()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;">×</button>
+    <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 16px;">🪄 AI Generate Quiz</h3>
+    <textarea id="aiQuizPrompt" class="admin-input" placeholder="What should the quiz be about? e.g. Present Continuous tense" style="width:100%;height:100px;margin-bottom:12px;"></textarea>
+    <div style="margin-bottom:16px;">
+      <label class="form-label">Number of Questions</label>
+      <input type="number" id="aiQuizCount" class="admin-input" value="5" style="width:100%;">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div><label class="form-label">Start Time</label><input type="datetime-local" id="aiQuizStart" class="admin-input" style="width:100%;"></div>
+      <div><label class="form-label">End Time</label><input type="datetime-local" id="aiQuizEnd" class="admin-input" style="width:100%;"></div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <label class="form-label">Time Limit (minutes)</label>
+      <input type="number" id="aiQuizTimeLimit" class="admin-input" value="15" style="width:100%;">
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:12px;">
+      <button onclick="closeAIQuizModal()" style="padding:10px 20px; border-radius:12px; border:1px solid #ddd; background:#eee; cursor:pointer;">Cancel</button>
+      <button onclick="generateAIQuiz()" id="aiQuizGenBtn" style="padding:10px 20px; border-radius:12px; border:none; background:linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color:#fff; font-weight:bold; cursor:pointer;">Generate & Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN BUDDY FLOATING WIDGET -->\n
+
+<!-- MANUAL QUIZ MODAL -->
+<div id="modalManualQuiz" style="position:fixed;inset:0;z-index:1000;background:rgba(31,26,22,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s ease;">
+  <div style="background:#fff;border-radius:24px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 24px 48px -12px rgba(80,58,40,0.25);position:relative;">
+    <button onclick="closeQuizModal()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;">×</button>
+    <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 16px;">Create Quiz</h3>
+    <input type="text" id="quizTitle" class="admin-input" placeholder="Quiz Title" style="width:100%;margin-bottom:12px;">
+    <textarea id="quizDesc" class="admin-input" placeholder="Description" style="width:100%;margin-bottom:12px;"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div><label class="form-label">Start Time</label><input type="datetime-local" id="quizStart" class="admin-input" style="width:100%;"></div>
+      <div><label class="form-label">End Time</label><input type="datetime-local" id="quizEnd" class="admin-input" style="width:100%;"></div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label class="form-label">Time Limit (minutes)</label>
+      <input type="number" id="quizTimeLimit" class="admin-input" value="30" style="width:100%;">
+    </div>
+    <div id="quizQuestionsContainer" style="margin-bottom: 16px;"></div>
+    <button onclick="addQuizQuestionRow()" style="padding: 8px 16px; border-radius: 8px; border: 1px dashed #ccc; background: none; cursor: pointer; width: 100%; margin-bottom: 24px;">+ Add Question</button>
+    
+    <div style="display:flex; justify-content:flex-end; gap:12px;">
+      <button onclick="closeQuizModal()" style="padding:10px 20px; border-radius:12px; border:1px solid #ddd; background:#eee; cursor:pointer;">Cancel</button>
+      <button onclick="saveManualQuiz()" style="padding:10px 20px; border-radius:12px; border:none; background:var(--accent-deep); color:#fff; font-weight:bold; cursor:pointer;">Save Quiz</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI QUIZ MODAL -->
+<div id="modalAIQuiz" style="position:fixed;inset:0;z-index:1000;background:rgba(31,26,22,0.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s ease;">
+  <div style="background:#fff;border-radius:24px;width:90%;max-width:500px;padding:32px;box-shadow:0 24px 48px -12px rgba(80,58,40,0.25);position:relative;">
+    <button onclick="closeAIQuizModal()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#888;">×</button>
+    <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 16px;">🪄 AI Generate Quiz</h3>
+    <textarea id="aiQuizPrompt" class="admin-input" placeholder="What should the quiz be about? e.g. Present Continuous tense" style="width:100%;height:100px;margin-bottom:12px;"></textarea>
+    <div style="margin-bottom:16px;">
+      <label class="form-label">Number of Questions</label>
+      <input type="number" id="aiQuizCount" class="admin-input" value="5" style="width:100%;">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div><label class="form-label">Start Time</label><input type="datetime-local" id="aiQuizStart" class="admin-input" style="width:100%;"></div>
+      <div><label class="form-label">End Time</label><input type="datetime-local" id="aiQuizEnd" class="admin-input" style="width:100%;"></div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <label class="form-label">Time Limit (minutes)</label>
+      <input type="number" id="aiQuizTimeLimit" class="admin-input" value="15" style="width:100%;">
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:12px;">
+      <button onclick="closeAIQuizModal()" style="padding:10px 20px; border-radius:12px; border:1px solid #ddd; background:#eee; cursor:pointer;">Cancel</button>
+      <button onclick="generateAIQuiz()" id="aiQuizGenBtn" style="padding:10px 20px; border-radius:12px; border:none; background:linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color:#fff; font-weight:bold; cursor:pointer;">Generate & Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADMIN BUDDY FLOATING WIDGET -->
 <div id="adminBuddyWidget" style="position: fixed; bottom: 30px; right: 30px; z-index: 10001; display: flex; flex-direction: column; align-items: flex-end; gap: 16px;">
   

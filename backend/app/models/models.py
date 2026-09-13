@@ -142,3 +142,45 @@ class FlashcardProgress(Base):
     __table_args__ = (
         __import__("sqlalchemy").UniqueConstraint("student_id", "flashcard_id", name="uq_flashcard_progress_student"),
     )
+# ── QUIZ ───────────────────────────────────────────────────────────────────
+class Quiz(Base):
+    __tablename__ = "quizzes"
+    id          = Column(String, primary_key=True, default=new_uuid)
+    admin_id    = Column(String, ForeignKey("admins.id", ondelete="CASCADE"), nullable=False)
+    title       = Column(String(200), nullable=False)
+    description = Column(Text, default="")
+    start_time  = Column(DateTime(timezone=True), nullable=True)
+    end_time    = Column(DateTime(timezone=True), nullable=True)
+    time_limit_minutes = Column(Integer, default=30)
+    created_at  = Column(DateTime(timezone=True), server_default=func.now())
+
+    created_by = relationship("Admin")
+    questions  = relationship("QuizQuestion", back_populates="quiz", cascade="all, delete-orphan", order_by="QuizQuestion.order")
+    progress   = relationship("QuizProgress", back_populates="quiz", cascade="all, delete-orphan")
+
+class QuizQuestion(Base):
+    __tablename__ = "quiz_questions"
+    id        = Column(String, primary_key=True, default=new_uuid)
+    quiz_id   = Column(String, ForeignKey("quizzes.id", ondelete="CASCADE"), nullable=False)
+    prompt    = Column(Text, nullable=False)
+    type      = Column(String(20), default="text")
+    order     = Column(Integer, default=0)
+
+    quiz      = relationship("Quiz", back_populates="questions")
+
+class QuizProgress(Base):
+    __tablename__ = "quiz_progress"
+    id             = Column(String, primary_key=True, default=new_uuid)
+    student_id     = Column(String, ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
+    quiz_id        = Column(String, ForeignKey("quizzes.id", ondelete="CASCADE"), nullable=False)
+    score          = Column(Integer, default=0)
+    completed      = Column(Boolean, default=False)
+    started_at     = Column(DateTime(timezone=True), server_default=func.now())
+    completed_at   = Column(DateTime(timezone=True), nullable=True)
+
+    student = relationship("Student")
+    quiz    = relationship("Quiz", back_populates="progress")
+
+    __table_args__ = (
+        __import__("sqlalchemy").UniqueConstraint("student_id", "quiz_id", name="uq_quiz_progress_student_quiz"),
+    )

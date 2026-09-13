@@ -842,3 +842,32 @@ def generate_bulk_curriculum(body: BulkCurriculumRequest, requester=Depends(requ
     except Exception as e:
         print("LLM JSON Parse Error. Raw Output:", raw if 'raw' in locals() else "N/A")
         raise HTTPException(status_code=500, detail=f"LLM Error: {str(e)}")
+
+class QuizGenerateRequest(BaseModel):
+    prompt: str
+    num_questions: int
+
+@router.post("/generate-quiz")
+def generate_quiz(body: QuizGenerateRequest, requester=Depends(require_authenticated_requester)):
+    prompt = f"""Generate a quiz with {body.num_questions} questions based on this prompt: "{body.prompt}".
+    Return ONLY a JSON object in this format (no markdown, no extra text):
+    {{
+        "title": "Quiz Title",
+        "description": "Quiz Description",
+        "questions": [
+            {{"prompt": "Question text here", "type": "text"}}
+        ]
+    }}
+    """
+    try:
+        raw = ask_groq(prompt, max_tokens=1500, system="Output valid JSON only.")
+        clean_json = raw.strip()
+        import re
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: 
+            clean_json = match.group(0)
+        import json
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"LLM Error: {str(e)}")
+

@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 from app.database import create_tables
-from app.routers import auth, lessons, students, ai
+from app.routers import auth, lessons, students, ai, quizzes
 
 load_dotenv()
 
@@ -52,6 +52,7 @@ app.include_router(auth.router)
 app.include_router(lessons.router)
 app.include_router(students.router)
 app.include_router(ai.router)
+app.include_router(quizzes.router)
 
 @app.get("/")
 def root():

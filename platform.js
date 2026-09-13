@@ -2135,3 +2135,108 @@ function generateInfiniteReading() {
     playPopSound();
   }, 1500);
 }
+
+
+
+// ── STUDENT QUIZZES ──
+let currentQuiz = null;
+let quizTimerInterval = null;
+let quizTimeLeft = 0;
+
+async function loadStudentQuizzes() {
+  try {
+    const quizzes = await apiFetch('/api/quizzes/?student_id='+currentStudent.id);
+    const container = document.getElementById('studentQuizzesContainer');
+    const now = new Date();
+    
+    let html = '';
+    for(let q of quizzes) {
+      let statusHtml = '';
+      let canTake = false;
+      let start = q.start_time ? new Date(q.start_time) : null;
+      let end = q.end_time ? new Date(q.end_time) : null;
+      
+      if(q.progress && q.progress.completed) {
+        statusHtml = `<span style="color:#2e7d32; font-weight:bold;">Completed (Score: ${q.progress.score}/${q.questions.length})</span>`;
+      } else if (start && now < start) {
+        statusHtml = `<span style="color:#f57c00;">Opens on ${start.toLocaleString()}</span>`;
+      } else if (end && now > end) {
+        statusHtml = `<span style="color:#d32f2f;">Closed</span>`;
+      } else {
+        canTake = true;
+        statusHtml = `<span style="color:#1565c0; font-weight:bold;">Available Now (${q.time_limit_minutes} mins)</span>`;
+      }
+      
+      html += `
+        <div style="background:#fff; border-radius:16px; padding:20px; border:1px solid #ddd; box-shadow:0 4px 12px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h3 style="margin:0 0 8px 0;">${q.title}</h3>
+            <p style="margin:0; color:#555;">${q.description}</p>
+            <div style="margin-top:12px; font-size:0.9rem;">${statusHtml}</div>
+          </div>
+          ${canTake ? `<button onclick='startQuiz(${JSON.stringify(q).replace(/'/g, "\'")})' style="background:var(--accent-deep); color:#fff; padding:10px 20px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">Take Quiz</button>` : ''}
+        </div>
+      `;
+    }
+    container.innerHTML = html || "<p>No quizzes available right now.</p>";
+  } catch (e) { console.error(e); }
+}
+
+window.startQuiz = function(quiz) {
+  currentQuiz = quiz;
+  currentQuiz.started_at = new Date();
+  document.getElementById('takeQuizTitle').innerText = quiz.title;
+  
+  const qc = document.getElementById('takeQuizQuestions');
+  qc.innerHTML = quiz.questions.map((q, i) => `
+    <div style="margin-bottom:24px; padding:20px; border-radius:12px; background:#f9f9f9; border:1px solid #eee;">
+      <h4 style="margin:0 0 12px 0;">${i+1}. ${q.prompt}</h4>
+      <textarea id="q_ans_${q.id}" style="width:100%; height:80px; border-radius:8px; border:1px solid #ccc; padding:12px;" placeholder="Your answer..."></textarea>
+    </div>
+  `).join('');
+  
+  document.getElementById('modalTakeQuiz').style.display = 'flex';
+  
+  quizTimeLeft = quiz.time_limit_minutes * 60;
+  updateTimerUI();
+  quizTimerInterval = setInterval(() => {
+    quizTimeLeft--;
+    updateTimerUI();
+    if(quizTimeLeft <= 0) {
+      clearInterval(quizTimerInterval);
+      alert("Time is up! Submitting automatically.");
+      submitQuiz();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const m = Math.floor(quizTimeLeft / 60).toString().padStart(2, '0');
+  const s = (quizTimeLeft % 60).toString().padStart(2, '0');
+  document.getElementById('quizTimer').innerText = `${m}:${s}`;
+}
+
+window.submitQuiz = async function() {
+  if(quizTimerInterval) clearInterval(quizTimerInterval);
+  
+  let score = 0;
+  for(let q of currentQuiz.questions) {
+    const ans = document.getElementById('q_ans_'+q.id).value.trim();
+    if(ans.length > 5) score++; 
+  }
+  
+  try {
+    await apiFetch('/api/quizzes/'+currentQuiz.id+'/submit', {
+      method: 'POST',
+      body: JSON.stringify({
+        student_id: currentStudent.id,
+        score: score,
+        started_at: currentQuiz.started_at.toISOString(),
+        completed_at: new Date().toISOString()
+      })
+    });
+    alert(`Quiz submitted successfully! You scored ${score} out of ${currentQuiz.questions.length}.`);
+    document.getElementById('modalTakeQuiz').style.display = 'none';
+    loadStudentQuizzes();
+  } catch(e) { alert("Error submitting quiz: " + e.message); }
+}
