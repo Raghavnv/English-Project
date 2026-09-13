@@ -924,11 +924,11 @@ function injectStudyModals() {
     </style>
     
     <!-- MODAL: RE-LEARN -->
-    <div class="ai-modal-overlay" id="modalRelearn" onclick="closeStudyModals(event)">
+    <dialog class="native-modal" id="modalRelearn" onclick="closeStudyModals(event)">
       <div class="ai-modal-content relearn-modal">
         <div class="ai-modal-header">
           <h3 class="ai-modal-title">📖 <span id="relearnModalTitle">Lesson Recap</span></h3>
-          <button class="ai-modal-close" onclick="closeStudyModals()">✕</button>
+          <button class="ai-modal-close" onclick="closeStudyModals()" aria-label="Close dialog" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">✕</button>
         </div>
         <div class="ai-modal-body">
           <div id="relearnContentArea"></div>
@@ -937,13 +937,13 @@ function injectStudyModals() {
     </div>
 
     <!-- MODAL: FLASHCARDS -->
-    <div class="ai-modal-overlay" id="modalFlashcards" onclick="closeStudyModals(event)">
+    <dialog class="native-modal" id="modalFlashcards" onclick="closeStudyModals(event)">
       <div class="ai-modal-content flashcard-modal">
         <div class="ai-modal-header">
           <h3 class="ai-modal-title">✨ <span id="flashcardModalTitle">Smart Flashcards</span></h3>
           <div style="display: flex; gap: 10px;">
             <button id="regenerateFlashcardsBtn" style="padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.1); color: #4c1d95; font-weight: 700; cursor: pointer; display: none; font-size: 0.85rem; transition: background 0.2s;">🔄 Generate New</button>
-            <button class="ai-modal-close" onclick="closeStudyModals()">✕</button>
+            <button class="ai-modal-close" onclick="closeStudyModals()" aria-label="Close dialog" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">✕</button>
           </div>
         </div>
         <div class="ai-modal-body">
@@ -963,8 +963,8 @@ function closeStudyModals(e) {
   const modalRelearn = document.getElementById("modalRelearn");
   const modalFlashcards = document.getElementById("modalFlashcards");
   
-  if (modalRelearn) modalRelearn.classList.remove("show");
-  if (modalFlashcards) modalFlashcards.classList.remove("show");
+  if (modalRelearn) modalRelearn.close();
+  if (modalFlashcards) modalFlashcards.close();
   
   setTimeout(() => {
     const rArea = document.getElementById("relearnContentArea");
@@ -1014,7 +1014,7 @@ async function openRelearn(lessonId, title, desc) {
 
     `;
   }
-  if (modal) modal.classList.add("show");
+  if (modal) modal.showModal();
 
   try {
     const res = await AI.getRelearn(lessonId, title, desc);
@@ -1225,7 +1225,7 @@ async function openFlashcards(title, desc) {
       </div>
     `;
   }
-  if (modal) modal.classList.add("show");
+  if (modal) modal.showModal();
 
   try {
     const res = await AI.generateFlashcards(title, desc, 6);
@@ -1530,7 +1530,7 @@ function renderPronunciationUI() {
     </div>
     
     <div style="padding-top: 32px; border-top: 1px solid rgba(80,58,40,0.1);">
-      <button id="pronunciationMicBtn" class="mic-btn" onclick="startPronunciationMic()">🎤</button>
+      <button id="pronunciationMicBtn" class="mic-btn" onclick="startPronunciationMic()" aria-label="Start recording" aria-pressed="false" style="width:52px; height:52px; border-radius:50%; border:none; background:#dc2626; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
       <p id="pronunciationStatus" style="color: var(--muted); font-size: 1.05rem; font-weight: 600; margin: 0;">Click the mic and start speaking</p>
     </div>
     
@@ -2208,7 +2208,7 @@ window.startQuiz = function(quiz) {
     </div>
   `).join('');
   
-  document.getElementById('modalTakeQuiz').style.display = 'flex';
+  document.getElementById('modalTakeQuiz').showModal();
   
   quizTimeLeft = quiz.time_limit_minutes * 60;
   updateTimerUI();
@@ -2249,7 +2249,17 @@ window.submitQuiz = async function() {
       })
     });
     alert(`Quiz submitted successfully! You scored ${score} out of ${currentQuiz.questions.length}.`);
-    document.getElementById('modalTakeQuiz').style.display = 'none';
+    document.getElementById('modalTakeQuiz').close();
     loadStudentQuizzes();
   } catch(e) { alert("Error submitting quiz: " + e.message); }
 }
+
+
+// Native Modal Backdrop Click to Close
+document.addEventListener('click', (e) => {
+  if (e.target.tagName === 'DIALOG') {
+    const rect = e.target.getBoundingClientRect();
+    const isInDialog = (rect.top <= e.clientY && e.clientY <= rect.bottom && rect.left <= e.clientX && e.clientX <= rect.right);
+    if (!isInDialog) { e.target.close(); }
+  }
+});
