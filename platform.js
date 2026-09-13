@@ -2290,3 +2290,57 @@ document.addEventListener('click', (e) => {
     if (!isInDialog) { e.target.close(); }
   }
 });
+
+
+// ===== DYNAMIC WEAKNESS TARGETING =====
+async function triggerWeaknessModule() {
+  if (!studentProfile?.id) return alert("Please log in first!");
+  
+  const btn = document.querySelector('button[onclick="triggerWeaknessModule()"]');
+  const originalText = btn.textContent;
+  btn.textContent = "Analyzing mistakes...";
+  btn.disabled = true;
+  
+  try {
+    const res = await apiFetch(`/api/ai/analysis/${studentProfile.id}/weakness-module`, { method: "POST" });
+    if (res.error) {
+      alert(res.error);
+      return;
+    }
+    
+    document.getElementById("weaknessModalTitle").textContent = res.weakness_title;
+    document.getElementById("weaknessExplanation").textContent = res.explanation;
+    
+    const area = document.getElementById("weaknessContentArea");
+    area.innerHTML = "";
+    
+    res.flashcards.forEach(card => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'ai-card-wrapper';
+      wrapper.innerHTML = `
+        <div class="ai-card-inner">
+          <div class="card-face-front" style="background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; border: 2px solid #fbcfe8; color: #9d174d;">
+            <h4 style="font-size: 1.15rem; font-weight: 800; margin:0;">${escapeHtml(card.front)}</h4>
+          </div>
+          <div class="card-face-back" style="background: linear-gradient(135deg, #db2777, #9d174d); color: white; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+            <p style="font-size: 1rem; font-weight: 700; margin: 0;">${escapeHtml(card.back)}</p>
+          </div>
+        </div>
+      `;
+      wrapper.onclick = () => {
+        const inner = wrapper.querySelector('.ai-card-inner');
+        inner.classList.toggle('is-flipped');
+      };
+      area.appendChild(wrapper);
+    });
+    
+    document.getElementById("modalWeakness").showModal();
+    document.getElementById("aiAnalysisModal").close(); // Close analysis modal behind it
+    
+  } catch (err) {
+    alert("Could not load weakness module: " + err.message);
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}

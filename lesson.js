@@ -136,7 +136,7 @@ function renderQuestions(lesson, savedProgress) {
         <p class="q-prompt" style="color:var(--text);line-height:1.75;font-size:1rem;margin-bottom:12px;">${q.prompt}</p>
         <div class="hint-bubble" id="hint_${q.id}" style="display:none;"></div>
         <div style="position:relative;">
-          <textarea class="q-answer" data-qid="${q.id}" placeholder="Type your answer here…" rows="3" style="padding-right:44px;">${savedAnswer}</textarea>
+          <textarea class="q-answer" data-qid="${q.id}" placeholder="${isEssay ? \'Write your essay or paragraph here (min 3 sentences)…\' : \'Type your answer here…\'}" rows="${isEssay ? 8 : 3}" style="padding-right:44px;">${savedAnswer}</textarea>
           <button class="q-mic-btn" data-qid="${q.id}" title="Speak your answer"
             style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(80,58,40,0.15);background:rgba(255,255,255,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
         </div>

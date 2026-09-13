@@ -271,6 +271,50 @@ IMPORTANT: Under HELPFUL EXAMPLES, just write the clean sentence directly (no ex
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
 
+
+@router.post("/analysis/{student_id}/weakness-module")
+def generate_weakness_module(student_id: str, db: Session = Depends(get_db)):
+    from app.models.models import Progress, Answer
+    progresses = db.query(Progress).filter(Progress.student_id == student_id).all()
+    
+    # Collect poorly scored answers
+    weak_answers = []
+    for p in progresses:
+        for a in p.answers:
+            if a.ai_score and a.ai_score < 4 and a.text:
+                weak_answers.append({"question": a.question.prompt, "answer": a.text, "feedback": a.ai_feedback})
+                
+    if not weak_answers:
+        return {"error": "Not enough data to identify a weakness! Keep practicing."}
+        
+    # Analyze and generate mini-lesson
+    import json
+    prompt = f"""Based on the following past mistakes from an ESL student:
+    {json.dumps(weak_answers[-5:])}
+    
+    1. Identify their #1 biggest grammatical or structural weakness (e.g., 'Past Tense Verbs' or 'Prepositions').
+    2. Generate a personalized 3-flashcard 'Targeted Mini-Lesson' to fix exactly this weakness.
+    
+    Return ONLY valid JSON (no markdown):
+    {{
+      "weakness_title": "Target: [The Weakness]",
+      "explanation": "A friendly 2-sentence explanation of the rule.",
+      "flashcards": [
+        {{"front": "Incorrect sentence with blank or prompt", "back": "Correct sentence and why"}}
+      ]
+    }}
+    """
+    
+    try:
+        raw = ask_groq(prompt, max_tokens=600, system="Output valid JSON only.")
+        clean_json = raw.strip()
+        match = re.search(r'\{.*\}', clean_json, re.DOTALL)
+        if match: clean_json = match.group(0)
+        return json.loads(clean_json)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── AI CONTENT GENERATION (ADMIN) ──
 
 class GenerateQuestionsRequest(BaseModel):
