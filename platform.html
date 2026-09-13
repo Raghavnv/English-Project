@@ -216,6 +216,7 @@
     <button class="rail-btn" title="Memory Deck" onclick="switchAppView('view-memory-deck', this)">🧠 <span class="rail-btn-text">Memory Deck</span></button>
     <button class="rail-btn" title="Leaderboard" onclick="switchAppView('view-leaderboard', this)">🏆 <span class="rail-btn-text">Leaderboards</span></button>
     <button class="rail-btn" title="Live Sessions" onclick="switchAppView('view-live-sessions', this)">🧑‍🏫 <span class="rail-btn-text">Live Sessions</span></button>
+    <button class="rail-btn" title="Quizzes" onclick="switchAppView('view-quizzes', this)">📝 <span class="rail-btn-text">Quizzes</span></button>
 
     <button class="rail-btn" title="Resources" onclick="switchAppView('view-resources', this)" style="position:relative;">
       📚 <span class="rail-btn-text">Resources</span><span id="resourceRailBadge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;border-radius:999px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:800;align-items:center;justify-content:center;line-height:1;"></span>
@@ -675,6 +676,14 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- ── QUIZZES ── -->
+    <section id="view-quizzes" class="app-view">
+      <div class="view-header">
+        <h2 style="font-size: 2rem; font-family: var(--font-family); font-weight: 800;">Quizzes</h2>
+      </div>
+      <div id="studentQuizzesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 24px; margin-top: 24px;"></div>
     </section>
 
     <!-- ── LIVE SESSIONS VIEW ── -->
