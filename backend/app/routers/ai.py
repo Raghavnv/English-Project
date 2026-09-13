@@ -806,10 +806,12 @@ def admin_buddy(body: BuddyRequest, requester=Depends(require_authenticated_requ
 class BulkCurriculumRequest(BaseModel):
     topic: str
     count: int
+    instructions: str = None
 
 @router.post("/bulk-curriculum")
 def generate_bulk_curriculum(body: BulkCurriculumRequest, requester=Depends(require_authenticated_requester)):
-    prompt = f"""Generate a {body.count}-module English course curriculum for the topic: "{body.topic}".
+    instructions_text = f"\n    Custom Instructions: {body.instructions}" if body.instructions else ""
+    prompt = f"""Generate a {body.count}-module English course curriculum for the topic: "{body.topic}".{instructions_text}
     For each module, provide 2 short reading/writing text questions, and 3 vocabulary flashcards.
     Return ONLY a JSON object in this format (no markdown, no extra text):
     {{

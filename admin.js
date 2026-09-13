@@ -1397,6 +1397,7 @@ function closeBulkCurriculumModal() {
 async function runBulkCurriculum() {
   const topic = document.getElementById("bulkCurriculumTopic").value.trim();
   const count = parseInt(document.getElementById("bulkCurriculumCount").value) || 3;
+  const instructions = document.getElementById("bulkCurriculumPrompt").value.trim();
   const btn = document.getElementById("generateCurriculumBtn");
   const loading = document.getElementById("bulkCurriculumLoading");
   
@@ -1408,7 +1409,7 @@ async function runBulkCurriculum() {
   try {
     const response = await apiFetch('/api/ai/bulk-curriculum', {
       method: 'POST',
-      body: JSON.stringify({ topic, count })
+      body: JSON.stringify({ topic, count, instructions })
     });
     
     console.log("Generated curriculum:", response);
