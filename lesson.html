@@ -703,10 +703,7 @@
         </div>
         <!-- Divider -->
         </div>
-        <div style="display: flex; gap: 12px; align-items: center;">
-      <button class="header-chip" style="background: linear-gradient(135deg, #7c3aed, #4c1d95); color: white; border: none; font-weight: 700; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);" onclick="promptAddWord()">+ Add Word to Bank</button>
-      <button class="header-chip" onclick="goBack()">← Back to Dashboard</button>
-    </div>
+    <button class="header-chip" onclick="goBack()">← Back to Dashboard</button>
   </header>
 
   <div class="lesson-shell">
@@ -741,7 +738,13 @@
       <!-- QUESTIONS COLUMN -->
       <div class="lesson-body">
       
-        <h2>Questions</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h2 style="margin: 0;">Questions</h2>
+          <button onclick="promptAddWord()" style="background: rgba(124, 58, 237, 0.1); color: #7c3aed; border: 1px solid rgba(124, 58, 237, 0.2); padding: 8px 16px; border-radius: 99px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 0.9rem;" onmouseover="this.style.background='rgba(124, 58, 237, 0.2)'" onmouseout="this.style.background='rgba(124, 58, 237, 0.1)'">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+            Save a Word
+          </button>
+        </div>
         <div class="question-stack" id="questionStack"></div>
       </div>
 
