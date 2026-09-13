@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi.responses import StreamingResponse, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
@@ -216,9 +217,14 @@ Your rules:
         response = client.chat.completions.create(
             model=MODEL, 
             max_tokens=200, 
-            messages=messages
+            messages=messages,
+            stream=True
         )
-        return {"reply": response.choices[0].message.content.strip()}
+        def generate():
+            for chunk in response:
+                if chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+        return StreamingResponse(generate(), media_type="text/plain")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
 
@@ -744,8 +750,17 @@ def roleplay_chat(request: RoleplayRequest, requester=Depends(require_authentica
     try:
         # Format history for the LLM
         formatted_history = [{"role": m.role, "content": m.content} for m in request.messages]
-        reply = ask_groq(system_prompt, history=formatted_history, max_tokens=150)
-        return {"reply": reply}
+        response = client.chat.completions.create(
+            model=MODEL,
+            max_tokens=150,
+            messages=[{"role": "system", "content": system_prompt}] + formatted_history,
+            stream=True
+        )
+        def generate():
+            for chunk in response:
+                if chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+        return StreamingResponse(generate(), media_type="text/plain")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

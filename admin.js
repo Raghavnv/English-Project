@@ -992,14 +992,26 @@ async function sendAdminBuddy() {
   showAdminBuddyTyping();
 
   try {
-    const res = await AI.chat(
-      adminBuddyHistory,
-      "",
-      adminSession.username || "Admin"
-    );
+    const response = await fetch("/api/ai/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + (localStorage.getItem("adminToken") || "") },
+      body: JSON.stringify({ messages: adminBuddyHistory, lesson_title: "", student_name: adminSession.username || "Admin" })
+    });
     hideAdminBuddyTyping();
-    appendAdminBuddyMsg("bot", res.reply);
-    adminBuddyHistory.push({ role: "assistant", content: res.reply });
+    
+    const msgId = appendAdminBuddyMsg("bot", "");
+    const msgEl = document.getElementById(msgId);
+    
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let fullText = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      fullText += decoder.decode(value, { stream: true });
+      msgEl.innerHTML = fullText; // Admin buddy supports markdown
+    }
+    adminBuddyHistory.push({ role: "assistant", content: fullText });
   } catch (err) {
     hideAdminBuddyTyping();
     appendAdminBuddyMsg("bot", "Sorry, I couldn't respond right now. Try again in a moment!");
@@ -1515,6 +1527,7 @@ function initLiveFeed() {
 
   window.liveFeedInterval = setInterval(() => {
     const el = document.createElement("div");
+  el.id = "admin_msg_" + Date.now();
     el.style.cssText = "padding: 8px 12px; background: rgba(255,255,255,0.6); border-radius: 8px; font-size: 0.85rem; color: #166534; animation: slideDown 0.3s ease-out; margin-bottom: 8px;";
     el.innerHTML = `<span style="opacity:0.6; font-size:0.75rem; margin-right:6px;">Just now</span> ` + activities[Math.floor(Math.random() * activities.length)];
     liveFeed.prepend(el);

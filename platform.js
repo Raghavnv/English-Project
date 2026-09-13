@@ -1867,14 +1867,27 @@ async function startRoleplay() {
   // Trigger the AI's opening line by sending a hidden system prompt
   const loadingId = appendRoleplayMsg("bot", `<div class="spinner blue" style="width:20px;height:20px;border-width:2px;"></div>`, true);
   try {
-    const res = await apiFetch("/api/ai/roleplay-chat", {
+    const response = await fetch("/api/ai/roleplay-chat", {
       method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + (localStorage.getItem("studentToken") || "") },
       body: JSON.stringify({ scenario: activeScenario, messages: [{ role: "user", content: "(Start the scenario)" }] })
     });
     document.getElementById(loadingId).remove();
-    appendRoleplayMsg("bot", res.reply);
-    roleplayHistory.push({ role: "assistant", content: res.reply });
-    BuddyVoice.speak(res.reply, "English");
+    const msgId = appendRoleplayMsg("bot", "");
+    const msgEl = document.getElementById(msgId);
+    
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let fullText = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      fullText += decoder.decode(value, { stream: true });
+      msgEl.innerHTML = escapeHtml(fullText);
+    }
+    
+    roleplayHistory.push({ role: "assistant", content: fullText });
+    BuddyVoice.speak(fullText.replace(/'/g, "\\\'"), "English");
   } catch(err) {
     document.getElementById(loadingId).innerHTML = `<p style="color:#ef4444;margin:0;">Connection error.</p>`;
   }
@@ -1919,14 +1932,27 @@ async function sendRoleplayMessage() {
   const loadingId = appendRoleplayMsg("bot", `<div class="spinner blue" style="width:20px;height:20px;border-width:2px;"></div>`, true);
   
   try {
-    const res = await apiFetch("/api/ai/roleplay-chat", {
+    const response = await fetch("/api/ai/roleplay-chat", {
       method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + (localStorage.getItem("studentToken") || "") },
       body: JSON.stringify({ scenario: activeScenario, messages: roleplayHistory })
     });
     document.getElementById(loadingId).remove();
-    appendRoleplayMsg("bot", res.reply);
-    roleplayHistory.push({ role: "assistant", content: res.reply });
-    BuddyVoice.speak(res.reply.replace(/'/g, "\\'"), "English");
+    const msgId = appendRoleplayMsg("bot", "");
+    const msgEl = document.getElementById(msgId);
+    
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let fullText = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      fullText += decoder.decode(value, { stream: true });
+      msgEl.innerHTML = escapeHtml(fullText);
+    }
+    
+    roleplayHistory.push({ role: "assistant", content: fullText });
+    BuddyVoice.speak(fullText.replace(/'/g, "\\\'"), "English");
   } catch(err) {
     document.getElementById(loadingId).innerHTML = `<p style="color:#ef4444;margin:0;">Oops, network error.</p>`;
   }
