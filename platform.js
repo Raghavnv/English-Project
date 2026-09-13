@@ -2168,13 +2168,26 @@ async function loadStudentQuizzes() {
       }
       
       html += `
-        <div style="background:#fff; border-radius:16px; padding:20px; border:1px solid #ddd; box-shadow:0 4px 12px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <h3 style="margin:0 0 8px 0;">${q.title}</h3>
-            <p style="margin:0; color:#555;">${q.description}</p>
-            <div style="margin-top:12px; font-size:0.9rem;">${statusHtml}</div>
+        <div style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); border-radius: 20px; padding: 24px; border: 1px solid rgba(80,58,40,0.1); box-shadow: 0 8px 24px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                <h3 style="margin:0; font-size: 1.4rem; font-weight: 800; color: var(--text);">${q.title}</h3>
+                <span style="background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; color: var(--muted);">⏱️ ${q.time_limit_minutes}m</span>
+              </div>
+              <p style="margin:0; font-size: 0.95rem; color: #666; line-height: 1.5;">${q.description || 'Test your knowledge on this topic.'}</p>
+            </div>
+            ${canTake ? `<button onclick='startQuiz(${JSON.stringify(q).replace(/'/g, "\\\\'")})' style="background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%); color: #fff; padding: 12px 24px; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(188,93,45,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">Start Quiz</button>` : ''}
           </div>
-          ${canTake ? `<button onclick='startQuiz(${JSON.stringify(q).replace(/'/g, "\'")})' style="background:var(--accent-deep); color:#fff; padding:10px 20px; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">Take Quiz</button>` : ''}
+          
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(80,58,40,0.08);">
+            <div style="font-size: 0.9rem;">
+              ${statusHtml}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--muted); font-weight: 600;">
+              📋 ${q.questions.length} Questions
+            </div>
+          </div>
         </div>
       `;
     }

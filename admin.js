@@ -1625,16 +1625,24 @@ async function loadQuizzes() {
     const quizzes = await apiFetch('/api/quizzes/');
     const c = document.getElementById('adminQuizzesContainer');
     c.innerHTML = quizzes.length === 0 ? '<p>No quizzes yet.</p>' : quizzes.map(q => `
-      <div style="background:#fff; border-radius:12px; padding:16px; border:1px solid #ddd; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <h4 style="margin:0; font-size:1.1rem;">${q.title}</h4>
-          <div style="font-size:0.85rem; color:#666; margin-top:4px;">
-            ${q.questions.length} questions | ${q.time_limit_minutes} min limit<br>
-            Start: ${q.start_time ? new Date(q.start_time).toLocaleString() : 'Anytime'} | 
-            End: ${q.end_time ? new Date(q.end_time).toLocaleString() : 'Never'}
+      <div style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); border-radius: 16px; padding: 24px; border: 1px solid rgba(80, 58, 40, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.03)';">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div style="padding-right: 12px;">
+            <h4 style="margin:0 0 8px 0; font-size:1.25rem; font-weight: 800; color: var(--text);">${q.title}</h4>
+            <p style="margin:0; font-size:0.9rem; color: var(--muted); line-height: 1.4;">${q.description || 'No description provided.'}</p>
+          </div>
+          <div style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; white-space: nowrap;">
+            ⏱️ ${q.time_limit_minutes}m
           </div>
         </div>
-        <button onclick="deleteQuiz('${q.id}')" style="background:#ffe6e6; color:#d00; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:bold;">Delete</button>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.85rem; color: #555;">
+          <div style="display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 6px;">📋 ${q.questions.length} Qs</div>
+          <div style="display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 6px;">🟢 ${q.start_time ? new Date(q.start_time).toLocaleString(undefined, {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'Anytime'}</div>
+          <div style="display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 6px;">🔴 ${q.end_time ? new Date(q.end_time).toLocaleString(undefined, {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'Never'}</div>
+        </div>
+        <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(80,58,40,0.08); display: flex; justify-content: flex-end;">
+           <button onclick="deleteQuiz('${q.id}')" style="background: rgba(211, 47, 47, 0.1); color: #d32f2f; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='rgba(211, 47, 47, 0.15)'" onmouseout="this.style.background='rgba(211, 47, 47, 0.1)'">🗑️ Delete</button>
+        </div>
       </div>
     `).join('');
   } catch(e) { console.error(e); }
