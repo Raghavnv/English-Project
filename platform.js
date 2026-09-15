@@ -1196,22 +1196,7 @@ async function openFlashcards(title, desc) {
   const contentArea = document.getElementById("flashcardContentArea");
   const regenBtn = document.getElementById("regenerateFlashcardsBtn");
 
-  if (openBtn && modal) {
-    openBtn.onclick = () => {
-      renderLocalAnalysisStats();
-      modal.style.display = "flex";
-      modal.style.pointerEvents = "all"; // Fix: Makes the modal clickable
-      void modal.offsetWidth;
-      modal.style.opacity = "1";
-    };
-  }
-  if (closeBtn && modal) {
-    closeBtn.onclick = () => {
-      modal.style.opacity = "0";
-      modal.style.pointerEvents = "none"; // Fix: Prevents invisible shield bug
-      setTimeout(() => modal.style.display = "none", 250);
-    };
-  }
+
   if (titleEl) titleEl.textContent = title + " Deck";
   if (regenBtn) {
     regenBtn.style.display = "none"; 
