@@ -934,7 +934,7 @@ function injectStudyModals() {
           <div id="relearnContentArea"></div>
         </div>
       </div>
-    </div>
+    </dialog>
 
     <!-- MODAL: FLASHCARDS -->
     <dialog class="native-modal" id="modalFlashcards" onclick="closeStudyModals(event)">
@@ -950,7 +950,7 @@ function injectStudyModals() {
           <div id="flashcardContentArea" class="ai-card-grid"></div>
         </div>
       </div>
-    </div>
+    </dialog>
   `;
   document.body.insertAdjacentHTML("beforeend", modalsHTML);
 }
@@ -958,13 +958,18 @@ function injectStudyModals() {
 document.addEventListener("DOMContentLoaded", injectStudyModals);
 
 function closeStudyModals(e) {
-  if (e && e.target.classList && !e.target.classList.contains("ai-modal-overlay")) return;
+  // If clicked inside the modal content, do nothing
+  if (e && e.target && e.target.closest('.ai-modal-content')) {
+    if (!e.target.closest('.ai-modal-close')) {
+      return;
+    }
+  }
   
   const modalRelearn = document.getElementById("modalRelearn");
   const modalFlashcards = document.getElementById("modalFlashcards");
   
-  if (modalRelearn) modalRelearn.close();
-  if (modalFlashcards) modalFlashcards.close();
+  if (modalRelearn && modalRelearn.open) modalRelearn.close();
+  if (modalFlashcards && modalFlashcards.open) modalFlashcards.close();
   
   setTimeout(() => {
     const rArea = document.getElementById("relearnContentArea");
