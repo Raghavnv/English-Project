@@ -896,7 +896,7 @@ function injectStudyModals() {
       .relearn-modal { background: linear-gradient(135deg, #0f2027 0%, #1a3a4a 50%, #0f2027 100%); border: 1px solid rgba(56,189,248,0.3); }
       .relearn-modal .ai-modal-header { border-bottom: 1px solid rgba(56,189,248,0.15); }
       .relearn-modal .ai-modal-title { color: #e0f2fe; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; }
-      .flashcard-modal { background: linear-gradient(145deg, #f5f3ff, #ede9fe); border: 1px solid rgba(139, 92, 246, 0.4); }
+      .flashcard-modal { background: linear-gradient(145deg, #f5f3ff, #ede9fe); border: 1px solid rgba(139, 92, 246, 0.4); max-width: 960px !important; }
       .flashcard-modal .ai-modal-header { border-bottom: 1px solid rgba(139, 92, 246, 0.15); }
       .flashcard-modal .ai-modal-title { color: #4c1d95; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; align-items: center; }
       .flashcard-modal .ai-modal-close { background: rgba(76, 29, 149, 0.1); color: #4c1d95; }
@@ -907,8 +907,8 @@ function injectStudyModals() {
       .relearn-content ul li { display: flex; gap: 10px; align-items: flex-start; }
       .relearn-content ul li::before { content: "→"; color: #38bdf8; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
       .relearn-content .rl-example { background: rgba(255,255,255,0.04); border: 1px solid rgba(56,189,248,0.1); border-radius: 12px; padding: 12px 16px; font-style: italic; color: #a5f3fc; margin-bottom: 10px; }
-      .ai-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; perspective: 1000px; }
-      .ai-card-wrapper { width: 100%; height: 180px; cursor: pointer; perspective: 1000px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; }
+      .ai-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; perspective: 1000px; }
+      .ai-card-wrapper { width: 100%; height: 160px; cursor: pointer; perspective: 1000px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; }
       .ai-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; border-radius: 18px; box-shadow: 0 8px 20px rgba(46, 16, 101, 0.12); }
       .ai-card-wrapper:hover .ai-card-inner { box-shadow: 0 12px 28px rgba(46, 16, 101, 0.2); transform: translateY(-3px); }
       .ai-card-inner.is-flipped { transform: rotateY(180deg); }
