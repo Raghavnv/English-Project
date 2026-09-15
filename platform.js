@@ -896,10 +896,11 @@ function injectStudyModals() {
       .relearn-modal { background: linear-gradient(135deg, #0f2027 0%, #1a3a4a 50%, #0f2027 100%); border: 1px solid rgba(56,189,248,0.3); }
       .relearn-modal .ai-modal-header { border-bottom: 1px solid rgba(56,189,248,0.15); }
       .relearn-modal .ai-modal-title { color: #e0f2fe; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; }
-      .flashcard-modal { background: linear-gradient(145deg, #f5f3ff, #ede9fe); border: 1px solid rgba(139, 92, 246, 0.4); max-width: 960px !important; }
-      .flashcard-modal .ai-modal-header { border-bottom: 1px solid rgba(139, 92, 246, 0.15); }
-      .flashcard-modal .ai-modal-title { color: #4c1d95; font-size: 1.2rem; font-weight: 800; margin: 0; display: flex; gap: 10px; align-items: center; }
-      .flashcard-modal .ai-modal-close { background: rgba(76, 29, 149, 0.1); color: #4c1d95; }
+      .flashcard-modal { background: linear-gradient(145deg, #f5f3ff, #ede9fe); border: 1px solid rgba(139, 92, 246, 0.4); max-width: 1200px !important; width: 95vw !important; max-height: 90vh !important; }
+      .flashcard-modal .ai-modal-header { border-bottom: 1px solid rgba(139, 92, 246, 0.15); padding: 24px 32px; }
+      .flashcard-modal .ai-modal-title { color: #4c1d95; font-size: 1.5rem; font-weight: 800; margin: 0; display: flex; gap: 10px; align-items: center; }
+      .flashcard-modal .ai-modal-close { background: rgba(76, 29, 149, 0.1); color: #4c1d95; width: 48px; height: 48px; font-size: 1.4rem; }
+      .flashcard-modal .ai-modal-body { padding: 32px; overflow-y: auto; flex: 1; }
       .relearn-content { color: #cbd5e1; font-size: 1rem; line-height: 1.8; }
       .relearn-content .rl-section { margin-bottom: 24px; }
       .relearn-content .rl-header { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #7dd3fc; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(56,189,248,0.12); }
@@ -907,8 +908,8 @@ function injectStudyModals() {
       .relearn-content ul li { display: flex; gap: 10px; align-items: flex-start; }
       .relearn-content ul li::before { content: "→"; color: #38bdf8; font-weight: 800; flex-shrink: 0; margin-top: 2px; }
       .relearn-content .rl-example { background: rgba(255,255,255,0.04); border: 1px solid rgba(56,189,248,0.1); border-radius: 12px; padding: 12px 16px; font-style: italic; color: #a5f3fc; margin-bottom: 10px; }
-      .ai-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; perspective: 1000px; }
-      .ai-card-wrapper { width: 100%; height: 160px; cursor: pointer; perspective: 1000px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; }
+      .ai-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; perspective: 1000px; align-content: center; }
+      .ai-card-wrapper { width: 100%; height: 260px; cursor: pointer; perspective: 1200px; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards; }
       .ai-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; border-radius: 18px; box-shadow: 0 8px 20px rgba(46, 16, 101, 0.12); }
       .ai-card-wrapper:hover .ai-card-inner { box-shadow: 0 12px 28px rgba(46, 16, 101, 0.2); transform: translateY(-3px); }
       .ai-card-inner.is-flipped { transform: rotateY(180deg); }
