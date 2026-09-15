@@ -910,7 +910,7 @@ function confirmDeleteStudent(studentId, name, school) {
     `This will remove "${name}" (${school}) and all their progress. This cannot be undone.`;
   const modal = document.getElementById("deleteStudentModal");
   modal.style.opacity = "1";
-  modal.style.pointerEvents = "all";
+  modal.style.pointerEvents = "auto";
   modal.querySelector("div").style.transform = "translateY(0) scale(1)";
 }
 
@@ -1396,7 +1396,7 @@ async function loadPronunciationAnalytics() {
 function openBulkCurriculumModal() {
   const modal = document.getElementById("modalBulkCurriculum");
   modal.style.opacity = "1";
-  modal.style.pointerEvents = "all";
+  modal.style.pointerEvents = "auto";
   modal.querySelector("div").style.transform = "translateY(0) scale(1)";
 }
 function closeBulkCurriculumModal() {

@@ -92,6 +92,7 @@ function renderQuestions(lesson, savedProgress) {
 
   lesson.questions.forEach((q, i) => {
     const isSpeech = q.type === "speech";
+    const isEssay = q.type === "essay";
     const card = document.createElement("div");
     const savedAnswer = answers[q.id] || "";
 
