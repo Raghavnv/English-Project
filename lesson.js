@@ -128,7 +128,7 @@ function renderQuestions(lesson, savedProgress) {
         <div class="speech-transcript-box" id="transcript_${q.id}" data-qid="${q.id}">${savedAnswer || '<span style="color:var(--muted);font-style:italic;">Your spoken answer will appear here…</span>'}</div>
         <div class="feedback-area" id="feedback_${q.id}" style="margin-top:10px;"></div>
         <div style="margin-top:10px;">
-          <button class="check-btn" data-qid="${q.id}" style="display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 14px;border-radius:var(--radius-pill);border:1px solid rgba(16,185,129,0.3);background:var(--emerald-soft);color:var(--emerald-deep);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.15s ease;">✨ Check with AI</button>
+          <button class="check-btn" data-qid="${q.id}" style="display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 14px;border-radius:var(--radius-pill);border:1px solid rgba(84,104,56,0.3);background:var(--emerald-soft);color:var(--emerald-deep);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.15s ease;">✨ Check with AI</button>
         </div>
       `;
     } else {
@@ -149,7 +149,7 @@ function renderQuestions(lesson, savedProgress) {
         </div>
         <div class="feedback-area" id="feedback_${q.id}" style="margin-top:10px;"></div>
         <div style="margin-top:10px;">
-          <button class="check-btn" data-qid="${q.id}" style="display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 14px;border-radius:var(--radius-pill);border:1px solid rgba(99,102,241,0.25);background:var(--accent-soft);color:var(--accent);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.15s ease;">✨ Check with AI</button>
+          <button class="check-btn" data-qid="${q.id}" style="display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 14px;border-radius:var(--radius-pill);border:1px solid rgba(188,93,45,0.25);background:var(--accent-soft);color:var(--accent);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.15s ease;">✨ Check with AI</button>
         </div>
       `;
     }
@@ -166,7 +166,7 @@ function renderQuestions(lesson, savedProgress) {
 
   const completionMsg = document.createElement("p");
   completionMsg.id = "completionMsg";
-  completionMsg.style.cssText = "display:none;padding:14px 16px;border-radius:var(--radius-md);background:var(--emerald-soft);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-deep);font-weight:700;font-size:0.92rem;text-align:center;";
+  completionMsg.style.cssText = "display:none;padding:14px 16px;border-radius:var(--radius-md);background:var(--emerald-soft);border:1px solid rgba(84,104,56,0.3);color:var(--emerald-deep);font-weight:700;font-size:0.92rem;text-align:center;";
   completionMsg.textContent = "✓ Lesson completed! Great work.";
   stack.appendChild(completionMsg);
 
@@ -296,9 +296,9 @@ function renderQuestions(lesson, savedProgress) {
         
         feedbackEl.innerHTML = `
           <div style="padding:12px 14px;border-radius:var(--radius-md);font-size:0.88rem;line-height:1.65;
-            background:${isGood ? "var(--emerald-soft)" : "var(--sass-soft)"};
-            border:1px solid ${isGood ? "rgba(16,185,129,0.25)" : "rgba(244,63,94,0.25)"};
-            color:${isGood ? "var(--emerald-deep)" : "var(--sass)"};">
+            background:${isGood ? "var(--olive-soft, rgba(84,104,56,0.09))" : "var(--crimson-soft, rgba(185,28,28,0.08))"};
+            border:1px solid ${isGood ? "rgba(84,104,56,0.3)" : "rgba(185,28,28,0.25)"};
+            color:${isGood ? "var(--olive-deep, #3c4c25)" : "var(--crimson, #b91c1c)"};">
             <strong>${badge}</strong>${score !== null ? ` · Score ${score}/5` : ""}<br>
             ${formatAIText(res.feedback)}
           </div>`;

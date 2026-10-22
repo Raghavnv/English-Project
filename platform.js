@@ -659,7 +659,7 @@ function renderLessonPanel(selectedClass, module) {
   if (total === 0) {
     stack.innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 48px 24px; text-align:center; opacity: 0.6; animation: pageEntrance 1s ease backwards;">
-        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(99,102,241,0.35)); animation: orbFloat 6s ease-in-out infinite alternate;">📝</div>
+        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(188,93,45,0.22)); animation: orbFloat 6s ease-in-out infinite alternate;">📝</div>
         <h4 style="font-size: 1.25rem; margin: 0 0 8px; color: var(--text);">No Questions Yet</h4>
         <p style="font-size: 0.95rem; color: var(--muted); max-width: 280px; margin: 0;">Your teacher hasn't added any questions to this lesson yet.</p>
       </div>
@@ -1325,7 +1325,7 @@ function render() {
     document.getElementById("lessonStatus").className = "status-badge";
     document.getElementById("questionStack").innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 48px 24px; text-align:center; opacity: 0.6; animation: pageEntrance 1s ease backwards;">
-        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(99,102,241,0.35)); animation: orbFloat 6s ease-in-out infinite alternate;">🚀</div>
+        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(188,93,45,0.22)); animation: orbFloat 6s ease-in-out infinite alternate;">🚀</div>
         <h4 style="font-size: 1.25rem; margin: 0 0 8px; color: var(--text);">Ready to begin?</h4>
         <p style="font-size: 0.95rem; color: var(--muted); max-width: 280px; margin: 0;">Click on any upcoming lesson in the carousel above to start your practice session.</p>
       </div>
@@ -1477,7 +1477,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div style="padding: 40px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-soft); animation: popIn 0.3s ease;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px;">
               <h4 style="font-family: var(--font-family); font-size: 2.1rem; font-weight: 800; letter-spacing: -0.025em; color: var(--accent-deep); margin: 0;">${escapeHtml(res.title)}</h4>
-              <button onclick="BuddyVoice.speak('${escapeHtml(fullStoryText).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.3); background: var(--emerald-soft); color: var(--emerald-deep); font-weight: 700; cursor: pointer; display:flex; align-items:center; gap: 8px; flex-shrink: 0;">🔊 Read to me</button>
+              <button onclick="BuddyVoice.speak('${escapeHtml(fullStoryText).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(84,104,56,0.3); background: var(--emerald-soft); color: var(--emerald-deep); font-weight: 700; cursor: pointer; display:flex; align-items:center; gap: 8px; flex-shrink: 0;">🔊 Read to me</button>
             </div>
             ${paragraphsHtml}
           </div>
@@ -1518,7 +1518,7 @@ function renderPronunciationUI() {
     <div style="margin-bottom: 32px;">
       <p style="font-size: 0.85rem; font-weight: 800; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Your Target Sentence</p>
       <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: var(--text); line-height: 1.35; margin: 0 0 16px;">"${escapeHtml(currentPronunciationSentence)}"</h2>
-      <button onclick="BuddyVoice.speak('${escapeHtml(currentPronunciationSentence).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(16,185,129,0.3); background: var(--emerald-soft); color: var(--emerald-deep); font-weight: 700; cursor: pointer;">🔊 Hear Buddy Say It</button>
+      <button onclick="BuddyVoice.speak('${escapeHtml(currentPronunciationSentence).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(84,104,56,0.3); background: var(--emerald-soft); color: var(--emerald-deep); font-weight: 700; cursor: pointer;">🔊 Hear Buddy Say It</button>
     </div>
     
     <div style="padding-top: 32px; border-top: 1px solid var(--line);">
@@ -1646,7 +1646,7 @@ window.openLightningModal = function() {
         <div class="spinner" style="border-top-color: var(--amber); margin: 0 auto;"></div>
         <p style="color: var(--amber); font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
       </div>
-      <button id="lightningStartBtn" style="min-height: 54px; padding: 0 36px; border-radius: var(--radius-pill); border: none; background: linear-gradient(135deg, var(--amber) 0%, #d97706 100%); color: #ffffff; font-family: var(--font-family); font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35); transition: transform 0.15s ease;">⚡ Start Now</button>
+      <button id="lightningStartBtn" style="min-height: 54px; padding: 0 36px; border-radius: var(--radius-pill); border: none; background: linear-gradient(135deg, var(--amber) 0%, #a16207 100%); color: #ffffff; font-family: var(--font-family); font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(194, 120, 3, 0.28); transition: transform 0.15s ease;">⚡ Start Now</button>
     `;
     
     // Bulletproof click listener attachment
@@ -2195,7 +2195,7 @@ async function loadStudentQuizzes() {
               </div>
               <p style="margin:0; font-size: 0.95rem; color: #666; line-height: 1.5;">${q.description || 'Test your knowledge on this topic.'}</p>
             </div>
-            ${canTake ? `<button onclick='startQuiz(${JSON.stringify(q).replace(/'/g, "\\\\'")})' style="background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%); color: #fff; padding: 12px 24px; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(99,102,241,0.35); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">Start Quiz</button>` : ''}
+            ${canTake ? `<button onclick='startQuiz(${JSON.stringify(q).replace(/'/g, "\\\\'")})' style="background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%); color: #fff; padding: 12px 24px; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(188,93,45,0.25); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">Start Quiz</button>` : ''}
           </div>
           
           <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line);">

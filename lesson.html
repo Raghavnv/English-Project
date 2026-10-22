@@ -6,7 +6,7 @@
   <title>Lesson | EnglishBridge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script>
     if (localStorage.getItem('eb_theme') === 'dark') {
       document.documentElement.classList.add('dark-theme');
@@ -91,12 +91,12 @@
 
     .question-card:hover { 
       box-shadow: var(--shadow-soft); 
-      border-color: rgba(99, 102, 241, 0.28); 
+      border-color: rgba(188, 93, 45, 0.35); 
     }
 
     .question-card.speech-card { 
       border-left: 3px solid var(--emerald); 
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.03), var(--surface)); 
+      background: linear-gradient(135deg, rgba(84, 104, 56, 0.04), var(--surface)); 
     }
 
     /* ── PROGRESS BANNER & BARS ── */
@@ -172,12 +172,12 @@
       min-height: 42px; 
       border-radius: var(--radius-pill); 
       background: var(--emerald-soft);
-      border: 1px solid rgba(16, 185, 129, 0.3); 
+      border: 1px solid rgba(84, 104, 56, 0.3); 
       color: var(--emerald-deep); 
       font-weight: 700; 
       font-size: 0.9rem; 
       cursor: pointer; 
-      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12);
+      box-shadow: 0 2px 6px rgba(84, 104, 56, 0.15);
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); 
     }
 
@@ -186,7 +186,7 @@
       border-color: var(--emerald);
       color: #ffffff; 
       transform: translateY(-1px); 
-      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35); 
+      box-shadow: 0 6px 18px rgba(84, 104, 56, 0.35); 
     }
 
     .speech-record-btn.recording { 
@@ -197,8 +197,8 @@
     }
 
     @keyframes pulse-ring { 
-      0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); } 
-      50% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); } 
+      0%, 100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0.4); } 
+      50% { box-shadow: 0 0 0 8px rgba(185, 28, 28, 0); } 
     }
 
     .speech-transcript-box { 
@@ -255,9 +255,9 @@
       overflow: hidden; 
       display: flex; 
       flex-direction: column; 
-      background: linear-gradient(170deg, #090d16 0%, #111827 45%, #0f172a 100%); 
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(99, 102, 241, 0.15); 
+      background: linear-gradient(170deg, #1c1511 0%, #241c17 45%, #181310 100%); 
+      border: 1px solid rgba(188, 93, 45, 0.25);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(188, 93, 45, 0.15); 
       max-height: calc(100vh - 108px); 
     }
 
@@ -275,13 +275,13 @@
       width: 44px; 
       height: 44px; 
       border-radius: 50%; 
-      background: linear-gradient(135deg, #818cf8, #6366f1); 
+      background: linear-gradient(135deg, var(--accent), var(--accent-deep)); 
       display: flex; 
       align-items: center; 
       justify-content: center; 
       font-size: 1.25rem; 
       flex-shrink: 0; 
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 6px 18px rgba(99, 102, 241, 0.4); 
+      box-shadow: 0 0 0 3px rgba(188, 93, 45, 0.25), 0 6px 18px rgba(188, 93, 45, 0.35); 
     }
 
     .buddy-header-info { 
@@ -308,14 +308,14 @@
       width: 7px; 
       height: 7px; 
       border-radius: 50%; 
-      background: #10b981; 
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8); 
+      background: var(--olive); 
+      box-shadow: 0 0 8px var(--olive); 
       flex-shrink: 0; 
     }
 
     .buddy-online-label { 
       font-size: 0.72rem; 
-      color: rgba(16, 185, 129, 0.9); 
+      color: var(--olive); 
       font-weight: 700; 
     }
 
@@ -329,7 +329,7 @@
       min-height: 260px; 
       max-height: 460px; 
       scrollbar-width: thin; 
-      scrollbar-color: rgba(99, 102, 241, 0.25) transparent; 
+      scrollbar-color: rgba(188, 93, 45, 0.25) transparent; 
     }
 
     .buddy-chat-body::-webkit-scrollbar { 
@@ -337,7 +337,7 @@
     }
 
     .buddy-chat-body::-webkit-scrollbar-thumb { 
-      background: rgba(99, 102, 241, 0.25); 
+      background: rgba(188, 93, 45, 0.25); 
       border-radius: 4px; 
     }
 
@@ -424,17 +424,17 @@
     .buddy-quick-actions button { 
       padding: 6px 12px; 
       border-radius: var(--radius-pill); 
-      border: 1px solid rgba(99, 102, 241, 0.35); 
-      background: rgba(99, 102, 241, 0.1); 
-      color: #c7d2fe; 
+      border: 1px solid rgba(188, 93, 45, 0.35); 
+      background: rgba(188, 93, 45, 0.1); 
+      color: #fcefe6; 
       font-size: 0.8rem; 
       cursor: pointer; 
       transition: all 0.2s; 
     }
 
     .buddy-quick-actions button:hover { 
-      background: rgba(99, 102, 241, 0.22); 
-      border-color: rgba(99, 102, 241, 0.5);
+      background: rgba(188, 93, 45, 0.22); 
+      border-color: rgba(188, 93, 45, 0.5);
     }
 
     .buddy-input-row { 
@@ -469,7 +469,7 @@
     }
 
     .buddy-input:focus { 
-      border-color: rgba(99, 102, 241, 0.6); 
+      border-color: rgba(188, 93, 45, 0.6); 
       background: rgba(255,255,255,0.09); 
     }
 
@@ -523,8 +523,8 @@
     .relearn-section { 
       border-radius: var(--radius-xl); 
       overflow: hidden; 
-      background: linear-gradient(135deg, #0b1329 0%, #0f172a 60%, #1e1b4b 100%); 
-      border: 1px solid rgba(99, 102, 241, 0.25); 
+      background: linear-gradient(135deg, #181310 0%, #221a15 60%, #1a1411 100%); 
+      border: 1px solid rgba(188, 93, 45, 0.25); 
       box-shadow: 0 16px 40px rgba(15,23,42,0.35); 
     }
 
@@ -534,7 +534,7 @@
       align-items: center; 
       justify-content: space-between; 
       gap: 16px; 
-      border-bottom: 1px solid rgba(99, 102, 241, 0.15); 
+      border-bottom: 1px solid rgba(188, 93, 45, 0.15); 
       flex-wrap: wrap; 
     }
 
@@ -548,14 +548,14 @@
       width: 48px; 
       height: 48px; 
       border-radius: var(--radius-md); 
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(244, 63, 94, 0.2)); 
-      border: 1px solid rgba(99, 102, 241, 0.3); 
+      background: linear-gradient(135deg, rgba(188, 93, 45, 0.2), rgba(185, 28, 28, 0.12)); 
+      border: 1px solid rgba(188, 93, 45, 0.3); 
       display: flex; 
       align-items: center; 
       justify-content: center; 
       font-size: 1.4rem; 
       flex-shrink: 0; 
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.15); 
+      box-shadow: 0 0 20px rgba(188, 93, 45, 0.15); 
     }
 
     .relearn-title-block strong { 
@@ -577,9 +577,9 @@
       gap: 8px; 
       padding: 10px 22px; 
       border-radius: var(--radius-pill); 
-      border: 1px solid rgba(99, 102, 241, 0.4); 
-      background: rgba(99, 102, 241, 0.12); 
-      color: #c7d2fe; 
+      border: 1px solid rgba(188, 93, 45, 0.4); 
+      background: rgba(188, 93, 45, 0.12); 
+      color: #fcefe6; 
       font-size: 0.88rem; 
       font-weight: 800; 
       cursor: pointer; 
@@ -588,11 +588,11 @@
     }
 
     .relearn-toggle-btn:hover { 
-      background: rgba(99, 102, 241, 0.25); 
-      border-color: rgba(99, 102, 241, 0.6); 
+      background: rgba(188, 93, 45, 0.25); 
+      border-color: rgba(188, 93, 45, 0.6); 
       color: #ffffff; 
       transform: translateY(-1px); 
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25); 
+      box-shadow: 0 6px 20px rgba(188, 93, 45, 0.25); 
     }
 
     .relearn-toggle-btn.loading { 
@@ -635,10 +635,10 @@
       font-weight: 800; 
       letter-spacing: 0.08em; 
       text-transform: uppercase; 
-      color: #93c5fd; 
+      color: #e8a87c; 
       margin-bottom: 10px; 
       padding-bottom: 7px; 
-      border-bottom: 1px solid rgba(99, 102, 241, 0.15); 
+      border-bottom: 1px solid rgba(188, 93, 45, 0.15); 
     }
 
     .relearn-content ul { 
@@ -665,11 +665,11 @@
 
     .relearn-content .rl-example { 
       background: rgba(255,255,255,0.04); 
-      border: 1px solid rgba(99, 102, 241, 0.15); 
+      border: 1px solid rgba(188, 93, 45, 0.15); 
       border-radius: var(--radius-sm); 
       padding: 10px 14px; 
       font-style: italic; 
-      color: #e0e7ff; 
+      color: #fcefe6; 
       margin-bottom: 7px; 
     }
 
@@ -685,7 +685,7 @@
     .rl-spinner { 
       width: 20px; 
       height: 20px; 
-      border: 2px solid rgba(99, 102, 241, 0.25); 
+      border: 2px solid rgba(188, 93, 45, 0.25); 
       border-top-color: var(--accent); 
       border-radius: 50%; 
       animation: rlSpin 0.8s linear infinite; 
@@ -704,7 +704,7 @@
       font-weight: 700; 
       color: #b45309; 
       background: var(--amber-soft); 
-      border: 1px solid rgba(245,158,11,0.3); 
+      border: 1px solid rgba(194,120,3,0.3); 
       cursor: pointer; 
       padding: 4px 12px; 
       border-radius: var(--radius-pill); 
@@ -713,8 +713,8 @@
     }
 
     .q-hint-btn:hover { 
-      background: rgba(245,158,11,0.2); 
-      border-color: rgba(245,158,11,0.5); 
+      background: rgba(194,120,3,0.2); 
+      border-color: rgba(194,120,3,0.5); 
     }
 
     .hint-bubble { 
@@ -722,7 +722,7 @@
       padding: 11px 14px; 
       border-radius: var(--radius-md); 
       background: var(--amber-soft); 
-      border: 1px solid rgba(245,158,11,0.25); 
+      border: 1px solid rgba(194,120,3,0.25); 
       font-size: 0.88rem; 
       line-height: 1.65; 
       color: #92400e; 
@@ -834,7 +834,7 @@
       
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
           <h2 style="margin: 0;">Questions</h2>
-          <button onclick="promptAddWord()" style="background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(99, 102, 241, 0.25); padding: 8px 16px; border-radius: var(--radius-pill); font-weight: 700; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px; font-size: 0.88rem;" onmouseover="this.style.background='rgba(99, 102, 241, 0.18)'" onmouseout="this.style.background='var(--accent-soft)'">
+          <button onclick="promptAddWord()" style="background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(188, 93, 45, 0.25); padding: 8px 16px; border-radius: var(--radius-pill); font-weight: 700; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px; font-size: 0.88rem;" onmouseover="this.style.background='rgba(188, 93, 45, 0.15)'" onmouseout="this.style.background='var(--accent-soft)'">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15m7.5-7.5h-15"></path></svg>
             Save a Word
           </button>
@@ -970,14 +970,14 @@ function toggleTheme() {
             angle: 60,
             spread: 55,
             origin: { x: 0, y: 0.8 },
-            colors: ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#ffffff']
+            colors: ['#bc5d2d', '#c27803', '#546838', '#7e3418', '#f8f4ec']
           });
           confetti({
             particleCount: 5,
             angle: 120,
             spread: 55,
             origin: { x: 1, y: 0.8 },
-            colors: ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#ffffff']
+            colors: ['#bc5d2d', '#c27803', '#546838', '#7e3418', '#f8f4ec']
           });
 
           if (Date.now() < end) {

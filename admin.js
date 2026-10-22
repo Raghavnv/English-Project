@@ -512,7 +512,7 @@ async function renderSavedLessons() {
       classSection.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
           <h4 style="margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent-deep); font-family: var(--font-family);">📂 ${escHtml(cls.label)}</h4>
-          <button class="delete-class-btn" data-id="${cls.id}" style="min-height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(244,63,94,0.3); background: var(--sass-soft); color: var(--sass); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">Delete Class</button>
+          <button class="delete-class-btn" data-id="${cls.id}" style="min-height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(185,28,28,0.3); background: var(--sass-soft); color: var(--sass); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">Delete Class</button>
         </div>
         <div class="class-lessons-container"></div>
       `;
@@ -1469,8 +1469,8 @@ function renderAdminCharts() {
       datasets: [{
         label: 'Active Students',
         data: [12, 19, 15, 22],
-        borderColor: '#6366f1',
-        backgroundColor: 'rgba(99,102,241,0.15)',
+        borderColor: '#bc5d2d',
+        backgroundColor: 'rgba(188, 93, 45, 0.12)',
         borderWidth: 3,
         fill: true,
         tension: 0.4
@@ -1486,7 +1486,7 @@ function renderAdminCharts() {
       datasets: [{
         label: 'Avg Accuracy %',
         data: [75, 88, 62, 91],
-        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+        backgroundColor: ['#bc5d2d', '#546838', '#c27803', '#7e3418'],
         borderRadius: 6
       }]
     },
@@ -1644,7 +1644,7 @@ async function loadQuizzes() {
             <h4 style="margin:0 0 8px 0; font-size:1.25rem; font-weight: 800; color: var(--text);">${q.title}</h4>
             <p style="margin:0; font-size:0.9rem; color: var(--muted); line-height: 1.4;">${q.description || 'No description provided.'}</p>
           </div>
-          <div style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; white-space: nowrap;">
+          <div style="background: rgba(188, 93, 45, 0.1); color: var(--accent, #bc5d2d); padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; white-space: nowrap;">
             ⏱️ ${q.time_limit_minutes}m
           </div>
         </div>
