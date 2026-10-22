@@ -1,40 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap");
 
 :root {
-  --font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-heading: "Newsreader", "Georgia", "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", monospace;
-  --bg: #f8f4ec;
-  --surface: #ffffff;
-  --surface-strong: #fffdf9;
-  --surface-translucent: rgba(255, 253, 249, 0.92);
-  --text: #1a1511;
-  --muted: #64564c;
-  --line: rgba(90, 65, 45, 0.12);
-  --line-strong: rgba(90, 65, 45, 0.22);
-  --accent: #bc5d2d;
-  --accent-hover: #a1481e;
-  --accent-deep: #7e3418;
-  --accent-soft: rgba(188, 93, 45, 0.08);
-  --olive: #546838;
-  --olive-deep: #3c4c25;
-  --olive-soft: rgba(84, 104, 56, 0.09);
-  --emerald: var(--olive);
-  --emerald-deep: var(--olive-deep);
-  --emerald-soft: var(--olive-soft);
-  --amber: #c27803;
-  --amber-soft: rgba(194, 120, 3, 0.09);
-  --sass: #b91c1c;
-  --sass-soft: rgba(185, 28, 28, 0.08);
-  --shadow: 0 10px 30px -5px rgba(60, 40, 20, 0.08), 0 4px 12px -2px rgba(60, 40, 20, 0.04);
-  --shadow-soft: 0 4px 16px -2px rgba(60, 40, 20, 0.05), 0 2px 6px -1px rgba(60, 40, 20, 0.03);
-  --shadow-hover: 0 20px 40px -8px rgba(188, 93, 45, 0.18), 0 6px 16px -3px rgba(60, 40, 20, 0.06);
-  --radius-xl: 16px;
-  --radius-lg: 12px;
-  --radius-md: 8px;
-  --radius-sm: 6px;
-  --radius-pill: 999px;
-  --max-width: 1280px;
+  --font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --bg: #f6efe4;
+  --surface: rgba(255, 250, 242, 0.88);
+  --surface-strong: #fffaf2;
+  --surface-translucent: rgba(255, 255, 255, 0.72);
+  --text: #1f1b17;
+  --muted: #645850;
+  --line: rgba(31, 27, 23, 0.1);
+  --line-strong: rgba(88, 63, 43, 0.16);
+  --accent: #b95d2f;
+  --accent-hover: #9c481f;
+  --accent-deep: #7c351a;
+  --olive: #6d7d49;
+  --shadow: 0 20px 48px -8px rgba(78, 47, 21, 0.13), 0 8px 18px -4px rgba(78, 47, 21, 0.07);
+  --shadow-soft: 0 10px 24px -4px rgba(78, 47, 21, 0.08), 0 4px 8px -2px rgba(78, 47, 21, 0.04);
+  --shadow-hover: 0 24px 56px -6px rgba(78, 47, 21, 0.18), 0 12px 24px -4px rgba(78, 47, 21, 0.09);
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+  --max-width: 1180px;
 }
 
 * {
@@ -55,12 +41,22 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg);
-  background-image: 
-    radial-gradient(at 10% 10%, rgba(188, 93, 45, 0.06) 0px, transparent 40%),
-    radial-gradient(at 90% 15%, rgba(84, 104, 56, 0.05) 0px, transparent 35%),
-    radial-gradient(at 50% 90%, rgba(194, 120, 3, 0.04) 0px, transparent 45%);
-  background-attachment: fixed;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(185, 93, 47, 0.16), transparent 24%),
+    radial-gradient(circle at 84% 12%, rgba(109, 125, 73, 0.16), transparent 22%),
+    linear-gradient(180deg, #faf4ea 0%, #f4ecdf 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(250, 244, 234, 0.7), rgba(244, 236, 223, 0.76)),
+    url("https://images.pexels.com/photos/5884360/pexels-photo-5884360.jpeg?cs=srgb&dl=pexels-villagerboy-5884360.jpg&fm=jpg") center/cover no-repeat;
+  opacity: 0.42;
+  filter: saturate(0.82) contrast(0.94);
 }
 
 a {

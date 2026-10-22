@@ -279,13 +279,13 @@ function addQuestion(type = "text") {
         <span style="font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent-deep);">
           Question ${questionCount}
         </span>
-        <span style="font-size:0.7rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;">
+        <span style="font-size:0.7rem;padding:2px 8px;border-radius:999px;background:rgba(188,93,45,0.1);color:var(--accent-deep);font-weight:700;">
           ${type === "speech" ? "🎤 Speech" : "✏️ Text"}
         </span>
       </div>
       <div style="position:relative;">
         <textarea placeholder="Type your question here…" rows="2" style="padding-right:44px;"></textarea>
-        <button class="q-mic-btn" title="Dictate question" style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
+        <button class="q-mic-btn" title="Dictate question" style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(80,58,40,0.15);background:rgba(255,255,255,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
       </div>
     </div>
     <button class="remove-q-btn" title="Remove">✕</button>
@@ -377,11 +377,11 @@ function startEditLesson(lesson) {
       <div style="display:grid;gap:8px;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
           <span style="font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent-deep);">Question ${i + 1}</span>
-          <span style="font-size:0.7rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;">${q.type === "speech" ? "🎤 Speech" : "✏️ Text"}</span>
+          <span style="font-size:0.7rem;padding:2px 8px;border-radius:999px;background:rgba(188,93,45,0.1);color:var(--accent-deep);font-weight:700;">${q.type === "speech" ? "🎤 Speech" : "✏️ Text"}</span>
         </div>
         <div style="position:relative;">
           <textarea rows="2" style="padding-right:44px;">${escHtml(q.prompt)}</textarea>
-          <button class="q-mic-btn" title="Dictate" style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
+          <button class="q-mic-btn" title="Dictate" style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(80,58,40,0.15);background:rgba(255,255,255,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
         </div>
       </div>
       <button class="remove-q-btn" title="Remove">✕</button>
@@ -414,7 +414,7 @@ function startEditLesson(lesson) {
     cancelBtn = document.createElement("button");
     cancelBtn.id = "cancelEditBtn";
     cancelBtn.textContent = "Cancel Edit";
-    cancelBtn.style.cssText = "margin-top:10px;width:100%;min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;font-size:0.92rem;color:var(--muted);";
+    cancelBtn.style.cssText = "margin-top:10px;width:100%;min-height:44px;border-radius:999px;border:1px solid rgba(80,58,40,0.14);background:rgba(255,255,255,0.6);font-weight:700;cursor:pointer;font-size:0.92rem;";
     cancelBtn.onclick = cancelEdit;
     document.getElementById("addBtn").parentNode.insertBefore(cancelBtn, document.getElementById("addBtn").nextSibling);
   }
@@ -507,12 +507,12 @@ async function renderSavedLessons() {
     container.innerHTML = "";
     classes.forEach(cls => {
       const classSection = document.createElement("div");
-      classSection.style.cssText = "margin-bottom: 24px; padding: 20px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-soft);";
+      classSection.style.cssText = "margin-bottom: 24px; padding: 20px; border-radius: 18px; background: rgba(80,58,40,0.03); border: 1px solid rgba(80,58,40,0.06);";
       
       classSection.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--line); padding-bottom: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(80,58,40,0.08); padding-bottom: 8px;">
           <h4 style="margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent-deep); font-family: var(--font-family);">📂 ${escHtml(cls.label)}</h4>
-          <button class="delete-class-btn" data-id="${cls.id}" style="min-height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(185,28,28,0.3); background: var(--sass-soft); color: var(--sass); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">Delete Class</button>
+          <button class="delete-class-btn" data-id="${cls.id}" style="min-height: 28px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(188,93,45,0.3); background: rgba(188,93,45,0.1); color: var(--accent-deep); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.2s;">Delete Class</button>
         </div>
         <div class="class-lessons-container"></div>
       `;
@@ -534,7 +534,7 @@ async function renderSavedLessons() {
               <span>${lesson.questions ? lesson.questions.length : 0} question(s), ${lesson.flashcards ? lesson.flashcards.length : 0} flashcard(s)</span>
             </div>
             <div style="display:flex;gap:8px;">
-              <button class="edit-lesson-btn" data-id="${lesson.id}" style="min-height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:0.82rem;font-weight:700;cursor:pointer;color:var(--text);">✏️ Edit</button>
+              <button class="edit-lesson-btn" data-id="${lesson.id}" style="min-height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(80,58,40,0.18);background:rgba(255,255,255,0.6);font-size:0.82rem;font-weight:700;cursor:pointer;">✏️ Edit</button>
               <button class="delete-lesson-btn" data-id="${lesson.id}">Delete</button>
             </div>
           `;
@@ -616,8 +616,8 @@ async function runAIGenerate() {
         : qType;
       const cleanQ = q.replace(/^(TEXT|SPEECH):\s*/i, "");
       const typeBadge = rowType === "speech"
-        ? `<span style="font-size:0.7rem;padding:2px 7px;border-radius:999px;background:var(--emerald-soft);color:var(--emerald-deep);font-weight:700;margin-left:6px;">🎤 Speech</span>`
-        : `<span style="font-size:0.7rem;padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;margin-left:6px;">✏️ Text</span>`;
+        ? `<span style="font-size:0.7rem;padding:2px 7px;border-radius:999px;background:rgba(111,124,74,0.12);color:#3a5018;font-weight:700;margin-left:6px;">🎤 Speech</span>`
+        : `<span style="font-size:0.7rem;padding:2px 7px;border-radius:999px;background:rgba(188,93,45,0.1);color:var(--accent-deep);font-weight:700;margin-left:6px;">✏️ Text</span>`;
       const item = document.createElement("label");
       item.className = "ai-gen-result-item";
       item.dataset.qtype = rowType;
@@ -660,16 +660,16 @@ function insertSelectedQuestions() {
           <span style="font-size:0.72rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent-deep);">
             Question ${questionCount}
           </span>
-          <span style="font-size:0.7rem;padding:2px 8px;border-radius:999px;background:${rowType==='speech'?'var(--emerald-soft)':'var(--accent-soft)'};color:${rowType==='speech'?'var(--emerald-deep)':'var(--accent)'};font-weight:700;">
+          <span style="font-size:0.7rem;padding:2px 8px;border-radius:999px;background:${rowType==='speech'?'rgba(111,124,74,0.12)':'rgba(188,93,45,0.1)'};color:${rowType==='speech'?'#3a5018':'var(--accent-deep)'};font-weight:700;">
             ${rowType === 'speech' ? '🎤 Speech' : '✏️ Text'}
           </span>
-          <span style="font-size:0.7rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;">
+          <span style="font-size:0.7rem;padding:2px 8px;border-radius:999px;background:rgba(111,124,74,0.12);color:#3a5018;font-weight:700;">
             ✨ AI
           </span>
         </div>
         <div style="position:relative;">
           <textarea rows="2" style="padding-right:44px;">${escHtml(questionText)}</textarea>
-          <button class="q-mic-btn" title="Dictate question" style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
+          <button class="q-mic-btn" title="Dictate question" style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(80,58,40,0.15);background:rgba(255,255,255,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
         </div>
       </div>
       <button class="remove-q-btn" title="Remove">✕</button>
@@ -876,7 +876,7 @@ async function renderProgress(classesData) {
                 <div class="answer-q">Q${qi + 1}: ${escHtml(q.prompt)}${scoreBadge}</div>
                 ${ansText.trim()
                   ? `<div class="answer-text">${escHtml(ansText)}</div>
-                     ${feedback ? `<div style="margin-top:6px;font-size:0.8rem;color:var(--emerald-deep);background:var(--emerald-soft);padding:6px 10px;border-radius:8px;">💬 ${escHtml(feedback)}</div>` : ""}`
+                     ${feedback ? `<div style="margin-top:6px;font-size:0.8rem;color:#3d5220;background:rgba(111,124,74,0.08);padding:6px 10px;border-radius:8px;">💬 ${escHtml(feedback)}</div>` : ""}`
                   : `<div class="answer-empty">No answer yet</div>`}
               `;
               answersBlock.appendChild(arow);
@@ -1118,7 +1118,7 @@ async function loadClassroomHeatmap() {
       lessons.forEach(l => {
         const prog = s.lessons[l.id];
 
-        let bg = "var(--line)";
+        let bg = "rgba(80,58,40,0.08)";
         let textColor = "var(--muted)";
         let cellText = "—";
         let tooltip = `${s.name}: Not Started`;
@@ -1138,7 +1138,7 @@ async function loadClassroomHeatmap() {
             textColor = "#ffffff";
             cellText = `${score}★`;
           } else {
-            bg = "var(--accent-soft)";
+            bg = "rgba(188,93,45,0.15)";
             textColor = "var(--accent-deep)";
             cellText = "In Prog";
           }
@@ -1309,13 +1309,13 @@ async function generateRemedialGroups() {
       
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <strong style="font-size:1.1rem; color:var(--emerald-deep);">${escapeHtml(g.group_name)}</strong>
+          <strong style="font-size:1.1rem; color:#14532d;">${escapeHtml(g.group_name)}</strong>
           <span style="font-size:0.75rem; padding:4px 8px; border-radius:999px; background:#dcfce7; color:#166534; font-weight:800;">${g.students.length} Students</span>
         </div>
         <p style="font-size:0.85rem; font-weight:800; color:#16a34a; text-transform:uppercase; margin:0 0 4px;">Focus: ${escapeHtml(g.focus_topic)}</p>
         <p style="font-size:0.9rem; color:var(--text); margin:0 0 12px; line-height:1.5;">${escapeHtml(g.reason)}</p>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          ${g.students.map(s => `<span style="font-size:0.8rem; background:var(--bg); border:1px solid var(--line); padding:4px 10px; border-radius:8px; font-weight:600;">${escapeHtml(s)}</span>`).join("")}
+          ${g.students.map(s => `<span style="font-size:0.8rem; background:rgba(80,58,40,0.06); padding:4px 10px; border-radius:8px; font-weight:600;">${escapeHtml(s)}</span>`).join("")}
         </div>
       `;
       resultArea.appendChild(card);
@@ -1362,10 +1362,10 @@ async function loadPronunciationAnalytics() {
 
     insights.forEach(insight => {
       const row = document.createElement("div");
-      row.style.cssText = "display: flex; gap: 16px; padding: 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); align-items: flex-start;";
+      row.style.cssText = "display: flex; gap: 16px; padding: 16px; border-radius: 14px; background: rgba(80,58,40,0.03); border: 1px solid rgba(80,58,40,0.08); align-items: flex-start;";
       
       row.innerHTML = `
-        <div style="width: 48px; height: 48px; border-radius: 12px; background: white; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: var(--accent-deep); flex-shrink: 0; box-shadow: var(--shadow-soft);">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: white; border: 1px solid rgba(80,58,40,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: var(--accent-deep); flex-shrink: 0; box-shadow: var(--shadow-soft);">
           🗣️
         </div>
         <div>
@@ -1470,7 +1470,7 @@ function renderAdminCharts() {
         label: 'Active Students',
         data: [12, 19, 15, 22],
         borderColor: '#bc5d2d',
-        backgroundColor: 'rgba(188, 93, 45, 0.12)',
+        backgroundColor: 'rgba(188,93,45,0.1)',
         borderWidth: 3,
         fill: true,
         tension: 0.4
@@ -1486,7 +1486,7 @@ function renderAdminCharts() {
       datasets: [{
         label: 'Avg Accuracy %',
         data: [75, 88, 62, 91],
-        backgroundColor: ['#bc5d2d', '#546838', '#c27803', '#7e3418'],
+        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
         borderRadius: 6
       }]
     },
@@ -1644,7 +1644,7 @@ async function loadQuizzes() {
             <h4 style="margin:0 0 8px 0; font-size:1.25rem; font-weight: 800; color: var(--text);">${q.title}</h4>
             <p style="margin:0; font-size:0.9rem; color: var(--muted); line-height: 1.4;">${q.description || 'No description provided.'}</p>
           </div>
-          <div style="background: rgba(188, 93, 45, 0.1); color: var(--accent, #bc5d2d); padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; white-space: nowrap;">
+          <div style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; white-space: nowrap;">
             ⏱️ ${q.time_limit_minutes}m
           </div>
         </div>
@@ -1653,7 +1653,7 @@ async function loadQuizzes() {
           <div style="display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 6px;">🟢 ${q.start_time ? new Date(q.start_time).toLocaleString(undefined, {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'Anytime'}</div>
           <div style="display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 6px;">🔴 ${q.end_time ? new Date(q.end_time).toLocaleString(undefined, {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'Never'}</div>
         </div>
-        <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end;">
+        <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(80,58,40,0.08); display: flex; justify-content: flex-end;">
            <button onclick="deleteQuiz('${q.id}')" style="background: rgba(211, 47, 47, 0.1); color: #d32f2f; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='rgba(211, 47, 47, 0.15)'" onmouseout="this.style.background='rgba(211, 47, 47, 0.1)'">🗑️ Delete</button>
         </div>
       </div>

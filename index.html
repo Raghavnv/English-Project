@@ -4,17 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Welcome | EnglishBridge</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="platform.css">
   <style>
+
     .welcome-shell {
-      width: min(calc(100% - 40px), 1140px);
+      width: min(calc(100% - 32px), 1100px);
       margin: 0 auto;
-      padding: 24px 0 60px;
+      padding: 28px 0 60px;
       display: grid;
-      gap: 24px;
+      gap: 20px;
     }
 
     /* ── HEADER ── */
@@ -22,211 +21,186 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 24px;
-      border-radius: var(--radius-lg);
-      background: var(--surface-glass);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft);
+      padding: 18px 24px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 248, 255, 0.8));
+      backdrop-filter: blur(16px);
+      border: 3px solid #ffffff;
+      box-shadow: inset -2px -2px 6px rgba(0,0,0,0.02), 8px 12px 24px rgba(0,0,0,0.05), inset 2px 2px 6px rgba(255,255,255,0.8);
       position: sticky;
       top: 16px;
       z-index: 20;
     }
 
-    .welcome-badge-live {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: var(--radius-pill);
-      background: var(--emerald-soft);
-      border: 1px solid rgba(84, 104, 56, 0.25);
-      color: var(--emerald-deep);
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    .pulse-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--emerald);
-      box-shadow: 0 0 8px var(--emerald);
-      animation: pulseGreen 1.8s infinite;
-    }
-
-    @keyframes pulseGreen {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.85); }
-    }
-
     /* ── HERO ── */
     .welcome-hero {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 1fr 1fr;
       gap: 20px;
       align-items: stretch;
     }
 
     .hero-left {
-      padding: 48px 44px;
-      border-radius: var(--radius-xl);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
+      padding: 52px 48px;
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 247, 255, 0.7));
+      border: 3px solid #ffffff;
+      box-shadow: inset -4px -4px 12px rgba(0, 0, 0, 0.04), 8px 8px 24px rgba(0, 0, 0, 0.06), inset 4px 4px 12px rgba(255, 255, 255, 0.8);
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 18px;
-      overflow: hidden;
+      gap: 20px;
+      backdrop-filter: blur(20px);
+    }
+
+    .hero-left::before {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 32px;
+      pointer-events: none;
     }
 
     .hero-left::after {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-deep) 100%);
+      left: 24px;
+      right: 24px;
+      top: 20px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(188,93,45,0.5), rgba(111,124,74,0.08));
+      pointer-events: none;
     }
 
     .welcome-eyebrow {
       font-size: 0.78rem;
       font-weight: 800;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      color: var(--accent-deep);
     }
 
     .welcome-title {
-      font-family: var(--font-heading);
-      font-size: clamp(2.4rem, 4.4vw, 3.6rem);
+      font-family: var(--font-family);
+      font-size: clamp(2.3rem, 4.2vw, 3.5rem);
       font-weight: 800;
-      letter-spacing: -0.035em;
-      line-height: 1.08;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
       color: var(--text);
+      max-width: 15ch;
     }
 
     .welcome-subtitle {
       color: var(--muted);
-      font-size: 1.05rem;
-      line-height: 1.65;
-      max-width: 48ch;
+      font-size: 1rem;
+      line-height: 1.75;
+      max-width: 50ch;
     }
 
     .hero-right {
       display: grid;
-      gap: 16px;
+      gap: 20px;
     }
 
     .stat-card {
-      padding: 22px 24px;
-      border-radius: var(--radius-lg);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft);
+      padding: 26px 28px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(245,248,255,0.7));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid #ffffff;
+      box-shadow: inset -2px -2px 8px rgba(0,0,0,0.03), 4px 8px 16px rgba(0,0,0,0.05), inset 2px 2px 8px rgba(255,255,255,0.9);
       display: flex;
       align-items: center;
-      gap: 18px;
-      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: 20px;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .stat-card:hover {
       transform: translateY(-2px);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(188, 93, 45, 0.3);
+      box-shadow: var(--shadow);
+      border-color: rgba(188,93,45,0.22);
     }
 
     .stat-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-md);
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(80,58,40,0.06);
     }
 
-    .stat-icon-violet {
-      background: var(--accent-soft);
-      border: 1px solid rgba(188, 93, 45, 0.2);
-    }
-    .stat-icon-green {
-      background: var(--olive-soft);
-      border: 1px solid rgba(84, 104, 56, 0.2);
-    }
-    .stat-icon-coral {
-      background: var(--amber-soft);
-      border: 1px solid rgba(194, 120, 3, 0.2);
-    }
+    .stat-icon-orange { background: linear-gradient(135deg, rgba(188,93,45,0.14), rgba(188,93,45,0.06)); border: 1px solid rgba(188,93,45,0.2); }
+    .stat-icon-green  { background: linear-gradient(135deg, rgba(111,124,74,0.16), rgba(111,124,74,0.07)); border: 1px solid rgba(111,124,74,0.22); }
+    .stat-icon-warm   { background: linear-gradient(135deg, rgba(188,93,45,0.1), rgba(188,93,45,0.03)); border: 1px solid rgba(188,93,45,0.15); }
 
     .stat-text strong {
       display: block;
-      font-size: 1.02rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
       color: var(--text);
     }
 
     .stat-text span {
       color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.55;
     }
 
-    /* ── BENTO STRIP ── */
+    /* ── ABOUT STRIP ── */
     .about-strip {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 18px;
     }
 
     .about-card {
-      padding: 28px 24px;
-      border-radius: var(--radius-lg);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft);
-      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 28px 26px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(245,248,255,0.7));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid #ffffff;
+      box-shadow: inset -2px -2px 8px rgba(0,0,0,0.03), 4px 8px 16px rgba(0,0,0,0.05), inset 2px 2px 8px rgba(255,255,255,0.9);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .about-card:hover {
       transform: translateY(-3px);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(188, 93, 45, 0.3);
+      box-shadow: var(--shadow);
+      border-color: rgba(188,93,45,0.2);
     }
 
     .about-card-label {
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 8px;
+      color: var(--accent-deep);
+      margin-bottom: 10px;
     }
 
     .about-card h3 {
-      font-family: var(--font-heading);
+      font-family: var(--font-family);
       font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: -0.02em;
-      margin-bottom: 8px;
-      line-height: 1.25;
+      margin-bottom: 10px;
+      line-height: 1.3;
     }
 
     .about-card p {
       color: var(--muted);
       font-size: 0.9rem;
-      line-height: 1.65;
+      line-height: 1.7;
     }
 
     /* ── PORTAL SECTION ── */
@@ -240,17 +214,17 @@
     }
 
     .portal-section-head p {
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 4px;
+      color: var(--accent-deep);
+      margin-bottom: 6px;
     }
 
     .portal-section-head h2 {
-      font-family: var(--font-heading);
-      font-size: 1.85rem;
+      font-family: var(--font-family);
+      font-size: 1.75rem;
       font-weight: 800;
       letter-spacing: -0.025em;
       color: var(--text);
@@ -259,39 +233,50 @@
     .portal-cards {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
+      gap: 16px;
     }
 
     .portal-card {
-      padding: 36px 32px;
-      border-radius: var(--radius-xl);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
+      padding: 38px 34px;
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(245,248,255,0.85));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 3px solid #ffffff;
+      box-shadow: inset -4px -4px 12px rgba(0,0,0,0.03), 8px 12px 24px rgba(0,0,0,0.06), inset 4px 4px 12px rgba(255,255,255,0.9);
       display: flex;
       flex-direction: column;
       gap: 16px;
       position: relative;
       overflow: hidden;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       text-align: left;
     }
 
     .portal-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(188, 93, 45, 0.4);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: inset -4px -4px 12px rgba(0,0,0,0.02), 12px 20px 32px rgba(0,0,0,0.1), inset 4px 4px 12px rgba(255,255,255,1);
+      border-color: #ffffff;
+    }
+
+    .portal-card::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(80,58,40,0.05);
+      border-radius: 22px;
+      pointer-events: none;
     }
 
     .portal-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      min-height: 30px;
-      padding: 0 12px;
-      border-radius: var(--radius-pill);
-      font-size: 0.78rem;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
       font-weight: 800;
       letter-spacing: 0.05em;
       text-transform: uppercase;
@@ -299,102 +284,95 @@
     }
 
     .portal-badge-student {
-      background: var(--accent-soft);
-      border: 1px solid rgba(188, 93, 45, 0.25);
-      color: var(--accent-deep);
+      background: linear-gradient(135deg, rgba(111,124,74,0.16), rgba(111,124,74,0.06));
+      border: 1px solid rgba(111,124,74,0.25);
+      color: #3d5220;
     }
 
     .portal-badge-admin {
-      background: var(--olive-soft);
-      border: 1px solid rgba(84, 104, 56, 0.25);
-      color: var(--olive-deep);
+      background: linear-gradient(135deg, rgba(188,93,45,0.14), rgba(188,93,45,0.06));
+      border: 1px solid rgba(188,93,45,0.22);
+      color: var(--accent-deep);
     }
 
     .portal-card h3 {
-      font-family: var(--font-heading);
-      font-size: 1.8rem;
+      font-family: var(--font-family);
+      font-size: 1.85rem;
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1.15;
+      line-height: 1.2;
       color: var(--text);
     }
 
     .portal-card p {
       color: var(--muted);
       font-size: 0.94rem;
-      line-height: 1.65;
-    }
-
-    .portal-card ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 8px;
-    }
-
-    .portal-card li {
-      font-size: 0.88rem;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .portal-card li::before {
-      content: "✓";
-      color: var(--accent);
-      font-weight: 800;
+      line-height: 1.7;
+      max-width: 40ch;
     }
 
     .portal-cta {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
       margin-top: 8px;
-      min-height: 46px;
-      padding: 0 22px;
-      border-radius: var(--radius-md);
+      min-height: 48px;
+      padding: 0 24px;
+      border-radius: 999px;
       font-family: var(--font-family);
       font-weight: 700;
       font-size: 0.94rem;
+      letter-spacing: -0.01em;
       border: none;
       cursor: pointer;
       width: fit-content;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 20px -4px rgba(60, 36, 18, 0.15);
+    }
+
+    .portal-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px -4px rgba(60, 36, 18, 0.25);
+    }
+
+    .portal-cta:active {
+      transform: translateY(0);
     }
 
     .portal-cta-student {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(188, 93, 45, 0.35);
-    }
-
-    .portal-cta-student:hover {
-      box-shadow: 0 8px 24px rgba(188, 93, 45, 0.45);
-      transform: translateY(-2px);
+      background: linear-gradient(135deg, #445924 0%, #2f4018 100%);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #f5f9ee;
+      box-shadow: 0 8px 20px -4px rgba(50, 70, 20, 0.35);
     }
 
     .portal-cta-admin {
-      background: linear-gradient(135deg, #1c1511 0%, #261e18 100%);
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(28, 21, 17, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent) 100%);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fffaf2;
+      box-shadow: 0 8px 20px -4px rgba(188, 93, 45, 0.4);
     }
 
-    .portal-cta-admin:hover {
-      box-shadow: 0 8px 24px rgba(28, 21, 17, 0.45);
-      transform: translateY(-2px);
+    .portal-deco {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      opacity: 0.08;
     }
+
+    .portal-deco-student { background: #3d5220; }
+    .portal-deco-admin   { background: var(--accent-deep); }
 
     /* ── FOOTER ── */
     .welcome-footer {
-      padding: 20px 28px;
-      border-radius: var(--radius-lg);
-      background: var(--surface-dark);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft);
+      padding: 24px 32px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(40,40,50,0.96), rgba(20,20,30,0.95));
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4), 8px 12px 24px rgba(0,0,0,0.1), inset 2px 2px 6px rgba(255,255,255,0.1);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -402,93 +380,117 @@
     }
 
     .welcome-footer p {
-      color: #94a3b8;
-      font-size: 0.86rem;
-      margin-top: 2px;
+      color: rgba(255,249,240,0.7);
+      font-size: 0.88rem;
     }
 
     .welcome-footer strong {
-      color: #ffffff;
+      color: #fffaf2;
       font-size: 0.95rem;
     }
 
+    /* ── RESPONSIVE ── */
     @media (max-width: 820px) {
       .welcome-hero,
-      .portal-cards,
+      .portal-cards {
+        grid-template-columns: 1fr;
+      }
+
       .about-strip {
         grid-template-columns: 1fr;
       }
+
       .hero-left {
-        padding: 32px 24px;
+        padding: 36px 28px;
       }
     }
-  </style>
+
+    @media (max-width: 500px) {
+      .hero-left { padding: 28px 22px; }
+      .portal-card { padding: 28px 22px; }
+      .welcome-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+
+  
+    .text-gradient {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+    
+    .glow-effect {
+      position: relative;
+    }
+    .glow-effect::after {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      background: radial-gradient(circle at center, rgba(188, 93, 45, 0.15) 0%, transparent 70%);
+      z-index: -1;
+      border-radius: 50%;
+    }
+
+</style>
 </head>
 <body>
 
 <div class="welcome-shell">
 
   <header class="welcome-header">
-    <div style="display: flex; align-items: center; gap: 14px;">
+    <div style="display: flex; align-items: center; gap: 16px;">
       <div class="platform-brand" style="margin: 0;">
-        <div class="platform-brand-mark">
-          <img src="EnglishBridgeLogo.png" alt="EnglishBridge logo" style="height:34px;width:auto;object-fit:contain;">
+        <div class="platform-brand-mark" style="display:flex;align-items:center;flex-shrink:0;">
+          <img src="EnglishBridgeLogo.png" alt="EnglishBridge logo" style="height:48px;width:auto;object-fit:contain;">
         </div>
         <div class="platform-brand-copy">
           <strong>EnglishBridge</strong>
-          <span>Bangalore EdTech Initiative</span>
+          <span>Bangalore</span>
         </div>
       </div>
-    </div>
-    <div class="welcome-badge-live">
-      <span class="pulse-dot"></span>
-      <span>Learning Platform Active</span>
-    </div>
+      </div>
+    <span style="font-size:0.85rem;color:var(--muted);font-weight:600;">Learning Platform</span>
   </header>
 
   <div class="welcome-hero">
     <div class="hero-left">
-      <div class="welcome-eyebrow">
-        <span>Empowering Classrooms</span>
-        <span>•</span>
-        <span>Bangalore</span>
-      </div>
-      
-      <h1 class="welcome-title">
-        English learning built on <span class="text-gradient">trust</span> and <span class="text-gradient">real practice.</span>
+      <h1 class="welcome-title" style="font-size: clamp(2.8rem, 5vw, 4.2rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 8px; animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;">
+        English learning built on <br><span class="text-gradient">trust</span> and <span class="text-gradient">real practice.</span>
       </h1>
       
-      <p class="welcome-subtitle">
-        A classroom-first, AI-enhanced platform for students and educators. Teachers craft tailored curriculums, students build speaking confidence, and progress is tracked automatically.
+      <p class="welcome-subtitle" style="font-size: 1.15rem; line-height: 1.6; color: var(--muted); margin-bottom: 24px; max-width: 90%; animation: pageEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;">
+        A classroom-first platform for underserved children in Bangalore. Teachers lead, students practise, and progress is tracked — all in one place.
       </p>
       
-      <div style="display: flex; gap: 14px; margin-top: 8px;">
-        <button class="primary-action" onclick="document.querySelector('.portal-section').scrollIntoView({behavior: 'smooth'})" style="font-size: 1rem; padding: 0 24px; min-height: 48px;">
-          Explore Portals ↓
+      <div style="display: flex; gap: 16px; animation: pageEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;">
+        <button onclick="document.querySelector('.portal-section').scrollIntoView({behavior: 'smooth'})" style="background: var(--accent-deep); color: #fffaf2; border: none; padding: 0 28px; min-height: 52px; border-radius: 999px; font-weight: 700; font-size: 1.05rem; cursor: pointer; box-shadow: 0 8px 24px -6px rgba(188,93,45,0.4); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 28px -6px rgba(188,93,45,0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px -6px rgba(188,93,45,0.4)'">
+          Get Started ↓
         </button>
       </div>
     </div>
 
     <div class="hero-right">
-      <div class="stat-card tilt-card">
-        <div class="stat-icon stat-icon-violet">📚</div>
+      <div class="stat-card tilt-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;">
+        <div class="stat-icon stat-icon-orange">📚</div>
         <div class="stat-text">
-          <strong>Lesson-Based Learning</strong>
-          <span>Structured modules with pronunciation drills, flashcards, and reading practice.</span>
+          <strong>Lesson-based learning</strong>
+          <span>Admins create structured lessons with questions that students work through at their own pace.</span>
         </div>
       </div>
-      <div class="stat-card tilt-card">
+      <div class="stat-card tilt-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s backwards;">
         <div class="stat-icon stat-icon-green">📈</div>
         <div class="stat-text">
-          <strong>Real-Time Progress Tracking</strong>
-          <span>Every audio recording analyzed, answers scored, and masteries tracked.</span>
+          <strong>Progress you can see</strong>
+          <span>Every answer saved, every lesson tracked. Students and teachers know exactly where they stand.</span>
         </div>
       </div>
-      <div class="stat-card tilt-card">
-        <div class="stat-icon stat-icon-coral">⚡</div>
+      <div class="stat-card tilt-card" style="animation: pageEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;">
+        <div class="stat-icon stat-icon-warm">🤝</div>
         <div class="stat-text">
-          <strong>AI Teaching Assistant</strong>
-          <span>Intelligent question generation, speech accuracy grading, and student buddy support.</span>
+          <strong>Human connection first</strong>
+          <span>Technology supports the teacher — it never replaces the relationship at the heart of learning.</span>
         </div>
       </div>
     </div>
@@ -496,75 +498,70 @@
 
   <div class="about-strip">
     <div class="about-card">
-      <p class="about-card-label">Curriculum</p>
+      <p class="about-card-label">How it works</p>
       <h3>Admins build the content</h3>
-      <p>Teachers create classes, generate AI-aligned questions, and deploy customized audio-interactive lessons for students.</p>
+      <p>Teachers and coordinators log in as admins to create classes, add lessons, and write the questions students will answer.</p>
     </div>
     <div class="about-card">
-      <p class="about-card-label">Student Hub</p>
-      <h3>Students learn and speak</h3>
-      <p>Learners log in, open their lessons, practice speaking with instant feedback, review flashcards, and climb the leaderboard.</p>
+      <p class="about-card-label">For students</p>
+      <h3>Students learn and track</h3>
+      <p>Students log in, pick their class, open a lesson, type their answers, and save progress. Everything is stored so they can resume anytime.</p>
     </div>
     <div class="about-card">
-      <p class="about-card-label">Human Core</p>
-      <h3>Technology that empowers</h3>
-      <p>No complicated friction. Just crisp lessons, actionable feedback, and an intuitive suite that keeps students motivated.</p>
+      <p class="about-card-label">Our approach</p>
+      <h3>Simple, consistent, human</h3>
+      <p>No complicated setup. No algorithms making decisions. Just clear lessons, honest progress tracking, and a teacher who shows up.</p>
     </div>
   </div>
 
   <div class="portal-section">
     <div class="portal-section-head">
       <p>Get Started</p>
-      <h2>Select Your Portal</h2>
+      <h2>Who are you entering as?</h2>
     </div>
 
     <div class="portal-cards stagger-in">
+
       <div class="portal-card tilt-card" onclick="window.location.href='login.html'">
-        <span class="portal-badge portal-badge-student">🎓 Learner Access</span>
+        <span class="portal-badge portal-badge-student">🎓 Student</span>
         <h3>I'm here to learn</h3>
-        <p>Access your class dashboard, pronunciation drills, interactive reading, and personal word bank.</p>
-        <ul>
-          <li>Interactive speech & pronunciation tutor</li>
-          <li>Vocabulary flashcards and quizzes</li>
-          <li>Saved progress and lesson achievements</li>
-        </ul>
+        <p>Enter your name and school to access your class, open your lessons, and track your answers and progress.</p>
         <button class="portal-cta portal-cta-student" onclick="window.location.href='login.html'">
           Enter as Student →
         </button>
+        <div class="portal-deco portal-deco-student"></div>
       </div>
 
       <div class="portal-card tilt-card" onclick="window.location.href='admin-login.html'">
-        <span class="portal-badge portal-badge-admin">🛠 Educator & Admin</span>
+        <span class="portal-badge portal-badge-admin">🛠 Admin</span>
         <h3>I'm here to teach</h3>
-        <p>Manage school classes, build lessons, generate AI questions, and monitor cohort analytics.</p>
-        <ul>
-          <li>Curriculum and Lesson Studio</li>
-          <li>AI question generator & batch creator</li>
-          <li>Live student roster and performance charts</li>
-        </ul>
+        <p>Create and manage classes, write lessons with questions, and keep content updated for your students.</p>
         <button class="portal-cta portal-cta-admin" onclick="window.location.href='admin-login.html'">
           Enter as Admin →
         </button>
+        <div class="portal-deco portal-deco-admin"></div>
       </div>
+
     </div>
   </div>
 
   <footer class="welcome-footer">
     <div>
       <strong>EnglishBridge Bangalore</strong>
-      <p>Built for impact, confidence, and real learning.</p>
+      <p>Built for trust before scale.</p>
     </div>
     
     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-      <span style="color: #64748b; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;">Powered By</span>
-      <img src="sensesyslogo_white.png" alt="SenseSys Logo" style="height: 18px; object-fit: contain;">
+      <span style="color: rgba(255,249,240,0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Powered By</span>
+      <img src="sensesyslogo_white.png" alt="SenseSys Logo" style="height: 20px; object-fit: contain; margin-bottom: 2px;">
     </div>
+
   </footer>
 
 </div>
 
 <script>
-  // 3D Tilt Effect
+  // ── 3D TILT EFFECT ──
   document.addEventListener("DOMContentLoaded", () => {
     const cards = document.querySelectorAll(".tilt-card");
     cards.forEach(card => {
@@ -574,9 +571,9 @@
         const y = e.clientY - rect.top;
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -4;
-        const rotateY = ((x - centerX) / centerX) * 4;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+        const rotateX = ((y - centerY) / centerY) * -5;
+        const rotateY = ((x - centerX) / centerX) * 5;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
       });
       card.addEventListener("mouseleave", () => {
         card.style.transform = "";
@@ -585,8 +582,11 @@
   });
 
   document.addEventListener("DOMContentLoaded", () => {
+    // Check if the user is already signed in by looking for a token
     const token = localStorage.getItem("token"); 
+    
     if (token) {
+      // If a token is found, redirect straight to the main app page
       window.location.href = "platform.html";
     }
   });

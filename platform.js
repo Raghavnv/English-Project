@@ -121,8 +121,8 @@ function renderStudentChip() {
     const banner = document.getElementById("welcomeBanner");
     if (banner) {
       banner.style.display    = "";
-      banner.style.background = "var(--accent-soft)";
-      banner.style.border     = "1px solid var(--line)";
+      banner.style.background = "rgba(188,93,45,0.08)";
+      banner.style.border     = "1px solid rgba(188,93,45,0.2)";
     }
     const bannerTitle = document.getElementById("welcomeBannerTitle");
     const bannerSub   = document.getElementById("welcomeBannerSub");
@@ -275,7 +275,7 @@ function renderBroadcasts() {
     panel.style.display = "";
     if (pill) pill.textContent = relevant.length;
     list.innerHTML = relevant.slice(0, 5).map(b => `
-      <div style="padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);">
+      <div style="padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);">
         <strong style="font-size:0.85rem;">${BROADCAST_ICONS[b.type] || "📣"} ${escapeHtml(b.title)}</strong>
         <p style="margin:4px 0 0;font-size:0.82rem;color:var(--muted);line-height:1.5;">${escapeHtml(b.message)}</p>
       </div>
@@ -336,7 +336,7 @@ function renderResourceLibrary() {
     panel.style.display = "";
     if (pill) pill.textContent = relevant.length;
     list.innerHTML = relevant.map(r => `
-      <a href="${escapeHtml(r.url)}" ${r.fileName ? `download="${escapeHtml(r.fileName)}"` : `target="_blank" rel="noopener"`} style="display:block;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);text-decoration:none;color:inherit;">
+      <a href="${escapeHtml(r.url)}" ${r.fileName ? `download="${escapeHtml(r.fileName)}"` : `target="_blank" rel="noopener"`} style="display:block;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.6);border:1px solid rgba(80,58,40,0.1);text-decoration:none;color:inherit;">
         <strong style="font-size:0.85rem;">${RESOURCE_ICONS[r.type] || "📄"} ${escapeHtml(r.title)}</strong>
         ${r.notes ? `<p style="margin:4px 0 0;font-size:0.8rem;color:var(--muted);line-height:1.5;">${escapeHtml(r.notes)}</p>` : ""}
       </a>
@@ -659,7 +659,7 @@ function renderLessonPanel(selectedClass, module) {
   if (total === 0) {
     stack.innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 48px 24px; text-align:center; opacity: 0.6; animation: pageEntrance 1s ease backwards;">
-        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(188,93,45,0.22)); animation: orbFloat 6s ease-in-out infinite alternate;">📝</div>
+        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(188,93,45,0.4)); animation: orbFloat 6s ease-in-out infinite alternate;">📝</div>
         <h4 style="font-size: 1.25rem; margin: 0 0 8px; color: var(--text);">No Questions Yet</h4>
         <p style="font-size: 0.95rem; color: var(--muted); max-width: 280px; margin: 0;">Your teacher hasn't added any questions to this lesson yet.</p>
       </div>
@@ -843,12 +843,12 @@ function renderAIPanel(module) {
       </div>
     </div>
 
-    <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow-soft);">
+    <div style="background: linear-gradient(145deg, #ffffff, #fdfbfa); border: 1px solid rgba(188,93,45,0.15); border-radius: 20px; padding: 24px; box-shadow: var(--shadow-soft);">
       <p style="font-size: 0.95rem; color: var(--muted); margin: 0 0 16px; line-height: 1.5;">
         Select a lesson below to generate personalized study guides or interactive memory decks.
       </p>
       
-      <select id="aiStudySelect" style="width: 100%; min-height: 52px; padding: 0 16px; margin-bottom: 24px; border-radius: 14px; border: 1px solid var(--line); font-family: inherit; font-size: 1rem; font-weight: 600; background: var(--surface) url('data:image/svg+xml;utf8,<svg fill=%236366f1 height=24 viewBox=0 0 24 24 width=24 xmlns=http://www.w3.org/2000/svg><path d=\"M7 10l5 5 5-5z\"/></svg>') no-repeat right 16px center; -webkit-appearance: none; appearance: none; color: var(--text); cursor: pointer; transition: border-color 0.2s;">
+      <select id="aiStudySelect" style="width: 100%; min-height: 52px; padding: 0 16px; margin-bottom: 24px; border-radius: 14px; border: 1px solid rgba(80,58,40,0.2); font-family: inherit; font-size: 1rem; font-weight: 600; background: #fff url('data:image/svg+xml;utf8,<svg fill=%23503a28 height=24 viewBox=0 0 24 24 width=24 xmlns=http://www.w3.org/2000/svg><path d=\"M7 10l5 5 5-5z\"/></svg>') no-repeat right 16px center; -webkit-appearance: none; appearance: none; color: var(--text); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); cursor: pointer; transition: border-color 0.2s;">
         ${optionsHtml}
       </select>
 
@@ -872,7 +872,7 @@ function renderAIPanel(module) {
     </div>
 
     <!-- Motivation Tip -->
-    <div style="margin-top: 24px; padding: 18px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); display: flex; gap: 12px; align-items: center;">
+    <div style="margin-top: 24px; padding: 18px; border-radius: 16px; background: rgba(80,58,40,0.04); border: 1px solid rgba(80,58,40,0.08); display: flex; gap: 12px; align-items: center;">
       <div style="font-size: 1.5rem;">💡</div>
       <p style="margin: 0; font-size: 0.9rem; color: var(--text); line-height: 1.5;">Good progress comes from small, repeated practice. Finish one lesson at a time!</p>
     </div>
@@ -1325,7 +1325,7 @@ function render() {
     document.getElementById("lessonStatus").className = "status-badge";
     document.getElementById("questionStack").innerHTML = `
       <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 48px 24px; text-align:center; opacity: 0.6; animation: pageEntrance 1s ease backwards;">
-        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(188,93,45,0.22)); animation: orbFloat 6s ease-in-out infinite alternate;">🚀</div>
+        <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 4px 12px rgba(188,93,45,0.4)); animation: orbFloat 6s ease-in-out infinite alternate;">🚀</div>
         <h4 style="font-size: 1.25rem; margin: 0 0 8px; color: var(--text);">Ready to begin?</h4>
         <p style="font-size: 0.95rem; color: var(--muted); max-width: 280px; margin: 0;">Click on any upcoming lesson in the carousel above to start your practice session.</p>
       </div>
@@ -1360,7 +1360,7 @@ window.loadWordBank = function() {
   words.reverse().forEach(item => {
     wordGrid.innerHTML += `
       <div class="word-card" style="position: relative; padding-right: 50px;">
-        <button onclick="BuddyVoice.speak('${escapeHtml(item.word).replace(/'/g, "\\'")}. ${escapeHtml(item.definition).replace(/'/g, "\\'")}. For example: ${escapeHtml(item.example).replace(/'/g, "\\'")}', 'English', this)" style="position: absolute; right: 16px; top: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--accent-soft); font-size: 1.1rem; cursor: pointer; display:flex; align-items:center; justify-content:center;">🔊</button>
+        <button onclick="BuddyVoice.speak('${escapeHtml(item.word).replace(/'/g, "\\'")}. ${escapeHtml(item.definition).replace(/'/g, "\\'")}. For example: ${escapeHtml(item.example).replace(/'/g, "\\'")}', 'English', this)" style="position: absolute; right: 16px; top: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(80,58,40,0.2); background: rgba(80,58,40,0.05); font-size: 1.1rem; cursor: pointer; display:flex; align-items:center; justify-content:center;">🔊</button>
         <h4 style="font-size: 1.4rem; font-family: var(--font-family); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--accent-deep);">${escapeHtml(item.word)}</h4>
         <p style="font-size: 0.95rem; color: var(--text); font-weight: 600; margin-bottom: 8px;">${escapeHtml(item.definition)}</p>
         <p style="font-size: 0.9rem; color: var(--muted); font-style: italic;">"${escapeHtml(item.example)}"</p>
@@ -1393,13 +1393,13 @@ document.addEventListener("DOMContentLoaded", () => {
         
         resultDiv.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-            <p style="font-size: 0.85rem; font-weight: 800; color: var(--emerald-deep); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">${escapeHtml(lang)} Translation:</p>
+            <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">${escapeHtml(lang)} Translation:</p>
             <button onclick="BuddyVoice.speak('${escapeHtml(res.translation).replace(/'/g, "\\'")}', '${lang}', this)" style="background:none; border:none; font-size:1.4rem; cursor:pointer; opacity:0.5; transition:0.2s;">🔊</button>
           </div>
-          <p style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-top:0; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line);">${escapeHtml(res.translation)}</p>
+          <p style="font-size: 1.5rem; font-weight: 700; color: #1f1a16; margin-top:0; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(111,124,74,0.2);">${escapeHtml(res.translation)}</p>
           
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-            <p style="font-size: 0.85rem; font-weight: 800; color: var(--emerald-deep); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Buddy's Grammar Tip 💡:</p>
+            <p style="font-size: 0.85rem; font-weight: 800; color: #3d5220; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Buddy's Grammar Tip 💡:</p>
             <button onclick="BuddyVoice.speak('${escapeHtml(res.grammar_tip).replace(/'/g, "\\'")}', 'English', this)" style="background:none; border:none; font-size:1.4rem; cursor:pointer; opacity:0.5; transition:0.2s;">🔊</button>
           </div>
           <p style="font-size: 1.05rem; color: var(--text); line-height: 1.6; margin: 0;">${escapeHtml(res.grammar_tip)}</p>
@@ -1474,10 +1474,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const fullStoryText = res.title + ". " + res.paragraphs.join(" ");
 
         resultDiv.innerHTML = `
-          <div style="padding: 40px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-soft); animation: popIn 0.3s ease;">
+          <div style="padding: 40px; border-radius: 24px; background: #fff; border: 1px solid rgba(80,58,40,0.1); box-shadow: var(--shadow-soft); animation: popIn 0.3s ease;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 24px;">
               <h4 style="font-family: var(--font-family); font-size: 2.1rem; font-weight: 800; letter-spacing: -0.025em; color: var(--accent-deep); margin: 0;">${escapeHtml(res.title)}</h4>
-              <button onclick="BuddyVoice.speak('${escapeHtml(fullStoryText).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(84,104,56,0.3); background: var(--emerald-soft); color: var(--emerald-deep); font-weight: 700; cursor: pointer; display:flex; align-items:center; gap: 8px; flex-shrink: 0;">🔊 Read to me</button>
+              <button onclick="BuddyVoice.speak('${escapeHtml(fullStoryText).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1px solid rgba(111,124,74,0.3); background: rgba(111,124,74,0.1); color: #3d5220; font-weight: 700; cursor: pointer; display:flex; align-items:center; gap: 8px; flex-shrink: 0;">🔊 Read to me</button>
             </div>
             ${paragraphsHtml}
           </div>
@@ -1518,10 +1518,10 @@ function renderPronunciationUI() {
     <div style="margin-bottom: 32px;">
       <p style="font-size: 0.85rem; font-weight: 800; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Your Target Sentence</p>
       <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: var(--text); line-height: 1.35; margin: 0 0 16px;">"${escapeHtml(currentPronunciationSentence)}"</h2>
-      <button onclick="BuddyVoice.speak('${escapeHtml(currentPronunciationSentence).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(84,104,56,0.3); background: var(--emerald-soft); color: var(--emerald-deep); font-weight: 700; cursor: pointer;">🔊 Hear Buddy Say It</button>
+      <button onclick="BuddyVoice.speak('${escapeHtml(currentPronunciationSentence).replace(/'/g, "\\'")}', 'English', this)" style="min-height: 40px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(111,124,74,0.3); background: rgba(111,124,74,0.1); color: #3d5220; font-weight: 700; cursor: pointer;">🔊 Hear Buddy Say It</button>
     </div>
     
-    <div style="padding-top: 32px; border-top: 1px solid var(--line);">
+    <div style="padding-top: 32px; border-top: 1px solid rgba(80,58,40,0.1);">
       <button id="pronunciationMicBtn" class="mic-btn" onclick="startPronunciationMic()" aria-label="Start recording" aria-pressed="false" style="width:52px; height:52px; border-radius:50%; border:none; background:#dc2626; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
       <p id="pronunciationStatus" style="color: var(--muted); font-size: 1.05rem; font-weight: 600; margin: 0;">Click the mic and start speaking</p>
     </div>
@@ -1585,7 +1585,7 @@ function evaluatePronunciation(spokenText) {
   
   resultArea.style.display = "block";
   resultArea.innerHTML = `
-    <div style="background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; text-align: left;">
+    <div style="background: rgba(80,58,40,0.04); border-radius: 16px; padding: 24px; text-align: left;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <span style="font-weight: 800; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-deep);">Accuracy Score</span>
         <span style="font-size: 1.4rem; font-weight: 800; color: ${accuracy >= 80 ? '#16a34a' : '#dc2626'};">${accuracy}%</span>
@@ -1640,13 +1640,13 @@ window.openLightningModal = function() {
   const playArea = document.getElementById("lightningPlayArea");
   if (playArea) {
     playArea.innerHTML = `
-      <h2 style="font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); margin-bottom: 10px;">Lightning Round</h2>
-      <p style="font-size: 1.05rem; color: var(--muted); margin-bottom: 28px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
+      <h2 style="font-family: var(--font-family); font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: #422006; margin-bottom: 10px;">Lightning Round</h2>
+      <p style="font-size: 1.1rem; color: #713f12; margin-bottom: 32px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
       <div class="ai-loading-state" id="lightningLoading" style="display:none; padding: 20px;">
-        <div class="spinner" style="border-top-color: var(--amber); margin: 0 auto;"></div>
-        <p style="color: var(--amber); font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
+        <div class="spinner" style="border-top-color: #713f12; margin: 0 auto;"></div>
+        <p style="color: #713f12; font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
       </div>
-      <button id="lightningStartBtn" style="min-height: 54px; padding: 0 36px; border-radius: var(--radius-pill); border: none; background: linear-gradient(135deg, var(--amber) 0%, #a16207 100%); color: #ffffff; font-family: var(--font-family); font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(194, 120, 3, 0.28); transition: transform 0.15s ease;">⚡ Start Now</button>
+      <button id="lightningStartBtn" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-family: var(--font-family); font-size: 1.25rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
     `;
     
     // Bulletproof click listener attachment
@@ -1745,8 +1745,8 @@ function renderLightningQuestion() {
   
   playArea.innerHTML = `
     <div style="animation: fadeViewIn 0.2s ease forwards;">
-      <p style="font-size: 0.85rem; font-weight: 800; color: var(--amber); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Question ${lightningIndex + 1} of 5</p>
-      <h3 style="font-size: 1.45rem; color: var(--text); margin-bottom: 24px; line-height: 1.4; font-weight: 700;">${escapeHtml(q.question)}</h3>
+      <p style="font-size: 0.9rem; font-weight: 800; color: #a16207; text-transform: uppercase; margin-bottom: 12px;">Question ${lightningIndex + 1} of 5</p>
+      <h3 style="font-size: 1.5rem; color: #422006; margin-bottom: 24px; line-height: 1.4;">${escapeHtml(q.question)}</h3>
       <div id="lightningOptionsBox"></div>
     </div>
   `;
@@ -1755,7 +1755,7 @@ function renderLightningQuestion() {
   q.options.forEach(opt => {
     const btn = document.createElement("button");
     btn.className = "lightning-opt-btn";
-    btn.style.cssText = "width:100%; text-align:left; padding:16px 20px; border-radius:var(--radius-lg); border:1px solid var(--line); background:var(--surface); color:var(--text); font-size:1.05rem; font-weight:600; cursor:pointer; transition:all 0.2s ease; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.02);";
+    btn.style.cssText = "width:100%; text-align:left; padding:16px 20px; border-radius:16px; border:2px solid rgba(113,63,18,0.2); background:rgba(255,255,255,0.6); color:#422006; font-size:1.1rem; font-weight:600; cursor:pointer; transition:all 0.2s; margin-bottom:10px;";
     btn.textContent = opt;
     btn.onclick = () => handleLightningAnswer(btn, opt, q.answer);
     optionsBox.appendChild(btn);
@@ -1831,9 +1831,9 @@ function endLightningGame(reason) {
   
   playArea.innerHTML = `
     <div style="font-size: 4rem; margin-bottom: 16px;">${icon}</div>
-    <h2 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text); margin-bottom: 12px;">${title}</h2>
-    <p style="font-size: 1.05rem; color: var(--muted); margin-bottom: 28px;">${msg}</p>
-    <button onclick="closeLightningModal()" style="min-height: 52px; padding: 0 32px; border-radius: var(--radius-pill); border: none; background: var(--surface-dark); color: #ffffff; font-family: var(--font-family); font-size: 1rem; font-weight: 800; cursor: pointer; transition: transform 0.2s;">Close & Return</button>
+    <h2 style="font-family: var(--font-family); font-size: 2.4rem; font-weight: 800; letter-spacing: -0.025em; color: #422006; margin-bottom: 12px;">${title}</h2>
+    <p style="font-size: 1.15rem; color: #713f12; margin-bottom: 32px;">${msg}</p>
+    <button onclick="closeLightningModal()" style="min-height: 56px; padding: 0 32px; border-radius: 999px; border: none; background: #713f12; color: #fef08a; font-family: var(--font-family); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: transform 0.2s;">Close & Return</button>
   `;
 }
 
@@ -1903,7 +1903,7 @@ function appendRoleplayMsg(role, content, isLoading = false) {
     msgDiv.style.alignSelf = "flex-start";
     msgDiv.style.borderBottomLeftRadius = "4px";
     msgDiv.style.boxShadow = "var(--shadow-soft)";
-    msgDiv.style.border = "1px solid var(--line)";
+    msgDiv.style.border = "1px solid rgba(80,58,40,0.1)";
   }
   
   msgDiv.innerHTML = content;
@@ -2018,7 +2018,7 @@ function startSpacedRepetition() {
   if (srsQueue.length === 0) {
     document.getElementById("srsPlayArea").innerHTML = `
       <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
-      <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: var(--emerald-deep);">You're all caught up!</h2>
+      <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: #3d5220;">You're all caught up!</h2>
       <p style="font-size: 1.1rem; color: var(--muted); margin-bottom: 32px;">There are no words due for review today. Add more words from the translator, or check back tomorrow.</p>
     `;
     return;
@@ -2031,7 +2031,7 @@ function renderSrsCard() {
   if (srsQueue.length === 0) {
     document.getElementById("srsPlayArea").innerHTML = `
       <div style="font-size: 4rem; margin-bottom: 16px;">🏆</div>
-      <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: var(--emerald-deep);">Daily Deck Complete!</h2>
+      <h2 style="font-family: var(--font-family); font-size: 2.2rem; font-weight: 700; letter-spacing: -0.025em; color: #3d5220;">Daily Deck Complete!</h2>
       <p style="font-size: 1.1rem; color: var(--muted); margin-bottom: 32px;">Excellent work. Your memory is growing stronger.</p>
       <button onclick="switchAppView('view-dashboard')" class="primary-action">Return to Dashboard</button>
     `;
@@ -2062,7 +2062,7 @@ function renderSrsCard() {
     
     <div id="srsControls" style="display: none; gap: 12px; justify-content: center;">
       <button onclick="gradeSrsCard(1)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #fee2e2; color: #b91c1c; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Hard<br><span style="font-size:0.75rem; font-weight:600;">Again soon</span></button>
-      <button onclick="gradeSrsCard(4)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: var(--amber-soft); color: #b45309; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Good<br><span style="font-size:0.75rem; font-weight:600;">Got it right</span></button>
+      <button onclick="gradeSrsCard(4)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #fef9c3; color: #a16207; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Good<br><span style="font-size:0.75rem; font-weight:600;">Got it right</span></button>
       <button onclick="gradeSrsCard(5)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #dcfce7; color: #15803d; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Easy<br><span style="font-size:0.75rem; font-weight:600;">Too simple</span></button>
     </div>
   `;
@@ -2186,7 +2186,7 @@ async function loadStudentQuizzes() {
       }
       
       html += `
-        <div style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); border-radius: 20px; padding: 24px; border: 1px solid var(--line); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); border-radius: 20px; padding: 24px; border: 1px solid rgba(80,58,40,0.1); box-shadow: 0 8px 24px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
             <div style="flex: 1;">
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
@@ -2195,10 +2195,10 @@ async function loadStudentQuizzes() {
               </div>
               <p style="margin:0; font-size: 0.95rem; color: #666; line-height: 1.5;">${q.description || 'Test your knowledge on this topic.'}</p>
             </div>
-            ${canTake ? `<button onclick='startQuiz(${JSON.stringify(q).replace(/'/g, "\\\\'")})' style="background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%); color: #fff; padding: 12px 24px; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(188,93,45,0.25); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">Start Quiz</button>` : ''}
+            ${canTake ? `<button onclick='startQuiz(${JSON.stringify(q).replace(/'/g, "\\\\'")})' style="background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%); color: #fff; padding: 12px 24px; border: none; border-radius: 12px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(188,93,45,0.3); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">Start Quiz</button>` : ''}
           </div>
           
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(80,58,40,0.08);">
             <div style="font-size: 0.9rem;">
               ${statusHtml}
             </div>
