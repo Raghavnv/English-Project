@@ -1309,7 +1309,7 @@ async function generateRemedialGroups() {
       
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <strong style="font-size:1.1rem; color:#14532d;">${escapeHtml(g.group_name)}</strong>
+          <strong style="font-size:1.1rem; color:var(--emerald-deep);">${escapeHtml(g.group_name)}</strong>
           <span style="font-size:0.75rem; padding:4px 8px; border-radius:999px; background:#dcfce7; color:#166534; font-weight:800;">${g.students.length} Students</span>
         </div>
         <p style="font-size:0.85rem; font-weight:800; color:#16a34a; text-transform:uppercase; margin:0 0 4px;">Focus: ${escapeHtml(g.focus_topic)}</p>

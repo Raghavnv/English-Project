@@ -1396,7 +1396,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <p style="font-size: 0.85rem; font-weight: 800; color: var(--emerald-deep); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">${escapeHtml(lang)} Translation:</p>
             <button onclick="BuddyVoice.speak('${escapeHtml(res.translation).replace(/'/g, "\\'")}', '${lang}', this)" style="background:none; border:none; font-size:1.4rem; cursor:pointer; opacity:0.5; transition:0.2s;">🔊</button>
           </div>
-          <p style="font-size: 1.5rem; font-weight: 700; color: #1f1a16; margin-top:0; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line);">${escapeHtml(res.translation)}</p>
+          <p style="font-size: 1.5rem; font-weight: 700; color: var(--text); margin-top:0; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line);">${escapeHtml(res.translation)}</p>
           
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
             <p style="font-size: 0.85rem; font-weight: 800; color: var(--emerald-deep); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">Buddy's Grammar Tip 💡:</p>
@@ -1640,13 +1640,13 @@ window.openLightningModal = function() {
   const playArea = document.getElementById("lightningPlayArea");
   if (playArea) {
     playArea.innerHTML = `
-      <h2 style="font-family: var(--font-family); font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: #422006; margin-bottom: 10px;">Lightning Round</h2>
-      <p style="font-size: 1.1rem; color: #713f12; margin-bottom: 32px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
+      <h2 style="font-family: var(--font-heading); font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); margin-bottom: 10px;">Lightning Round</h2>
+      <p style="font-size: 1.05rem; color: var(--muted); margin-bottom: 28px;">Answer 5 questions before the clock runs out to earn the Lightning Badge!</p>
       <div class="ai-loading-state" id="lightningLoading" style="display:none; padding: 20px;">
-        <div class="spinner" style="border-top-color: #713f12; margin: 0 auto;"></div>
-        <p style="color: #713f12; font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
+        <div class="spinner" style="border-top-color: var(--amber); margin: 0 auto;"></div>
+        <p style="color: var(--amber); font-weight: 700; margin-top: 16px;">Generating your challenge...</p>
       </div>
-      <button id="lightningStartBtn" style="min-height: 60px; padding: 0 40px; border-radius: 20px; border: none; background: #713f12; color: #fef08a; font-family: var(--font-family); font-size: 1.25rem; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px rgba(113, 63, 18, 0.4); transition: transform 0.1s;">⚡ Start Now</button>
+      <button id="lightningStartBtn" style="min-height: 54px; padding: 0 36px; border-radius: var(--radius-pill); border: none; background: linear-gradient(135deg, var(--amber) 0%, #d97706 100%); color: #ffffff; font-family: var(--font-family); font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35); transition: transform 0.15s ease;">⚡ Start Now</button>
     `;
     
     // Bulletproof click listener attachment
@@ -1745,8 +1745,8 @@ function renderLightningQuestion() {
   
   playArea.innerHTML = `
     <div style="animation: fadeViewIn 0.2s ease forwards;">
-      <p style="font-size: 0.9rem; font-weight: 800; color: #a16207; text-transform: uppercase; margin-bottom: 12px;">Question ${lightningIndex + 1} of 5</p>
-      <h3 style="font-size: 1.5rem; color: #422006; margin-bottom: 24px; line-height: 1.4;">${escapeHtml(q.question)}</h3>
+      <p style="font-size: 0.85rem; font-weight: 800; color: var(--amber); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">Question ${lightningIndex + 1} of 5</p>
+      <h3 style="font-size: 1.45rem; color: var(--text); margin-bottom: 24px; line-height: 1.4; font-weight: 700;">${escapeHtml(q.question)}</h3>
       <div id="lightningOptionsBox"></div>
     </div>
   `;
@@ -1755,7 +1755,7 @@ function renderLightningQuestion() {
   q.options.forEach(opt => {
     const btn = document.createElement("button");
     btn.className = "lightning-opt-btn";
-    btn.style.cssText = "width:100%; text-align:left; padding:16px 20px; border-radius:16px; border:2px solid rgba(113,63,18,0.2); background:rgba(255,255,255,0.6); color:#422006; font-size:1.1rem; font-weight:600; cursor:pointer; transition:all 0.2s; margin-bottom:10px;";
+    btn.style.cssText = "width:100%; text-align:left; padding:16px 20px; border-radius:var(--radius-lg); border:1px solid var(--line); background:var(--surface); color:var(--text); font-size:1.05rem; font-weight:600; cursor:pointer; transition:all 0.2s ease; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.02);";
     btn.textContent = opt;
     btn.onclick = () => handleLightningAnswer(btn, opt, q.answer);
     optionsBox.appendChild(btn);
@@ -1831,9 +1831,9 @@ function endLightningGame(reason) {
   
   playArea.innerHTML = `
     <div style="font-size: 4rem; margin-bottom: 16px;">${icon}</div>
-    <h2 style="font-family: var(--font-family); font-size: 2.4rem; font-weight: 800; letter-spacing: -0.025em; color: #422006; margin-bottom: 12px;">${title}</h2>
-    <p style="font-size: 1.15rem; color: #713f12; margin-bottom: 32px;">${msg}</p>
-    <button onclick="closeLightningModal()" style="min-height: 56px; padding: 0 32px; border-radius: 999px; border: none; background: #713f12; color: #fef08a; font-family: var(--font-family); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: transform 0.2s;">Close & Return</button>
+    <h2 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; letter-spacing: -0.025em; color: var(--text); margin-bottom: 12px;">${title}</h2>
+    <p style="font-size: 1.05rem; color: var(--muted); margin-bottom: 28px;">${msg}</p>
+    <button onclick="closeLightningModal()" style="min-height: 52px; padding: 0 32px; border-radius: var(--radius-pill); border: none; background: var(--surface-dark); color: #ffffff; font-family: var(--font-family); font-size: 1rem; font-weight: 800; cursor: pointer; transition: transform 0.2s;">Close & Return</button>
   `;
 }
 
@@ -2062,7 +2062,7 @@ function renderSrsCard() {
     
     <div id="srsControls" style="display: none; gap: 12px; justify-content: center;">
       <button onclick="gradeSrsCard(1)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #fee2e2; color: #b91c1c; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Hard<br><span style="font-size:0.75rem; font-weight:600;">Again soon</span></button>
-      <button onclick="gradeSrsCard(4)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #fef9c3; color: #a16207; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Good<br><span style="font-size:0.75rem; font-weight:600;">Got it right</span></button>
+      <button onclick="gradeSrsCard(4)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: var(--amber-soft); color: #b45309; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Good<br><span style="font-size:0.75rem; font-weight:600;">Got it right</span></button>
       <button onclick="gradeSrsCard(5)" style="flex: 1; padding: 16px; border-radius: 16px; border: none; background: #dcfce7; color: #15803d; font-size: 1rem; font-weight: 800; cursor: pointer; transition: 0.2s;">Easy<br><span style="font-size:0.75rem; font-weight:600;">Too simple</span></button>
     </div>
   `;
