@@ -30,8 +30,8 @@
       background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(245,248,255,0.9));
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 3px solid #ffffff;
-      box-shadow: inset -4px -4px 12px rgba(0,0,0,0.03), 12px 24px 48px rgba(0,0,0,0.08), inset 4px 4px 12px rgba(255,255,255,0.9);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 16px 48px -8px rgba(60, 36, 18, 0.1), 0 4px 12px -2px rgba(60, 36, 18, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.95);
       position: relative;
     }
 
@@ -229,8 +229,22 @@
 
     <!-- LOGIN MODE -->
     <div id="loginForm">
-      <h2>Admin Sign In</h2>
-      <p class="auth-subtitle">Enter your admin credentials to access the dashboard.</p>
+      <div style="display:flex;align-items:center;gap:10px;margin: 12px 0 10px;">
+        <div style="width:38px;height:38px;border-radius:12px;background:rgba(188,93,45,0.1);border:1px solid rgba(188,93,45,0.2);display:flex;align-items:center;justify-content:center;color:var(--accent-deep);flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div>
+          <span style="font-size:0.75rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--accent-deep);display:block;">SenseSys Verified</span>
+          <h2 style="font-size:1.8rem;margin:0;">Educator Sign In</h2>
+        </div>
+      </div>
+      <p class="auth-subtitle">Enter your educator credentials to manage curriculum and review student analytics.</p>
+
+      <button type="button" onclick="fillDemoAdmin()" style="background: rgba(188,93,45,0.06); border: 1px dashed rgba(188,93,45,0.3); color: var(--accent-deep); padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(188,93,45,0.12)'" onmouseout="this.style.background='rgba(188,93,45,0.06)'">
+        ✨ Fill Demo: admin / admin123
+      </button>
 
       <label class="form-label" for="loginUser">Username</label>
       <input id="loginUser" type="text" placeholder="Your admin username" autocomplete="username">
@@ -289,6 +303,11 @@ function clearErrors() {
 
 function showError(id, msg)   { const el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.add("show"); } }
 function showSuccess(id, msg) { const el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.add("show"); } }
+
+function fillDemoAdmin() {
+  document.getElementById("loginUser").value = "admin";
+  document.getElementById("loginPass").value = "admin123";
+}
 
 async function doLogin() {
   const username = document.getElementById("loginUser").value.trim();

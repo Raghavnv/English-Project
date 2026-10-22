@@ -295,7 +295,7 @@ function renderQuestions(lesson, savedProgress) {
         const badge = score !== null ? (isGood ? "✅ Correct" : "❌ Needs Work") : (isGood ? "✅" : "💬");
         
         feedbackEl.innerHTML = `
-          <div style="padding:11px 14px;border-radius:12px;font-size:0.88rem;line-height:1.65;
+          <div style="padding:12px 16px;border-radius:14px;font-size:0.9rem;line-height:1.65;word-break:break-word;overflow-wrap:anywhere;box-sizing:border-box;max-width:100%;
             background:${isGood ? "rgba(111,124,74,0.1)" : "rgba(188,93,45,0.07)"};
             border:1px solid ${isGood ? "rgba(111,124,74,0.22)" : "rgba(188,93,45,0.18)"};
             color:${isGood ? "#3a5018" : "var(--accent-deep)"};">
@@ -329,7 +329,7 @@ function renderQuestions(lesson, savedProgress) {
       
       try {
         const res = await AI.getHint(qid, lessonTitle);
-        hintEl.innerHTML = `<strong>💡 Hint</strong>${formatAIText(res.hint)}`;
+        hintEl.innerHTML = `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:800;color:#92400e;">💡 Hint</div>${formatAIText(res.hint)}`;
         btn.textContent = "✕ Hide";
       } catch {
         hintEl.textContent = "Could not load hint.";

@@ -44,15 +44,13 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f8f9fa;
+  background-color: var(--bg);
   background-image: 
-    radial-gradient(at 40% 20%, hsla(28,100%,74%,0.15) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, hsla(189,100%,56%,0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, hsla(355,100%,93%,0.2) 0px, transparent 50%),
-    radial-gradient(at 80% 50%, hsla(340,100%,76%,0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, hsla(22,100%,77%,0.15) 0px, transparent 50%),
-    radial-gradient(at 80% 100%, hsla(242,100%,70%,0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 0%, hsla(343,100%,76%,0.1) 0px, transparent 50%);
+    radial-gradient(1100px circle at 15% 5%, rgba(245, 158, 11, 0.09) 0%, transparent 60%),
+    radial-gradient(950px circle at 85% 15%, rgba(188, 93, 45, 0.09) 0%, transparent 55%),
+    radial-gradient(850px circle at 50% 70%, rgba(96, 114, 61, 0.07) 0%, transparent 60%),
+    radial-gradient(rgba(188, 93, 45, 0.08) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px;
   background-attachment: fixed;
   color: var(--text);
   min-height: 100vh;
@@ -124,10 +122,10 @@ h6 {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(245, 248, 255, 0.8));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 3px solid #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow: inset -2px -2px 6px rgba(0,0,0,0.02), 8px 12px 24px rgba(0,0,0,0.05), inset 2px 2px 6px rgba(255,255,255,0.8);
   transition: all 0.25s ease;
-}
+box-shadow: 0 10px 28px -4px rgba(60, 36, 18, 0.07), 0 2px 6px -1px rgba(60, 36, 18, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);}
 
 .platform-brand {
   display: flex;
@@ -213,8 +211,8 @@ h6 {
   -webkit-backdrop-filter: blur(16px);
   padding: 24px;
   position: relative;
-  border: 3px solid #ffffff;
-  box-shadow: inset -4px -4px 12px rgba(0,0,0,0.03), 8px 12px 24px rgba(0,0,0,0.05), inset 4px 4px 12px rgba(255,255,255,0.9);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 28px -4px rgba(60, 36, 18, 0.07), 0 2px 6px -1px rgba(60, 36, 18, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .sidebar-panel::before,
@@ -468,8 +466,8 @@ h6 {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(245, 248, 255, 0.9));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 3px solid #ffffff;
-  box-shadow: inset -2px -2px 8px rgba(0,0,0,0.03), 4px 8px 16px rgba(0,0,0,0.05), inset 2px 2px 8px rgba(255,255,255,0.9);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 24px -4px rgba(60, 36, 18, 0.06), 0 2px 6px -1px rgba(60, 36, 18, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
   text-align: left;
   transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
@@ -1164,45 +1162,164 @@ textarea {
 }
 
 
-body {
-  background-color: var(--bg);
-  background-image: radial-gradient(rgba(188, 93, 45, 0.12) 1px, transparent 1px);
-  background-size: 24px 24px;
+/* ── BUBBLE & CHIP OVERFLOW INTEGRITY (UIUX PRO MAX) ── */
+.buddy-bubble,
+.hint-bubble,
+.speech-transcript-box,
+.feedback-area > div,
+.completion-msg,
+.custom-popup,
+.relearn-content,
+.q-prompt {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
-/* Animated Mesh Orbs */
-body::before, body::after {
-  content: "";
-  position: fixed;
-  width: 80vw;
-  height: 80vw;
-  border-radius: 50%;
-  filter: blur(100px);
-  z-index: -1;
-  opacity: 0.85;
-  pointer-events: none;
-  animation: orbFloat 25s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+.buddy-bubble {
+  padding: 12px 18px;
+  border-radius: 18px;
+  font-size: 0.92rem;
+  line-height: 1.62;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
-body::before {
-  top: -20vw;
-  left: -20vw;
-  background: radial-gradient(circle, rgba(188, 93, 45, 0.25) 0%, rgba(188, 93, 45, 0) 65%);
+.buddy-bubble * {
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
 }
 
-body::after {
-  bottom: -20vw;
-  right: -20vw;
-  background: radial-gradient(circle, rgba(96, 114, 61, 0.22) 0%, rgba(96, 114, 61, 0) 65%);
-  animation-duration: 30s;
-  animation-direction: alternate-reverse;
+.buddy-bubble p {
+  margin: 0 0 8px 0;
+  line-height: 1.65;
 }
 
-@keyframes orbFloat {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(5vw, 8vw) scale(1.1); }
-  66% { transform: translate(-3vw, 12vw) scale(0.9); }
-  100% { transform: translate(8vw, -5vw) scale(1.05); }
+.buddy-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+.buddy-bubble pre,
+.buddy-bubble code {
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 0.86rem;
+}
+
+.buddy-msg {
+  max-width: 88%;
+  width: fit-content;
+  box-sizing: border-box;
+}
+
+.hint-bubble {
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #78350f;
+  box-sizing: border-box;
+}
+
+.speech-transcript-box {
+  margin-top: 10px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(80, 58, 40, 0.14);
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text);
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.pill,
+.status-badge,
+.module-meta,
+.header-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-chip {
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.student-chip-info {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.student-chip-info strong,
+.student-chip-info span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-card {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.badge-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ── ANIMATED SPEECH WAVEFORM BARS ── */
+.audio-waveform {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+  padding: 0 4px;
+}
+.audio-waveform .bar {
+  width: 3px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  transition: height 0.15s ease;
+}
+.audio-waveform.is-active .bar:nth-child(1) { animation: wavePulse 0.8s ease-in-out infinite alternate; }
+.audio-waveform.is-active .bar:nth-child(2) { animation: wavePulse 0.8s ease-in-out 0.15s infinite alternate; }
+.audio-waveform.is-active .bar:nth-child(3) { animation: wavePulse 0.8s ease-in-out 0.3s infinite alternate; }
+.audio-waveform.is-active .bar:nth-child(4) { animation: wavePulse 0.8s ease-in-out 0.45s infinite alternate; }
+.audio-waveform.is-active .bar:nth-child(5) { animation: wavePulse 0.8s ease-in-out 0.6s infinite alternate; }
+
+@keyframes wavePulse {
+  0% { height: 4px; }
+  100% { height: 18px; }
 }
 
 /* Page Load Animation */

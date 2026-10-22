@@ -1638,13 +1638,13 @@ async function loadQuizzes() {
     const quizzes = await apiFetch('/api/quizzes/');
     const c = document.getElementById('adminQuizzesContainer');
     c.innerHTML = quizzes.length === 0 ? '<p>No quizzes yet.</p>' : quizzes.map(q => `
-      <div style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); border-radius: 16px; padding: 24px; border: 1px solid rgba(80, 58, 40, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.03)';">
+      <div style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); border-radius: 16px; padding: 24px; border: 1px solid rgba(80, 58, 40, 0.1); box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s ease, box-shadow 0.2s ease; box-sizing: border-box; word-break: break-word; overflow-wrap: anywhere; max-width: 100%;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.03)';">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div style="padding-right: 12px;">
             <h4 style="margin:0 0 8px 0; font-size:1.25rem; font-weight: 800; color: var(--text);">${q.title}</h4>
             <p style="margin:0; font-size:0.9rem; color: var(--muted); line-height: 1.4;">${q.description || 'No description provided.'}</p>
           </div>
-          <div style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; white-space: nowrap;">
+          <div style="background: rgba(188, 93, 45, 0.1); color: var(--accent-deep); padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; white-space: nowrap;">
             ⏱️ ${q.time_limit_minutes}m
           </div>
         </div>

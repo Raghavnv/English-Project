@@ -1585,7 +1585,7 @@ function evaluatePronunciation(spokenText) {
   
   resultArea.style.display = "block";
   resultArea.innerHTML = `
-    <div style="background: rgba(80,58,40,0.04); border-radius: 16px; padding: 24px; text-align: left;">
+    <div style="background: rgba(80,58,40,0.04); border-radius: 16px; padding: 24px; text-align: left; word-break: break-word; overflow-wrap: anywhere; box-sizing: border-box; max-width: 100%;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <span style="font-weight: 800; font-size: 0.9rem; text-transform: uppercase; color: var(--accent-deep);">Accuracy Score</span>
         <span style="font-size: 1.4rem; font-weight: 800; color: ${accuracy >= 80 ? '#16a34a' : '#dc2626'};">${accuracy}%</span>
@@ -2186,7 +2186,7 @@ async function loadStudentQuizzes() {
       }
       
       html += `
-        <div style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); border-radius: 20px; padding: 24px; border: 1px solid rgba(80,58,40,0.1); box-shadow: 0 8px 24px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+        <div style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(10px); border-radius: 20px; padding: 24px; border: 1px solid rgba(80,58,40,0.1); box-shadow: 0 8px 24px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s ease; box-sizing: border-box; word-break: break-word; overflow-wrap: anywhere; max-width: 100%;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
             <div style="flex: 1;">
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">

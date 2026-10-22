@@ -41,22 +41,18 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(185, 93, 47, 0.16), transparent 24%),
-    radial-gradient(circle at 84% 12%, rgba(109, 125, 73, 0.16), transparent 22%),
-    linear-gradient(180deg, #faf4ea 0%, #f4ecdf 100%);
+  background-color: var(--bg);
+  background-image: 
+    radial-gradient(1100px circle at 15% 5%, rgba(245, 158, 11, 0.09) 0%, transparent 60%),
+    radial-gradient(950px circle at 85% 15%, rgba(188, 93, 45, 0.09) 0%, transparent 55%),
+    radial-gradient(850px circle at 50% 70%, rgba(96, 114, 61, 0.07) 0%, transparent 60%),
+    radial-gradient(rgba(188, 93, 45, 0.08) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px;
+  background-attachment: fixed;
 }
 
 body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(rgba(250, 244, 234, 0.7), rgba(244, 236, 223, 0.76)),
-    url("https://images.pexels.com/photos/5884360/pexels-photo-5884360.jpeg?cs=srgb&dl=pexels-villagerboy-5884360.jpg&fm=jpg") center/cover no-repeat;
-  opacity: 0.42;
-  filter: saturate(0.82) contrast(0.94);
+  display: none;
 }
 
 a {

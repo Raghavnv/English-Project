@@ -34,12 +34,21 @@
 
   <!-- LOGIN PANEL -->
   <main class="platform-main" style="grid-template-columns:1fr; min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;">
-    <section class="workspace-panel login-container" style="max-width: 440px; width: 100%; padding: 42px 36px; border-radius: 32px; background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(245,248,255,0.9)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 3px solid #ffffff; box-shadow: inset -4px -4px 12px rgba(0,0,0,0.03), 12px 24px 48px rgba(0,0,0,0.08), inset 4px 4px 12px rgba(255,255,255,0.9);">
+    <section class="workspace-panel login-container" style="max-width: 440px; width: 100%; padding: 42px 36px; border-radius: 32px; background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(245,248,255,0.9)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.95); box-shadow: 0 16px 48px -8px rgba(60, 36, 18, 0.1), 0 4px 12px -2px rgba(60, 36, 18, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.95);">
 
       <div style="text-align: center; margin-bottom: 24px;">
-        <span class="pill" style="margin-bottom: 12px;">🎓 Learner Portal</span>
+        <div style="width: 58px; height: 58px; border-radius: 20px; background: linear-gradient(135deg, rgba(188, 93, 45, 0.12), rgba(96, 114, 61, 0.14)); border: 1px solid rgba(188, 93, 45, 0.22); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; box-shadow: 0 6px 18px rgba(188, 93, 45, 0.12);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-deep);">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <span class="pill" style="margin-bottom: 10px;">🎓 Student Learning Studio</span>
         <h2 style="font-family: var(--font-family); font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px;">Welcome Back</h2>
-        <p class="sidebar-copy" style="margin: 0; font-size: 0.95rem;">Enter your details to continue your learning journey.</p>
+        <p class="sidebar-copy" style="margin: 0; font-size: 0.95rem;">Enter your student details to continue your practice.</p>
+        <button type="button" onclick="fillDemoStudent()" style="background: rgba(188,93,45,0.06); border: 1px dashed rgba(188,93,45,0.3); color: var(--accent-deep); padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; cursor: pointer; margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(188,93,45,0.12)'" onmouseout="this.style.background='rgba(188,93,45,0.06)'">
+          ✨ Fill Demo: Ananya Rao (Bangalore High)
+        </button>
       </div>
 
       <div style="display: grid; gap: 14px; margin-bottom: 6px;">
@@ -93,6 +102,10 @@ async function login() {
     errEl.style.display = "block";
     if (btn) { btn.textContent = "Enter Platform"; btn.disabled = false; }
   }
+}
+function fillDemoStudent() {
+  document.getElementById("name").value = "Ananya Rao";
+  document.getElementById("school").value = "Bangalore High School";
 }
 function goAdmin() { window.location.href = "admin-login.html"; }
 document.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
