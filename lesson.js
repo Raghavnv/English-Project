@@ -104,8 +104,8 @@ function renderQuestions(lesson, savedProgress) {
 
     // ── TYPE BADGE ──
     const typeBadge = isSpeech
-      ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.7rem;padding:3px 9px;border-radius:999px;background:rgba(111,124,74,0.14);color:#3a5018;font-weight:800;letter-spacing:0.03em;">🎤 Speak Your Answer</span>`
-      : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.7rem;padding:3px 9px;border-radius:999px;background:rgba(188,93,45,0.1);color:var(--accent-deep);font-weight:800;letter-spacing:0.03em;">✏️ Written Answer</span>`;
+      ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;padding:3px 10px;border-radius:var(--radius-pill);background:var(--emerald-soft);color:var(--emerald-deep);font-weight:800;letter-spacing:0.03em;">🎤 Speak Your Answer</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;padding:3px 10px;border-radius:var(--radius-pill);background:var(--accent-soft);color:var(--accent);font-weight:800;letter-spacing:0.03em;">✏️ Written Answer</span>`;
 
     card.className = "question-card" + (isSpeech ? " speech-card" : "");
 
@@ -113,7 +113,7 @@ function renderQuestions(lesson, savedProgress) {
       card.innerHTML = `
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <h4 style="font-size:0.75rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:#3a5018;margin:0;">Question ${i + 1}</h4>
+            <h4 style="font-size:0.75rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--emerald-deep);margin:0;">Question ${i + 1}</h4>
             ${typeBadge}
           </div>
           <button class="q-hint-btn" data-qid="${q.id}">💡 Hint</button>
@@ -122,20 +122,20 @@ function renderQuestions(lesson, savedProgress) {
         <div class="hint-bubble" id="hint_${q.id}" style="display:none;"></div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;">
           <button class="speech-record-btn" id="recBtn_${q.id}" data-qid="${q.id}" onclick="toggleSpeechRecord('${q.id}')">🎤 Start Speaking</button>
-          <button style="min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(111,124,74,0.25);background:rgba(255,255,255,0.6);color:#3a5018;font-size:0.8rem;font-weight:700;cursor:pointer;" onclick="clearSpeech('${q.id}')">Clear</button>
+          <button style="min-height:36px;padding:0 14px;border-radius:var(--radius-pill);border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.15s ease;" onclick="clearSpeech('${q.id}')">Clear</button>
         </div>
         <div class="speech-status" id="speechStatus_${q.id}"></div>
         <div class="speech-transcript-box" id="transcript_${q.id}" data-qid="${q.id}">${savedAnswer || '<span style="color:var(--muted);font-style:italic;">Your spoken answer will appear here…</span>'}</div>
         <div class="feedback-area" id="feedback_${q.id}" style="margin-top:10px;"></div>
         <div style="margin-top:10px;">
-          <button class="check-btn" data-qid="${q.id}" style="display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 14px;border-radius:999px;border:1px solid rgba(111,124,74,0.25);background:rgba(111,124,74,0.1);color:#3a5018;font-size:0.82rem;font-weight:700;cursor:pointer;">✨ Check with AI</button>
+          <button class="check-btn" data-qid="${q.id}" style="display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 14px;border-radius:var(--radius-pill);border:1px solid rgba(16,185,129,0.3);background:var(--emerald-soft);color:var(--emerald-deep);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.15s ease;">✨ Check with AI</button>
         </div>
       `;
     } else {
       card.innerHTML = `
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <h4 style="font-size:0.75rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--accent-deep);margin:0;">Question ${i + 1}</h4>
+            <h4 style="font-size:0.75rem;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:var(--accent);margin:0;">Question ${i + 1}</h4>
             ${typeBadge}
           </div>
           <button class="q-hint-btn" data-qid="${q.id}">💡 Hint</button>
@@ -145,11 +145,11 @@ function renderQuestions(lesson, savedProgress) {
         <div style="position:relative;">
           <textarea class="q-answer" data-qid="${q.id}" placeholder="${isEssay ? 'Write your essay or paragraph here (min 3 sentences)…' : 'Type your answer here…'}" rows="${isEssay ? 8 : 3}" style="padding-right:44px;">${savedAnswer}</textarea>
           <button class="q-mic-btn" data-qid="${q.id}" title="Speak your answer"
-            style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(80,58,40,0.15);background:rgba(255,255,255,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
+            style="position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">🎤</button>
         </div>
         <div class="feedback-area" id="feedback_${q.id}" style="margin-top:10px;"></div>
         <div style="margin-top:10px;">
-          <button class="check-btn" data-qid="${q.id}" style="display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 14px;border-radius:999px;border:1px solid rgba(188,93,45,0.2);background:rgba(188,93,45,0.07);color:var(--accent-deep);font-size:0.82rem;font-weight:700;cursor:pointer;">✨ Check with AI</button>
+          <button class="check-btn" data-qid="${q.id}" style="display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 14px;border-radius:var(--radius-pill);border:1px solid rgba(99,102,241,0.25);background:var(--accent-soft);color:var(--accent);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.15s ease;">✨ Check with AI</button>
         </div>
       `;
     }
@@ -166,7 +166,7 @@ function renderQuestions(lesson, savedProgress) {
 
   const completionMsg = document.createElement("p");
   completionMsg.id = "completionMsg";
-  completionMsg.style.cssText = "display:none;padding:14px 16px;border-radius:12px;background:rgba(111,124,74,0.1);border:1px solid rgba(111,124,74,0.2);color:#3a5018;font-weight:700;font-size:0.92rem;text-align:center;";
+  completionMsg.style.cssText = "display:none;padding:14px 16px;border-radius:var(--radius-md);background:var(--emerald-soft);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-deep);font-weight:700;font-size:0.92rem;text-align:center;";
   completionMsg.textContent = "✓ Lesson completed! Great work.";
   stack.appendChild(completionMsg);
 
@@ -295,10 +295,10 @@ function renderQuestions(lesson, savedProgress) {
         const badge = score !== null ? (isGood ? "✅ Correct" : "❌ Needs Work") : (isGood ? "✅" : "💬");
         
         feedbackEl.innerHTML = `
-          <div style="padding:11px 14px;border-radius:12px;font-size:0.88rem;line-height:1.65;
-            background:${isGood ? "rgba(111,124,74,0.1)" : "rgba(188,93,45,0.07)"};
-            border:1px solid ${isGood ? "rgba(111,124,74,0.22)" : "rgba(188,93,45,0.18)"};
-            color:${isGood ? "#3a5018" : "var(--accent-deep)"};">
+          <div style="padding:12px 14px;border-radius:var(--radius-md);font-size:0.88rem;line-height:1.65;
+            background:${isGood ? "var(--emerald-soft)" : "var(--sass-soft)"};
+            border:1px solid ${isGood ? "rgba(16,185,129,0.25)" : "rgba(244,63,94,0.25)"};
+            color:${isGood ? "var(--emerald-deep)" : "var(--sass)"};">
             <strong>${badge}</strong>${score !== null ? ` · Score ${score}/5` : ""}<br>
             ${formatAIText(res.feedback)}
           </div>`;

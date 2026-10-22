@@ -3,73 +3,197 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EnglishBridge Login</title>
-
-  <!-- SAME FONTS -->
+  <title>Student Login | EnglishBridge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="platform.css">
+  <style>
+    .auth-shell {
+      width: min(calc(100% - 32px), 440px);
+      margin: 0 auto;
+      padding: 40px 0 60px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .auth-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .auth-card {
+      padding: 38px 34px;
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--sass) 100%);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .auth-header h2 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 8px 0 4px;
+      color: var(--text);
+    }
+
+    .auth-header p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .demo-pill-btn {
+      margin: 14px 0 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px dashed rgba(99, 102, 241, 0.4);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .demo-pill-btn:hover {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .error-banner {
+      display: none;
+      margin: 12px 0;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--sass-soft);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: var(--sass);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      transition: color 0.2s ease;
+    }
+
+    .back-btn:hover {
+      color: var(--text);
+    }
+  </style>
 </head>
 <body>
 
-<div class="platform-shell">
+<div class="auth-shell">
 
-  <!-- HEADER -->
-  <header class="platform-header">
-    <div style="display: flex; align-items: center; gap: 16px;">
-      <div class="platform-brand" style="margin: 0;">
-        <div class="platform-brand-mark" style="overflow:hidden;background:transparent;border:none;box-shadow:none;padding:2px;">
-          <img src="EnglishBridgeLogo.png" alt="EnglishBridge logo" style="width:100%;height:100%;object-fit:contain;">
-        </div>
-        <div class="platform-brand-copy">
-          <strong>EnglishBridge</strong>
-          <span>Student Access Portal</span>
-        </div>
-      </div>
-      <!-- Divider -->
-      </div>
-  </header>
+  <div class="auth-brand">
+    <div class="platform-brand-mark">
+      <img src="EnglishBridgeLogo.png" alt="EnglishBridge logo" style="height:32px;width:auto;object-fit:contain;">
+    </div>
+    <div class="platform-brand-copy">
+      <strong style="font-size:1.15rem;">EnglishBridge</strong>
+      <span style="font-size:0.8rem;">Bangalore Student Access</span>
+    </div>
+  </div>
 
-  <!-- LOGIN PANEL -->
-  <main class="platform-main" style="grid-template-columns:1fr; min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;">
-    <section class="workspace-panel login-container" style="max-width: 440px; width: 100%; padding: 42px 36px; border-radius: 32px; background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(245,248,255,0.9)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 3px solid #ffffff; box-shadow: inset -4px -4px 12px rgba(0,0,0,0.03), 12px 24px 48px rgba(0,0,0,0.08), inset 4px 4px 12px rgba(255,255,255,0.9);">
+  <section class="auth-card">
+    <div class="auth-header">
+      <span class="pill" style="margin-bottom: 6px;">🎓 Learner Portal</span>
+      <h2>Welcome Back</h2>
+      <p>Enter your details to resume your lessons and practice.</p>
+    </div>
 
-      <div style="text-align: center; margin-bottom: 24px;">
-        <span class="pill" style="margin-bottom: 12px;">🎓 Learner Portal</span>
-        <h2 style="font-family: var(--font-family); font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px;">Welcome Back</h2>
-        <p class="sidebar-copy" style="margin: 0; font-size: 0.95rem;">Enter your details to continue your learning journey.</p>
-      </div>
+    <div class="form-group">
+      <label class="form-label" for="name">Your Name</label>
+      <input id="name" placeholder="e.g. Ananya Rao" autocomplete="name">
+    </div>
 
-      <div style="display: grid; gap: 14px; margin-bottom: 6px;">
-        <div>
-          <label style="display: block; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 6px;">Your Name</label>
-          <input id="name" placeholder="e.g. Ananya Rao" autocomplete="name" style="width: 100%; min-height: 48px; border-radius: 14px; padding: 0 16px;">
-        </div>
-        <div>
-          <label style="display: block; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-deep); margin-bottom: 6px;">Your School</label>
-          <input id="school" placeholder="e.g. Govt High School, Bangalore" autocomplete="organization" style="width: 100%; min-height: 48px; border-radius: 14px; padding: 0 16px;">
-        </div>
-      </div>
+    <div class="form-group">
+      <label class="form-label" for="school">Your School</label>
+      <input id="school" placeholder="e.g. Govt High School, Bangalore" autocomplete="organization">
+    </div>
 
-      <div id="errorMsg" style="display:none;margin:12px 0;padding:12px 16px;border-radius:14px;background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.25);color:#b91c1c;font-size:0.88rem;font-weight:600;text-align:center;">
-        Please enter both your name and school.
-      </div>
+    <button type="button" class="demo-pill-btn" onclick="fillDemo()">
+      ⚡ Quick Fill Demo Student
+    </button>
 
-      <button class="primary-action" style="margin-top:16px; width: 100%; min-height: 48px; font-size: 1rem;" onclick="login()">Enter Platform →</button>
-      <button class="secondary-action" style="margin-top:10px; width: 100%; min-height: 44px; font-size: 0.92rem;" onclick="goAdmin()">Admin Login</button>
+    <div id="errorMsg" class="error-banner"></div>
 
-    </section>
-    <button onclick="window.location.href='index.html'" style="display:flex;align-items:center;justify-content:center;gap:6px;color:var(--muted);text-decoration:none;font-size:0.88rem;font-family:var(--font-family);font-weight:600;cursor:pointer;background:none;border:none;padding:0;transition:color 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Back to Welcome</button>
-  </main>
-  
+    <button class="primary-action" style="margin-top: 14px; width: 100%; min-height: 48px; font-size: 1rem;" onclick="login()">
+      Enter Platform →
+    </button>
 
+    <button class="secondary-action" style="margin-top: 10px; width: 100%; min-height: 44px; font-size: 0.9rem;" onclick="goAdmin()">
+      Admin & Educator Login
+    </button>
+  </section>
+
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    ← Back to Welcome
+  </button>
 
 </div>
 
 <script src="Api.js"></script>
 <script>
+function fillDemo() {
+  document.getElementById("name").value = "Ananya Rao";
+  document.getElementById("school").value = "Bangalore Model School";
+}
+
 async function login() {
   const name   = document.getElementById("name").value.trim();
   const school = document.getElementById("school").value.trim();
@@ -83,7 +207,7 @@ async function login() {
   errEl.style.display = "none";
 
   const btn = document.querySelector(".primary-action");
-  if (btn) { btn.textContent = "Signing in…"; btn.disabled = true; }
+  if (btn) { btn.textContent = "Connecting…"; btn.disabled = true; }
 
   try {
     await Students.login(name, school);
@@ -91,11 +215,17 @@ async function login() {
   } catch (err) {
     errEl.textContent = "Could not connect to server. Make sure the backend is running.";
     errEl.style.display = "block";
-    if (btn) { btn.textContent = "Enter Platform"; btn.disabled = false; }
+    if (btn) { btn.textContent = "Enter Platform →"; btn.disabled = false; }
   }
 }
-function goAdmin() { window.location.href = "admin-login.html"; }
-document.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+
+function goAdmin() { 
+  window.location.href = "admin-login.html"; 
+}
+
+document.addEventListener("keydown", e => { 
+  if (e.key === "Enter") login(); 
+});
 </script>
 </body>
 </html>
